@@ -230,7 +230,8 @@ def text(
         backend: auto, html, lite. Defaults to auto.
             auto - try all backends in random order,
             html - collect data from https://html.duckduckgo.com,
-            lite - collect data from https://lite.duckduckgo.com.
+            lite - collect data from https://lite.duckduckgo.com,
+            bing - collect data from https://www.bing.com.
         max_results: max number of results. If None, returns results only from the first response. Defaults to None.
 
     Returns:

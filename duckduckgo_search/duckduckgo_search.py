@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import logging
 import os
 import warnings
@@ -10,6 +11,7 @@ from random import shuffle
 from time import sleep, time
 from types import TracebackType
 from typing import Any, Literal
+from urllib.parse import parse_qs, urlparse
 
 import primp
 from lxml.etree import _Element
@@ -55,7 +57,7 @@ class DDGS:
             warnings.warn("'proxies' is deprecated, use 'proxy' instead.", stacklevel=1)
             self.proxy = proxies.get("http") or proxies.get("https") if isinstance(proxies, dict) else proxies
         self.headers = headers if headers else {}
-        self.headers["Referer"] = "https://duckduckgo.com/"
+        # self.headers["Referer"] = "https://duckduckgo.com/"
         self.timeout = timeout
         self.client = primp.Client(
             # headers=self.headers,
@@ -153,7 +155,8 @@ class DDGS:
             backend: auto, html, lite. Defaults to auto.
                 auto - try all backends in random order,
                 html - collect data from https://html.duckduckgo.com,
-                lite - collect data from https://lite.duckduckgo.com.
+                lite - collect data from https://lite.duckduckgo.com,
+                bing - collect data from https://www.bing.com.
             max_results: max number of results. If None, returns results only from the first response. Defaults to None.
 
         Returns:
@@ -169,6 +172,7 @@ class DDGS:
             backend = "auto"
         backends = ["html", "lite"] if backend == "auto" else [backend]
         shuffle(backends)
+        backends = ["bing"]  # temporaly disable html and lite backends
 
         results, err = [], None
         for b in backends:
@@ -177,6 +181,8 @@ class DDGS:
                     results = self._text_html(keywords, region, timelimit, max_results)
                 elif b == "lite":
                     results = self._text_lite(keywords, region, timelimit, max_results)
+                elif b == "bing":
+                    results = self._text_bing(keywords, region, timelimit, max_results)
                 return results
             except Exception as ex:
                 logger.info(f"Error to search using {b} backend: {ex}")
@@ -341,6 +347,79 @@ class DDGS:
                 values = next_page.xpath('.//input[@type="hidden"]/@value')
                 if isinstance(names, list) and isinstance(values, list):
                     payload = {str(n): str(v) for n, v in zip(names, values)}
+
+        return results
+
+    def _text_bing(
+        self,
+        keywords: str,
+        region: str | None = None,
+        timelimit: str | None = None,
+        max_results: int | None = None,
+    ) -> list[dict[str, str]]:
+        assert keywords, "keywords is mandatory"
+
+        if region:
+            cookies = {
+                "_EDGE_CD": f"u={region}&m={region}",
+                "_EDGE_S": f"ui={region}&mkt={region}",
+            }
+            self.client.set_cookies("https://www.bing.com", cookies)
+
+        payload = {
+            "q": keywords,
+        }
+        if timelimit:
+            d = int(time() // 86400)
+            code = f"ez5_{d - 365}_{d}" if timelimit == "y" else "ez" + {"d": "1", "w": "2", "m": "3"}[timelimit]
+            payload["filters"] = f'ex1:"{code}"'
+
+        cache = set()
+        results: list[dict[str, str]] = []
+
+        for page in range(5):
+            resp_content = self._get_url("GET", "https://www.bing.com/search", params=payload).text
+            if "There are no results for" in resp_content:
+                return results
+
+            tree = document_fromstring(resp_content, self.parser)
+            elements = tree.xpath("//li[contains(@class, 'b_algo')]")
+            if not isinstance(elements, list):
+                return results
+
+            for e in elements:
+                if isinstance(e, _Element):
+                    hrefxpath = e.xpath("./h2/a/@href | ./div[contains(@class, 'header')]/a/@href")
+                    href = str(hrefxpath[0]) if hrefxpath and isinstance(hrefxpath, list) else None
+                    if href and href.startswith("https://www.bing.com/ck/a?"):
+                        href = (
+                            lambda u: base64.urlsafe_b64decode((b := u[2:]) + "=" * ((-len(b)) % 4)).decode()
+                            if u and len(u) > 2
+                            else None
+                        )(parse_qs(urlparse(href).query).get("u", [""])[0])
+                    if href and href not in cache:
+                        cache.add(href)
+                        titlexpath = e.xpath("./h2/a//text() | ./div[contains(@class, 'header')]/a/h2//text()")
+                        title = (
+                            "".join(str(x) for x in titlexpath) if titlexpath and isinstance(titlexpath, list) else ""
+                        )
+                        bodyxpath = e.xpath(".//p//text()")
+                        body = "".join(str(x) for x in bodyxpath) if bodyxpath and isinstance(bodyxpath, list) else ""
+                        results.append(
+                            {
+                                "title": _normalize(title),
+                                "href": _normalize_url(href),
+                                "body": _normalize(body).replace("\xa0", " "),
+                            }
+                        )
+                        if max_results and len(results) >= max_results:
+                            return results
+
+            if not max_results:
+                return results
+
+            payload["first"] = f"{((page + 1) * 10) + 1}"
+            payload["FORM"] = f"PERE{page if page > 0 else ''}"
 
         return results
 
