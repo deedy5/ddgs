@@ -1,3 +1,8 @@
+# :warning: This package (`duckduckgo_search`) has been renamed to `ddgs`! Use `pip install ddgs` instead.
+
+New package: https://pypi.org/project/ddgs/
+___
+
 ![Python >= 3.9](https://img.shields.io/badge/python->=3.9-red.svg) [![](https://badgen.net/github/release/deedy5/duckduckgo_search)](https://github.com/deedy5/duckduckgo_search/releases) [![](https://badge.fury.io/py/duckduckgo-search.svg)](https://pypi.org/project/duckduckgo-search)
 # Duckduckgo_search<a name="TOP"></a>
 

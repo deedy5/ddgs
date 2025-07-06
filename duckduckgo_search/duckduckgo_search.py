@@ -50,6 +50,13 @@ class DDGS:
             timeout (int, optional): Timeout value for the HTTP client. Defaults to 10.
             verify (bool): SSL verification when making the request. Defaults to True.
         """
+        warnings.simplefilter("always")
+        warnings.warn(
+            "This package (`duckduckgo_search`) has been renamed to `ddgs`! Use `pip install ddgs` instead.",
+            RuntimeWarning,
+            stacklevel=2,
+        )
+
         ddgs_proxy: str | None = os.environ.get("DDGS_PROXY")
         self.proxy: str | None = ddgs_proxy if ddgs_proxy else _expand_proxy_tb_alias(proxy)
         assert self.proxy is None or isinstance(self.proxy, str), "proxy must be a str"
