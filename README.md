@@ -13,10 +13,10 @@ Search for text, news, images and videos using the DuckDuckGo.com search engine.
 * [DDGS class](#ddgs-class)
 * [Proxy](#proxy)
 * [Exceptions](#exceptions)
-* [1. text() - text search](#2-text---text-search-by-duckduckgocom)
-* [2. images() - image search](#3-images---image-search-by-duckduckgocom)
-* [3. videos() - video search](#4-videos---video-search-by-duckduckgocom)
-* [4. news() - news search](#5-news---news-search-by-duckduckgocom)
+* [1. text()](#1-text)
+* [2. images()](#2-images)
+* [3. videos()](#3-videos)
+* [4. news()](#4-news)
 * [Disclaimer](#disclaimer)
 
 ## Install
@@ -209,7 +209,7 @@ Exceptions:
 
 [Go To TOP](#TOP)
 
-## 1. text() - text search by duckduckgo.com
+## 1. text()
 
 ```python
 def text(
@@ -255,7 +255,7 @@ print(results)
 
 [Go To TOP](#TOP)
 
-## 2. images() - image search by duckduckgo.com
+## 2. images()
 
 ```python
 def images(
@@ -322,7 +322,7 @@ print(images)
 
 [Go To TOP](#TOP)
 
-## 3. videos() - video search by duckduckgo.com
+## 3. videos()
 
 ```python
 def videos(
@@ -389,7 +389,7 @@ print(results)
 
 [Go To TOP](#TOP)
 
-## 4. news() - news search by duckduckgo.com
+## 4. news()
 
 ```python
 def news(
