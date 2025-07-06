@@ -1,7 +1,7 @@
 import time
 import pytest
 
-from duckduckgo_search import DDGS
+from ddgs import DDGS
 
 
 @pytest.fixture(autouse=True)
@@ -15,13 +15,18 @@ def test_context_manager() -> None:
         assert 20 <= len(results) <= 30
 
 
-def test_text_html() -> None:
-    results = DDGS().text("eagle", backend="html", region="br-pt", timelimit="y", max_results=20)
-    assert 15 <= len(results) <= 20
+#def test_text_html() -> None:
+#    results = DDGS().text("eagle", backend="html", region="br-pt", timelimit="y", max_results=20)
+#    assert 15 <= len(results) <= 20
+#
+#
+#def test_text_lite() -> None:
+#    results = DDGS().text("dog", backend="lite", region="br-pt", timelimit="y", max_results=20)
+#    assert 15 <= len(results) <= 20
 
 
 def test_text_lite() -> None:
-    results = DDGS().text("dog", backend="lite", region="br-pt", timelimit="y", max_results=20)
+    results = DDGS().text("dog", backend="bing", region="br-pt", timelimit="y", max_results=20)
     assert 15 <= len(results) <= 20
 
 

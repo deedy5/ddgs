@@ -5,7 +5,7 @@ from html import unescape
 from typing import Any
 from urllib.parse import unquote
 
-from .exceptions import DuckDuckGoSearchException
+from .exceptions import DDGSException
 
 try:
     HAS_ORJSON = True
@@ -25,14 +25,14 @@ def json_dumps(obj: Any) -> str:
             else json.dumps(obj, ensure_ascii=False, indent=2)
         )
     except Exception as ex:
-        raise DuckDuckGoSearchException(f"{type(ex).__name__}: {ex}") from ex
+        raise DDGSException(f"{type(ex).__name__}: {ex}") from ex
 
 
 def json_loads(obj: str | bytes) -> Any:
     try:
         return orjson.loads(obj) if HAS_ORJSON else json.loads(obj)
     except Exception as ex:
-        raise DuckDuckGoSearchException(f"{type(ex).__name__}: {ex}") from ex
+        raise DDGSException(f"{type(ex).__name__}: {ex}") from ex
 
 
 def _extract_vqd(html_bytes: bytes, keywords: str) -> str:
@@ -48,7 +48,7 @@ def _extract_vqd(html_bytes: bytes, keywords: str) -> str:
             return html_bytes[start:end].decode()
         except ValueError:
             pass
-    raise DuckDuckGoSearchException(f"_extract_vqd() {keywords=} Could not extract vqd.")
+    raise DDGSException(f"_extract_vqd() {keywords=} Could not extract vqd.")
 
 
 def _normalize(raw_html: str) -> str:

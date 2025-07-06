@@ -9,8 +9,8 @@ from pathlib import Path
 import pytest
 from click.testing import CliRunner
 
-from duckduckgo_search import DDGS, __version__
-from duckduckgo_search.cli import _download_results, _save_csv, _save_json, cli
+from ddgs import DDGS, __version__
+from ddgs.cli import _download_results, _save_csv, _save_json, cli
 
 runner = CliRunner()
 TEXT_RESULTS = []

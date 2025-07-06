@@ -1,14 +1,13 @@
-![Python >= 3.9](https://img.shields.io/badge/python->=3.9-red.svg) [![](https://badgen.net/github/release/deedy5/duckduckgo_search)](https://github.com/deedy5/duckduckgo_search/releases) [![](https://badge.fury.io/py/duckduckgo-search.svg)](https://pypi.org/project/duckduckgo-search)
-# Duckduckgo_search<a name="TOP"></a>
+![Python >= 3.9](https://img.shields.io/badge/python->=3.9-red.svg) [![](https://badgen.net/github/release/deedy5/ddgs)](https://github.com/deedy5/ddgs/releases) [![](https://badge.fury.io/py/ddgs.svg)](https://pypi.org/project/ddgs)
+# D.D.G.S. | Dux Distributed Global Search<a name="TOP"></a>
 
-Search for text, news, images and videos using the DuckDuckGo.com search engine.
+A metasearch library that aggregates results from diverse web search services.
 
-:bangbang: AI chat moved to [duckai](https://pypi.org/project/duckai) package
 
 ## Table of Contents
 * [Install](#install)
 * [CLI version](#cli-version)
-* [Duckduckgo search operators](#duckduckgo-search-operators)
+* [DDGS search operators](#ddgs-search-operators)
 * [Regions](#regions)
 * [DDGS class](#ddgs-class)
 * [Proxy](#proxy)
@@ -21,7 +20,7 @@ Search for text, news, images and videos using the DuckDuckGo.com search engine.
 
 ## Install
 ```python
-pip install -U duckduckgo_search
+pip install -U ddgs
 ```
 
 ## CLI version
@@ -48,7 +47,7 @@ ddgs news -k "sanctions" -m 100 -t d -o json
 ```
 [Go To TOP](#TOP)
 
-## Duckduckgo search operators
+## DDGS search operators
 
 | Keywords example |	Result|
 | ---     | ---   |
@@ -144,10 +143,9 @@ ___
 
 ## DDGS class
 
-The DDGS classes is used to retrieve search results from DuckDuckGo.com.
 ```python3
 class DDGS:
-    """DuckDuckgo_search class to get search results from duckduckgo.com
+    """Dux Distributed Global Search. A metasearch library that aggregates results from diverse web search services.
 
     Args:
         headers (dict, optional): Dictionary of headers for the HTTP client. Defaults to None.
@@ -160,7 +158,7 @@ class DDGS:
 
 Here is an example of initializing the DDGS class.
 ```python3
-from duckduckgo_search import DDGS
+from ddgs import DDGS
 
 results = DDGS().text("python programming", max_results=5)
 print(results)
@@ -193,19 +191,17 @@ export DDGS_PROXY="socks5h://user:password@geo.iproyal.com:32325"
 ## Exceptions
 
 ```python
-from duckduckgo_search.exceptions import (
-    ConversationLimitException,
-    DuckDuckGoSearchException,
+from ddgs.exceptions import (
+    DDGSException,
     RatelimitException,
     TimeoutException,
 )
 ```
 
 Exceptions:
-- `DuckDuckGoSearchException`: Base exception for duckduckgo_search errors.
-- `RatelimitException`: Inherits from DuckDuckGoSearchException, raised for exceeding API request rate limits.
-- `TimeoutException`: Inherits from DuckDuckGoSearchException, raised for API request timeouts.
-- `ConversationLimitException`: Inherits from DuckDuckGoSearchException, raised for conversation limit during API requests to AI endpoint.
+- `DDGSException`: Base exception for ddgs errors.
+- `RatelimitException`: Inherits from DDGSException, raised for exceeding API request rate limits.
+- `TimeoutException`: Inherits from DDGSException, raised for API request timeouts.
 
 [Go To TOP](#TOP)
 
@@ -220,7 +216,7 @@ def text(
     backend: str = "auto",
     max_results: int | None = None,
 ) -> list[dict[str, str]]:
-    """DuckDuckGo text search generator. Query params: https://duckduckgo.com/params.
+    """DDGS text metasearch.
 
     Args:
         keywords: keywords for query.
@@ -270,7 +266,7 @@ def images(
     license_image: str | None = None,
     max_results: int | None = None,
 ) -> list[dict[str, str]]:
-    """DuckDuckGo images search. Query params: https://duckduckgo.com/params.
+    """DDGS images metasearch.
 
     Args:
         keywords: keywords for query.
@@ -335,7 +331,7 @@ def videos(
     license_videos: str | None = None,
     max_results: int | None = None,
 ) -> list[dict[str, str]]:
-    """DuckDuckGo videos search. Query params: https://duckduckgo.com/params.
+    """DDGS videos metasearch.
 
     Args:
         keywords: keywords for query.
@@ -399,7 +395,7 @@ def news(
     timelimit: str | None = None,
     max_results: int | None = None,
 ) -> list[dict[str, str]]:
-    """DuckDuckGo news search. Query params: https://duckduckgo.com/params.
+    """DDGS news metasearch.
 
     Args:
         keywords: keywords for query.
@@ -432,4 +428,4 @@ print(results)
 
 ## Disclaimer
 
-This library is not affiliated with DuckDuckGo and is for educational purposes only. It is not intended for commercial use or any purpose that violates DuckDuckGo's Terms of Service. By using this library, you acknowledge that you will not use it in a way that infringes on DuckDuckGo's terms. The official DuckDuckGo website can be found at https://duckduckgo.com.
+This library is for educational purposes only.

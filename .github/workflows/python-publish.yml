@@ -26,7 +26,7 @@ jobs:
     - name: Build and publish
       env:
         TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.duckduckgo_search }}
+        TWINE_PASSWORD: ${{ secrets.ddgs }}
       run: |
         python -m build
         twine upload dist/*

@@ -11,7 +11,7 @@ from urllib.parse import unquote
 import click
 import primp
 
-from .duckduckgo_search import DDGS
+from .ddgs import DDGS
 from .utils import _expand_proxy_tb_alias, json_dumps
 from .version import __version__
 
@@ -134,7 +134,7 @@ def _download_results(
 
 @click.group(chain=True)
 def cli() -> None:
-    """duckduckgo_search CLI tool"""
+    """DDGS CLI tool"""
     pass
 
 
@@ -153,14 +153,14 @@ def version() -> str:
 
 @cli.command()
 @click.option("-k", "--keywords", required=True, help="text search, keywords for query")
-@click.option("-r", "--region", help="us-en, ru-ru, etc. -region https://duckduckgo.com/params")
+@click.option("-r", "--region", help="us-en, ru-ru, etc. -region")
 @click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m", "y"]), help="day, week, month, year")
 @click.option("-m", "--max_results", type=int, help="maximum number of results")
 @click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
 @click.option("-d", "--download", is_flag=True, default=False, help="download results. -dd to set custom directory")
 @click.option("-dd", "--download-directory", help="Specify custom download directory")
-@click.option("-b", "--backend", default="auto", type=click.Choice(["auto", "html", "lite"]))
+@click.option("-b", "--backend", default="auto", type=click.Choice(["auto", "html", "lite", "bing"]))
 @click.option("-th", "--threads", default=10, help="download threads, default=10")
 @click.option("-p", "--proxy", help="the proxy to send requests, example: socks5://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
@@ -178,7 +178,7 @@ def text(
     proxy: str | None,
     verify: bool,
 ) -> None:
-    """CLI function to perform a text search using DuckDuckGo API."""
+    """CLI function to perform a DDGS text metasearch."""
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).text(
         keywords=keywords,
         region=region,
@@ -206,7 +206,7 @@ def text(
 
 @cli.command()
 @click.option("-k", "--keywords", required=True, help="keywords for query")
-@click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc. -region https://duckduckgo.com/params")
+@click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc.")
 @click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
 @click.option("-t", "--timelimit", type=click.Choice(["Day", "Week", "Month", "Year"]))
 @click.option("-size", "--size", type=click.Choice(["Small", "Medium", "Large", "Wallpaper"]))
@@ -264,7 +264,7 @@ def images(
     proxy: str | None,
     verify: bool,
 ) -> None:
-    """CLI function to perform a images search using DuckDuckGo API."""
+    """CLI function to perform a DDGS images metasearch."""
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).images(
         keywords=keywords,
         region=region,
@@ -296,7 +296,7 @@ def images(
 
 @cli.command()
 @click.option("-k", "--keywords", required=True, help="keywords for query")
-@click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc. -region https://duckduckgo.com/params")
+@click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc.")
 @click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m"]), help="day, week, month")
 @click.option("-res", "--resolution", type=click.Choice(["high", "standart"]))
@@ -319,7 +319,7 @@ def videos(
     proxy: str | None,
     verify: bool,
 ) -> None:
-    """CLI function to perform a videos search using DuckDuckGo API."""
+    """CLI function to perform a DDGS videos metasearch."""
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).videos(
         keywords=keywords,
         region=region,
@@ -339,7 +339,7 @@ def videos(
 
 @cli.command()
 @click.option("-k", "--keywords", required=True, help="keywords for query")
-@click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc. -region https://duckduckgo.com/params")
+@click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc.")
 @click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m", "y"]), help="day, week, month, year")
 @click.option("-m", "--max_results", type=int, help="maximum number of results")
@@ -356,7 +356,7 @@ def news(
     proxy: str | None,
     verify: bool,
 ) -> None:
-    """CLI function to perform a news search using DuckDuckGo API."""
+    """CLI function to perform a DDGS news metasearch."""
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).news(
         keywords=keywords, region=region, safesearch=safesearch, timelimit=timelimit, max_results=max_results
     )

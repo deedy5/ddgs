@@ -18,7 +18,7 @@ from lxml.etree import _Element
 from lxml.html import HTMLParser as LHTMLParser
 from lxml.html import document_fromstring
 
-from .exceptions import DuckDuckGoSearchException, RatelimitException, TimeoutException
+from .exceptions import DDGSException, RatelimitException, TimeoutException
 from .utils import (
     _expand_proxy_tb_alias,
     _extract_vqd,
@@ -27,11 +27,11 @@ from .utils import (
     json_loads,
 )
 
-logger = logging.getLogger("duckduckgo_search.DDGS")
+logger = logging.getLogger("ddgs.DDGS")
 
 
 class DDGS:
-    """DuckDuckgo_search class to get search results from duckduckgo.com."""
+    """Dux Distributed Global Search. A metasearch library that aggregates results from diverse web search services."""
 
     def __init__(
         self,
@@ -57,7 +57,6 @@ class DDGS:
             warnings.warn("'proxies' is deprecated, use 'proxy' instead.", stacklevel=1)
             self.proxy = proxies.get("http") or proxies.get("https") if isinstance(proxies, dict) else proxies
         self.headers = headers if headers else {}
-        # self.headers["Referer"] = "https://duckduckgo.com/"
         self.timeout = timeout
         self.client = primp.Client(
             # headers=self.headers,
@@ -123,13 +122,13 @@ class DDGS:
         except Exception as ex:
             if "time" in str(ex).lower():
                 raise TimeoutException(f"{url} {type(ex).__name__}: {ex}") from ex
-            raise DuckDuckGoSearchException(f"{url} {type(ex).__name__}: {ex}") from ex
+            raise DDGSException(f"{url} {type(ex).__name__}: {ex}") from ex
         logger.debug(f"_get_url() {resp.url} {resp.status_code}")
         if resp.status_code == 200:
             return resp
         elif resp.status_code in (202, 301, 403, 400, 429, 418):
             raise RatelimitException(f"{resp.url} {resp.status_code} Ratelimit")
-        raise DuckDuckGoSearchException(f"{resp.url} return None. {params=} {content=} {data=}")
+        raise DDGSException(f"{resp.url} return None. {params=} {content=} {data=}")
 
     def _get_vqd(self, keywords: str) -> str:
         """Get vqd value for a search query."""
@@ -145,7 +144,7 @@ class DDGS:
         backend: str = "auto",
         max_results: int | None = None,
     ) -> list[dict[str, str]]:
-        """DuckDuckGo text search. Query params: https://duckduckgo.com/params.
+        """DDGS text metasearch.
 
         Args:
             keywords: keywords for query.
@@ -163,9 +162,9 @@ class DDGS:
             List of dictionaries with search results, or None if there was an error.
 
         Raises:
-            DuckDuckGoSearchException: Base exception for duckduckgo_search errors.
-            RatelimitException: Inherits from DuckDuckGoSearchException, raised for exceeding API request rate limits.
-            TimeoutException: Inherits from DuckDuckGoSearchException, raised for API request timeouts.
+            DDGSException: Base exception for ddgs errors.
+            RatelimitException: Inherits from DDGSException, raised for exceeding API request rate limits.
+            TimeoutException: Inherits from DDGSException, raised for API request timeouts.
         """
         if backend in ("api", "ecosia"):
             warnings.warn(f"{backend=} is deprecated, using backend='auto'", stacklevel=2)
@@ -178,9 +177,9 @@ class DDGS:
         for b in backends:
             try:
                 if b == "html":
-                    results = self._text_html(keywords, region, timelimit, max_results)
+                    results = self._text_duckduckgo_html(keywords, region, timelimit, max_results)
                 elif b == "lite":
-                    results = self._text_lite(keywords, region, timelimit, max_results)
+                    results = self._text_duckduckgo_lite(keywords, region, timelimit, max_results)
                 elif b == "bing":
                     results = self._text_bing(keywords, region, timelimit, max_results)
                 return results
@@ -188,9 +187,9 @@ class DDGS:
                 logger.info(f"Error to search using {b} backend: {ex}")
                 err = ex
 
-        raise DuckDuckGoSearchException(err)
+        raise DDGSException(err)
 
-    def _text_html(
+    def _text_duckduckgo_html(
         self,
         keywords: str,
         region: str | None = None,
@@ -265,7 +264,7 @@ class DDGS:
 
         return results
 
-    def _text_lite(
+    def _text_duckduckgo_lite(
         self,
         keywords: str,
         region: str | None = None,
@@ -436,7 +435,7 @@ class DDGS:
         license_image: str | None = None,
         max_results: int | None = None,
     ) -> list[dict[str, str]]:
-        """DuckDuckGo images search. Query params: https://duckduckgo.com/params.
+        """DDGS images metasearch.
 
         Args:
             keywords: keywords for query.
@@ -459,9 +458,9 @@ class DDGS:
             List of dictionaries with images search results.
 
         Raises:
-            DuckDuckGoSearchException: Base exception for duckduckgo_search errors.
-            RatelimitException: Inherits from DuckDuckGoSearchException, raised for exceeding API request rate limits.
-            TimeoutException: Inherits from DuckDuckGoSearchException, raised for API request timeouts.
+            DDGSException: Base exception for ddgs errors.
+            RatelimitException: Inherits from DDGSException, raised for exceeding API request rate limits.
+            TimeoutException: Inherits from DDGSException, raised for API request timeouts.
         """
         assert keywords, "keywords is mandatory"
 
@@ -532,7 +531,7 @@ class DDGS:
         license_videos: str | None = None,
         max_results: int | None = None,
     ) -> list[dict[str, str]]:
-        """DuckDuckGo videos search. Query params: https://duckduckgo.com/params.
+        """DDGS videos metasearch.
 
         Args:
             keywords: keywords for query.
@@ -548,9 +547,9 @@ class DDGS:
             List of dictionaries with videos search results.
 
         Raises:
-            DuckDuckGoSearchException: Base exception for duckduckgo_search errors.
-            RatelimitException: Inherits from DuckDuckGoSearchException, raised for exceeding API request rate limits.
-            TimeoutException: Inherits from DuckDuckGoSearchException, raised for API request timeouts.
+            DDGSException: Base exception for ddgs errors.
+            RatelimitException: Inherits from DDGSException, raised for exceeding API request rate limits.
+            TimeoutException: Inherits from DDGSException, raised for API request timeouts.
         """
         assert keywords, "keywords is mandatory"
 
@@ -599,7 +598,7 @@ class DDGS:
         timelimit: str | None = None,
         max_results: int | None = None,
     ) -> list[dict[str, str]]:
-        """DuckDuckGo news search. Query params: https://duckduckgo.com/params.
+        """DDGS news metasearch.
 
         Args:
             keywords: keywords for query.
@@ -612,9 +611,9 @@ class DDGS:
             List of dictionaries with news search results.
 
         Raises:
-            DuckDuckGoSearchException: Base exception for duckduckgo_search errors.
-            RatelimitException: Inherits from DuckDuckGoSearchException, raised for exceeding API request rate limits.
-            TimeoutException: Inherits from DuckDuckGoSearchException, raised for API request timeouts.
+            DDGSException: Base exception for ddgs errors.
+            RatelimitException: Inherits from DDGSException, raised for exceeding API request rate limits.
+            TimeoutException: Inherits from DDGSException, raised for API request timeouts.
         """
         assert keywords, "keywords is mandatory"
 

@@ -3,12 +3,12 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "duckduckgo_search"
-description = "Search for words, documents, images, news, maps and text translation using the DuckDuckGo.com search engine."
+name = "ddgs"
+description = "Dux Distributed Global Search. A metasearch library that aggregates results from diverse web search services."
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "MIT License"}
-keywords = ["python", "duckduckgo"]
+keywords = ["python", "search", "metasearch"]
 authors = [
   {name = "deedy5"}
 ]
@@ -35,13 +35,13 @@ dependencies = [
 dynamic = ["version"]
 
 [project.urls]  # Optional
-"Homepage" = "https://github.com/deedy5/duckduckgo_search"
+"Homepage" = "https://github.com/deedy5/ddgs"
 
 [project.scripts]
-ddgs = "duckduckgo_search.cli:safe_entry_point"
+ddgs = "ddgs.cli:safe_entry_point"
 
 [tool.setuptools.dynamic]
-version = {attr = "duckduckgo_search.version.__version__"}
+version = {attr = "ddgs.version.__version__"}
 
 [project.optional-dependencies]
 dev = [
@@ -71,5 +71,5 @@ strict = true
 exclude = ["build/"]
 
 [[tool.mypy.overrides]]
-module = "duckduckgo_search.cli"
+module = "ddgs.cli"
 warn_unused_ignores = false
