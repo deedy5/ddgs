@@ -41,7 +41,7 @@ dynamic = ["version"]
 ddgs = "ddgs.cli:safe_entry_point"
 
 [tool.setuptools.dynamic]
-version = {attr = "ddgs.version.__version__"}
+version = {attr = "ddgs.__version__"}
 
 [project.optional-dependencies]
 dev = [
