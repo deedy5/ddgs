@@ -9,7 +9,7 @@ from ..results import SearchResult
 
 
 class Duckduckgo(BaseSearchEngine):
-    """Duckdcukgo search engine"""
+    """Duckduckgo search engine"""
 
     search_url = "https://html.duckduckgo.com/html/"
     search_method = "POST"
@@ -17,16 +17,15 @@ class Duckduckgo(BaseSearchEngine):
     items_xpath = "//div[contains(@class, 'body')]"
     elements_xpath = {"title": ".//h2//text()", "href": "./a/@href", "body": "./a//text()"}
 
-    def build_payload(self, **kwargs: Any) -> dict[str, Any]:
-        return {
-            "q": kwargs["query"],
-            "s": "0",
-            "o": "json",
-            "api": "d.js",
-            "vqd": "",
-            "kl": "wt-wt",
-            "bing_market": "wt-wt",
-        }
+    def build_payload(self, query: str, region: str | None, timelimit: str | None, page: int) -> dict[str, Any]:
+        payload = {"q": query, "b": ""}
+        if region:
+            payload["l"] = region
+        if page > 1:
+            payload["s"] = f"{10 + (page - 2) * 15}"
+        if timelimit:
+            payload["df"] = timelimit
+        return payload
 
     def extract_results(self, tree: html.Element) -> list[dict[str, Any]]:
         """Extract search results from lxml tree"""

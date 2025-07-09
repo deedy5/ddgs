@@ -22,15 +22,23 @@ class Bing(BaseSearchEngine):
         "body": ".//p//text()",
     }
 
-    def build_params(self, **kwargs: Any) -> dict[str, Any]:
-        payload = {
-            "q": kwargs["query"],
-        }
-        if timelimit := kwargs.get("timelimit"):
+    def build_params(self, query: str, region: str | None, timelimit: str | None, page: int) -> dict[str, Any]:
+        params = {"q": query}
+        if region:
+            params["cc"] = region.split("-")[0]
+            cookies = {
+                "_EDGE_CD": f"u={region}&m={region}",
+                "_EDGE_S": f"ui={region}&mkt={region}",
+            }
+            self.http_client.client.set_cookies("https://www.bing.com", cookies)
+        if timelimit:
             d = int(time() // 86400)
             code = f"ez5_{d - 365}_{d}" if timelimit == "y" else "ez" + {"d": "1", "w": "2", "m": "3"}[timelimit]
-            payload["filters"] = f'ex1:"{code}"'
-        return payload
+            params["filters"] = f'ex1:"{code}"'
+        if page > 1:
+            params["first"] = f"{(page - 1) * 10}"
+            params["FORM"] = f"PERE{page - 2 if page > 2 else ''}"
+        return params
 
     def extract_results(self, tree: html.Element) -> list[dict[str, Any]]:
         """Extract search results from lxml tree"""

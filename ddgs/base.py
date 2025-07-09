@@ -20,14 +20,14 @@ class BaseSearchEngine(ABC):
         self.http_client = HttpClient(proxy=proxy, timeout=timeout)
         self.results: list[SearchResult] = []
 
-    def build_params(self, **kwargs: Any) -> dict[str, Any]:
+    def build_params(self, query: str, region: str | None, timelimit: str | None, page: int) -> dict[str, Any]:
         """
         Override in GET-based engines.
         Return an empty dict by default.
         """
         return {}
 
-    def build_payload(self, **kwargs: Any) -> dict[str, Any]:
+    def build_payload(self, query: str, region: str | None, timelimit: str | None, page: int) -> dict[str, Any]:
         """
         Override in POST-based engines.
         Return an empty dict by default.
@@ -59,10 +59,12 @@ class BaseSearchEngine(ABC):
         """Extract search results from lxml tree"""
         raise NotImplementedError
 
-    def search(self, query: str) -> list[dict[str, Any]] | None:
+    def search(
+        self, query: str, region: str | None = None, timelimit: str | None = None, page: int = 1
+    ) -> list[dict[str, Any]] | None:
         """Search the engine"""
-        params = self.build_params(query=query)
-        payload = self.build_payload(query=query)
+        params = self.build_params(query=query, region=region, timelimit=timelimit, page=page)
+        payload = self.build_payload(query=query, region=region, timelimit=timelimit, page=page)
         html_text = self.request(self.search_method, self.search_url, params=params, data=payload)
         if html_text:
             tree = self.parse_tree(html_text)
