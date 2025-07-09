@@ -10,6 +10,7 @@ from lxml.etree import HTMLParser as LHTMLParser
 
 from .http_client import HttpClient
 from .results import SearchResult
+from .utils import _normalize_text, _normalize_url
 
 
 class BaseSearchEngine(ABC):
@@ -59,6 +60,13 @@ class BaseSearchEngine(ABC):
         """Extract search results from lxml tree"""
         raise NotImplementedError
 
+    def normalize_results(self, results: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        for result in results:
+            result["title"] = _normalize_text(result["title"])
+            result["href"] = _normalize_url(result["href"])
+            result["body"] = _normalize_text(result["body"])
+        return results
+
     def search(
         self, query: str, region: str | None = None, timelimit: str | None = None, page: int = 1
     ) -> list[dict[str, Any]] | None:
@@ -69,5 +77,6 @@ class BaseSearchEngine(ABC):
         if html_text:
             tree = self.parse_tree(html_text)
             results = self.extract_results(tree)
+            results = self.normalize_results(results)
             return results
         return None
