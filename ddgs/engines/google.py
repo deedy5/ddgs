@@ -36,15 +36,19 @@ class Google(BaseSearchEngine):
         "body": "./div[2]//text()",
     }
 
-    def build_params(self, **kwargs: Any) -> dict[str, Any]:
-        start = kwargs.get("start", 0)
-        payload = {
-            "q": kwargs["query"],
+    def build_params(self, query: str, region: str | None, timelimit: str | None, page: int) -> dict[str, Any]:
+        start = (page - 1) * 10
+        params = {
+            "q": query,
             "start": str(start),
             "asearch": "arc",
             "async": ui_async(start),
         }
-        return payload
+        if region:
+            params["hl"] = f"{region.split('-')[1]}-{region.split('-')[0].upper()}"
+        if timelimit:
+            params["tbs"] = f"qdr:{timelimit}"
+        return params
 
     def extract_results(self, tree: html.Element) -> list[dict[str, Any]]:
         """Extract search results from lxml tree"""
