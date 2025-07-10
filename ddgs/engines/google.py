@@ -5,7 +5,6 @@ from random import choices
 from time import time
 from typing import Any
 
-
 from ..base import BaseSearchEngine
 from ..results import TextResult
 
