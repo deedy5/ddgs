@@ -49,7 +49,7 @@ ddgs news -k "sanctions" -m 100 -t d -o json
 
 ## DDGS search operators
 
-| Keywords example |	Result|
+| Query example |	Result|
 | ---     | ---   |
 | cats dogs |	Results about cats or dogs |
 | "cats and dogs" |	Results for exact term "cats and dogs". If no results are found, related results are shown. |
@@ -148,7 +148,6 @@ class DDGS:
     """Dux Distributed Global Search. A metasearch library that aggregates results from diverse web search services.
 
     Args:
-        headers (dict, optional): Dictionary of headers for the HTTP client. Defaults to None.
         proxy (str, optional): proxy for the HTTP client, supports http/https/socks5 protocols.
             example: "http://user:pass@example.com:3128". Defaults to None.
         timeout (int, optional): Timeout value for the HTTP client. Defaults to 10.
@@ -209,26 +208,26 @@ Exceptions:
 
 ```python
 def text(
-    keywords: str,
+    query: str,
     region: str | None = None,
     safesearch: str = "moderate",
     timelimit: str | None = None,
+    page: int = 1,
     backend: str = "auto",
-    max_results: int | None = None,
 ) -> list[dict[str, str]]:
     """DDGS text metasearch.
 
     Args:
-        keywords: keywords for query.
+        query: text search query.
         region: us-en, uk-en, ru-ru, etc. Defaults to None.
         safesearch: on, moderate, off. Defaults to "moderate".
         timelimit: d, w, m, y. Defaults to None.
-        backend: auto, html, lite. Defaults to auto.
+        page: page of results. Defaults to 1.
+        backend: auto, bing, duckduckgo, google. Defaults to auto.
             auto - try all backends in random order,
-            html - collect data from https://html.duckduckgo.com,
-            lite - collect data from https://lite.duckduckgo.com,
-            bing - collect data from https://www.bing.com.
-        max_results: max number of results. If None, returns results only from the first response. Defaults to None.
+            bing - collect data from https://www.bing.com,
+            duckduckgo - collect data from https://html.duckduckgo.com,
+            google - collect data from https://www.google.com.
 
     Returns:
         List of dictionaries with search results.
@@ -236,9 +235,9 @@ def text(
 ```
 ***Example***
 ```python
-results = DDGS().text('live free or die', region='wt-wt', safesearch='off', timelimit='y', max_results=10)
+results = DDGS().text('live free or die', region='wt-wt', safesearch='off', timelimit='y', page=1, backend="auto")
 # Searching for pdf files
-results = DDGS().text('russia filetype:pdf', region='wt-wt', safesearch='off', timelimit='y', max_results=10)
+results = DDGS().text('russia filetype:pdf', region='wt-wt', safesearch='off', timelimit='y', page=1, backend="auto")
 print(results)
 [
     {
@@ -255,24 +254,29 @@ print(results)
 
 ```python
 def images(
-    keywords: str,
+    query: str,
     region: str = "us-en",
     safesearch: str = "moderate",
     timelimit: str | None = None,
+    page: int = 1,
+    backend: str = "auto",
     size: str | None = None,
     color: str | None = None,
     type_image: str | None = None,
     layout: str | None = None,
     license_image: str | None = None,
-    max_results: int | None = None,
 ) -> list[dict[str, str]]:
     """DDGS images metasearch.
 
     Args:
-        keywords: keywords for query.
+        query: images search query.
         region: us-en, uk-en, ru-ru, etc. Defaults to "us-en".
         safesearch: on, moderate, off. Defaults to "moderate".
-        timelimit: Day, Week, Month, Year. Defaults to None.
+        timelimit: d, w, m, y. Defaults to None.
+        page: page of results. Defaults to 1.
+        backend: auto, duckduckgo. Defaults to auto.
+            auto - try all backends in random order,
+            duckduckgo - collect data from https://duckduckgo.com.
         size: Small, Medium, Large, Wallpaper. Defaults to None.
         color: color, Monochrome, Red, Orange, Yellow, Green, Blue,
             Purple, Pink, Brown, Black, Gray, Teal, White. Defaults to None.
@@ -283,7 +287,6 @@ def images(
             Share (Free to Share and Use), ShareCommercially (Free to Share and Use Commercially),
             Modify (Free to Modify, Share, and Use), ModifyCommercially (Free to Modify, Share, and
             Use Commercially). Defaults to None.
-        max_results: max number of results. If None, returns results only from the first response. Defaults to None.
 
     Returns:
         List of dictionaries with images search results.
@@ -292,15 +295,17 @@ def images(
 ***Example***
 ```python
 results = DDGS().images(
-    keywords="butterfly",
-    region="wt-wt",
+    query="butterfly",
+    region="en-us",
     safesearch="off",
+    timelimit="m",
+    page=1,
+    backend="auto",
     size=None,
     color="Monochrome",
     type_image=None,
     layout=None,
     license_image=None,
-    max_results=100,
 )
 print(images)
 [
@@ -322,26 +327,30 @@ print(images)
 
 ```python
 def videos(
-    keywords: str,
+    query: str,
     region: str = "us-en",
     safesearch: str = "moderate",
     timelimit: str | None = None,
+    page: int = 1,
+    backend: str = "auto",
     resolution: str | None = None,
     duration: str | None = None,
     license_videos: str | None = None,
-    max_results: int | None = None,
 ) -> list[dict[str, str]]:
     """DDGS videos metasearch.
 
     Args:
-        keywords: keywords for query.
+        query: videos search query.
         region: us-en, uk-en, ru-ru, etc. Defaults to "us-en".
         safesearch: on, moderate, off. Defaults to "moderate".
         timelimit: d, w, m. Defaults to None.
+        page: page of results. Defaults to 1.
+        backend: auto, duckduckgo. Defaults to auto.
+            auto - try all backends in random order,
+            duckduckgo - collect data from https://duckduckgo.com.
         resolution: high, standart. Defaults to None.
         duration: short, medium, long. Defaults to None.
         license_videos: creativeCommon, youtube. Defaults to None.
-        max_results: max number of results. If None, returns results only from the first response. Defaults to None.
 
     Returns:
         List of dictionaries with videos search results.
@@ -350,13 +359,14 @@ def videos(
 ***Example***
 ```python
 results = DDGS().videos(
-    keywords="cars",
-    region="wt-wt",
+    query="cars",
+    region="us-en",
     safesearch="off",
     timelimit="w",
+    page=1,
+    backend="auto",
     resolution="high",
     duration="medium",
-    max_results=100,
 )
 print(results)
 [
@@ -389,20 +399,24 @@ print(results)
 
 ```python
 def news(
-    keywords: str,
+    query: str,
     region: str = "us-en",
     safesearch: str = "moderate",
     timelimit: str | None = None,
-    max_results: int | None = None,
+    page: int = 1,
+    backend: str = "auto",
 ) -> list[dict[str, str]]:
     """DDGS news metasearch.
 
     Args:
-        keywords: keywords for query.
+        query: news search query.
         region: us-en, uk-en, ru-ru, etc. Defaults to "us-en".
         safesearch: on, moderate, off. Defaults to "moderate".
         timelimit: d, w, m. Defaults to None.
-        max_results: max number of results. If None, returns results only from the first response. Defaults to None.
+        page: page of results. Defaults to 1.
+        backend: auto, duckduckgo. Defaults to auto.
+            auto - try all backends in random order,
+            duckduckgo - collect data from https://duckduckgo.com.
 
     Returns:
         List of dictionaries with news search results.
@@ -410,7 +424,7 @@ def news(
 ```
 ***Example***
 ```python
-results = DDGS().news(keywords="sun", region="wt-wt", safesearch="off", timelimit="m", max_results=20)
+results = DDGS().news(query="sun", region="wt-wt", safesearch="off", timelimit="m", page=1, backend="auto")
 print(results)
 [
     {
