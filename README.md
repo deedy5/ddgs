@@ -212,6 +212,7 @@ def text(
     region: str | None = None,
     safesearch: str = "moderate",
     timelimit: str | None = None,
+    num_results: int | None = None,
     page: int = 1,
     backend: str = "auto",
 ) -> list[dict[str, str]]:
@@ -222,6 +223,7 @@ def text(
         region: us-en, uk-en, ru-ru, etc. Defaults to None.
         safesearch: on, moderate, off. Defaults to "moderate".
         timelimit: d, w, m, y. Defaults to None.
+        num_results: number of results. Defaults to None.
         page: page of results. Defaults to 1.
         backend: auto, bing, duckduckgo, google. Defaults to auto.
             auto - try all backends in random order,
@@ -258,6 +260,7 @@ def images(
     region: str = "us-en",
     safesearch: str = "moderate",
     timelimit: str | None = None,
+    num_results: int | None = None,
     page: int = 1,
     backend: str = "auto",
     size: str | None = None,
@@ -273,6 +276,7 @@ def images(
         region: us-en, uk-en, ru-ru, etc. Defaults to "us-en".
         safesearch: on, moderate, off. Defaults to "moderate".
         timelimit: d, w, m, y. Defaults to None.
+        num_results: number of results. Defaults to None.
         page: page of results. Defaults to 1.
         backend: auto, duckduckgo. Defaults to auto.
             auto - try all backends in random order,
@@ -331,6 +335,7 @@ def videos(
     region: str = "us-en",
     safesearch: str = "moderate",
     timelimit: str | None = None,
+    num_results: int | None = None,
     page: int = 1,
     backend: str = "auto",
     resolution: str | None = None,
@@ -344,6 +349,7 @@ def videos(
         region: us-en, uk-en, ru-ru, etc. Defaults to "us-en".
         safesearch: on, moderate, off. Defaults to "moderate".
         timelimit: d, w, m. Defaults to None.
+        num_results: number of results. Defaults to None.
         page: page of results. Defaults to 1.
         backend: auto, duckduckgo. Defaults to auto.
             auto - try all backends in random order,
@@ -403,6 +409,7 @@ def news(
     region: str = "us-en",
     safesearch: str = "moderate",
     timelimit: str | None = None,
+    num_results: int | None = None,
     page: int = 1,
     backend: str = "auto",
 ) -> list[dict[str, str]]:
@@ -413,6 +420,7 @@ def news(
         region: us-en, uk-en, ru-ru, etc. Defaults to "us-en".
         safesearch: on, moderate, off. Defaults to "moderate".
         timelimit: d, w, m. Defaults to None.
+        num_results: number of results. Defaults to None.
         page: page of results. Defaults to 1.
         backend: auto, duckduckgo. Defaults to auto.
             auto - try all backends in random order,
