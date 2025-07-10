@@ -5,7 +5,6 @@ from time import time
 from typing import Any
 from urllib.parse import parse_qs, urlparse
 
-
 from ..base import BaseSearchEngine
 from ..results import TextResult
 
