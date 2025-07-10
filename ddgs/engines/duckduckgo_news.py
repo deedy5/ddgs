@@ -1,0 +1,52 @@
+from __future__ import annotations
+
+from typing import Any
+
+from ..base import BaseSearchEngine
+from ..results import NewsResult
+from ..utils import _extract_vqd
+
+
+class DuckduckgoNews(BaseSearchEngine):
+    """Duckduckgo news search engine"""
+
+    search_url = "https://duckduckgo.com/news.js"
+    search_method = "GET"
+
+    elements = ["date", "title", "body", "url", "image", "source"]
+
+    def _get_vqd(self, query: str) -> str:
+        """Get vqd value for a search query using DuckDuckGo."""
+        resp_content = self.http_client.request("GET", "https://duckduckgo.com", params={"q": query}).content
+        return _extract_vqd(resp_content, query)
+
+    def build_payload(
+        self, query: str, region: str | None, safesearch: str, timelimit: str | None, page: int, **kwargs: Any
+    ) -> dict[str, Any]:
+        safesearch_base = {"on": "1", "moderate": "-1", "off": "-2"}
+        payload = {
+            "l": region,
+            "o": "json",
+            "noamp": "1",
+            "q": query,
+            "vqd": self._get_vqd(query),
+            "p": safesearch_base[safesearch.lower()],
+        }
+        if timelimit:
+            payload["df"] = timelimit
+        if page > 1:
+            payload["s"] = f"{(page - 1) * 30}"
+        return payload
+
+    def extract_results(self, html_text: str) -> list[dict[str, Any]]:
+        """Extract search results from lxml tree"""
+        json_data = self.extract_json(html_text)
+        items = json_data.get("results", [])
+        results = []
+        for item in items:
+            result = NewsResult()
+            for key in self.elements:
+                data = item.get(key)
+                result.__setattr__(key, data)
+            results.append(result.__dict__)
+        return results

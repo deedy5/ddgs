@@ -5,10 +5,9 @@ from random import choices
 from time import time
 from typing import Any
 
-from lxml import html
 
 from ..base import BaseSearchEngine
-from ..results import SearchResult
+from ..results import TextResult
 
 _arcid_random = None  # (random_part, timestamp)
 
@@ -36,26 +35,29 @@ class Google(BaseSearchEngine):
         "body": "./div[2]//text()",
     }
 
-    def build_params(self, query: str, region: str | None, timelimit: str | None, page: int) -> dict[str, Any]:
+    def build_payload(
+        self, query: str, region: str | None, safesearch: str, timelimit: str | None, page: int, **kwargs: Any
+    ) -> dict[str, Any]:
         start = (page - 1) * 10
-        params = {
+        payload = {
             "q": query,
             "start": str(start),
             "asearch": "arc",
             "async": ui_async(start),
         }
         if region:
-            params["hl"] = f"{region.split('-')[1]}-{region.split('-')[0].upper()}"
+            payload["hl"] = f"{region.split('-')[1]}-{region.split('-')[0].upper()}"
         if timelimit:
-            params["tbs"] = f"qdr:{timelimit}"
-        return params
+            payload["tbs"] = f"qdr:{timelimit}"
+        return payload
 
-    def extract_results(self, tree: html.Element) -> list[dict[str, Any]]:
-        """Extract search results from lxml tree"""
+    def extract_results(self, html_text: str) -> list[dict[str, Any]]:
+        """Extract search results from html text"""
+        tree = self.extract_tree(html_text)
         items = tree.xpath(self.items_xpath)
         results = []
         for item in items:
-            result = SearchResult()
+            result = TextResult()
             for key, value in self.elements_xpath.items():
                 data = item.xpath(value)
                 data = "".join(x for x in data if x.strip())

@@ -4,6 +4,24 @@ from html import unescape
 from typing import Literal
 from urllib.parse import unquote
 
+from .exceptions import DDGSException
+
+
+def _extract_vqd(html_bytes: bytes, keywords: str) -> str:
+    """Extract vqd from html bytes."""
+    for c1, c1_len, c2 in (
+        (b'vqd="', 5, b'"'),
+        (b"vqd=", 4, b"&"),
+        (b"vqd='", 5, b"'"),
+    ):
+        try:
+            start = html_bytes.index(c1) + c1_len
+            end = html_bytes.index(c2, start)
+            return html_bytes[start:end].decode()
+        except ValueError:
+            pass
+    raise DDGSException(f"_extract_vqd() {keywords=} Could not extract vqd.")
+
 
 def _normalize_url(url: str) -> str:
     """Unquote URL and replace spaces with '+'."""
@@ -25,6 +43,8 @@ def _normalize_text(
     Returns:
         The normalized text as a string.
     """
+    if raw is None:
+        return ""
 
     s = unescape(raw)
 
