@@ -4,6 +4,7 @@ from typing import Any
 
 from .base import BaseSearchEngine
 from .engines import images_engines_dict, news_engines_dict, text_engines_dict, videos_engines_dict
+from .engines.google import Google
 
 
 class DDGS:
@@ -36,6 +37,8 @@ class DDGS:
         if backend == "auto":
             engines: list[BaseSearchEngine] = self._engines.get(category, [])
             for engine in engines:
+                if category == "text" and not isinstance(engine, Google):  # only google for text search, TODO: fix
+                    continue
                 engine_results = engine.search(
                     query, region=region, safesearch=safesearch, timelimit=timelimit, page=page, **kwargs
                 )
