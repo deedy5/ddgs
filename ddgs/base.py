@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import logging
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
@@ -23,8 +22,8 @@ class BaseSearchEngine(ABC):
     elements_xpath: dict[str, str]
     elements: list[str]
 
-    def __init__(self, proxy: str | None = None, timeout: int | None = None):
-        self.http_client = HttpClient(proxy=proxy, timeout=timeout)
+    def __init__(self, proxy: str | None = None, timeout: int | None = None, verify: bool = True):
+        self.http_client = HttpClient(proxy=proxy, timeout=timeout, verify=verify)
         self.results: list[TextResult | ImagesResult] = []
 
     @abstractmethod
@@ -52,10 +51,6 @@ class BaseSearchEngine(ABC):
     def extract_tree(self, html_text: str) -> html.Element:
         """Extract html tree from html text"""
         return html.fromstring(html_text, parser=self.parser)
-
-    def extract_json(self, html_text: str) -> Any:
-        """Extract json data from html text"""
-        return json.loads(html_text)
 
     @abstractmethod
     def extract_results(self, html_text: str) -> list[dict[str, Any]]:

@@ -4,7 +4,7 @@ from typing import Any
 
 from ..base import BaseSearchEngine
 from ..results import NewsResult
-from ..utils import _extract_vqd
+from ..utils import _extract_vqd, json_loads
 
 
 class DuckduckgoNews(BaseSearchEngine):
@@ -21,7 +21,7 @@ class DuckduckgoNews(BaseSearchEngine):
         return _extract_vqd(resp_content, query)
 
     def build_payload(
-        self, query: str, region: str | None, safesearch: str, timelimit: str | None, page: int, **kwargs: Any
+        self, query: str, region: str | None, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
         safesearch_base = {"on": "1", "moderate": "-1", "off": "-2"}
         payload = {
@@ -40,7 +40,7 @@ class DuckduckgoNews(BaseSearchEngine):
 
     def extract_results(self, html_text: str) -> list[dict[str, Any]]:
         """Extract search results from lxml tree"""
-        json_data = self.extract_json(html_text)
+        json_data = json_loads(html_text)
         items = json_data.get("results", [])
         results = []
         for item in items:

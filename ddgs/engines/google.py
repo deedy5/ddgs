@@ -35,7 +35,7 @@ class Google(BaseSearchEngine):
     }
 
     def build_payload(
-        self, query: str, region: str | None, safesearch: str, timelimit: str | None, page: int, **kwargs: Any
+        self, query: str, region: str | None, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
         start = (page - 1) * 10
         payload = {

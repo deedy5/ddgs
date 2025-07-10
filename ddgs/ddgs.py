@@ -7,12 +7,12 @@ from .engines import images_engines_dict, news_engines_dict, text_engines_dict, 
 
 
 class DDGS:
-    def __init__(self, proxy: str | None = None, timeout: int | None = None):
+    def __init__(self, proxy: str | None = None, timeout: int | None = None, verify: bool = True):
         self._engines: dict[str, list[BaseSearchEngine]] = {
-            "text": [E(proxy, timeout) for E in text_engines_dict.values()],
-            "images": [E(proxy, timeout) for E in images_engines_dict.values()],
-            "news": [E(proxy, timeout) for E in news_engines_dict.values()],
-            "videos": [E(proxy, timeout) for E in videos_engines_dict.values()],
+            "text": [E(proxy, timeout, verify) for E in text_engines_dict.values()],
+            "images": [E(proxy, timeout, verify) for E in images_engines_dict.values()],
+            "news": [E(proxy, timeout, verify) for E in news_engines_dict.values()],
+            "videos": [E(proxy, timeout, verify) for E in videos_engines_dict.values()],
         }
 
     def _search(
@@ -24,6 +24,7 @@ class DDGS:
         safesearch: str = "moderate",
         timelimit: str | None = None,
         page: int = 1,
+        backend: str = "auto",
         **kwargs: Any,
     ) -> list[dict[str, Any]]:
         """
@@ -32,13 +33,14 @@ class DDGS:
         """
         results: list[dict[str, Any]] = []
 
-        engines: list[BaseSearchEngine] = self._engines.get(category, [])
-        for engine in engines:
-            engine_results = engine.search(
-                query, region=region, safesearch=safesearch, timelimit=timelimit, page=page, **kwargs
-            )
-            if engine_results:
-                results.extend(engine_results)
+        if backend == "auto":
+            engines: list[BaseSearchEngine] = self._engines.get(category, [])
+            for engine in engines:
+                engine_results = engine.search(
+                    query, region=region, safesearch=safesearch, timelimit=timelimit, page=page, **kwargs
+                )
+                if engine_results:
+                    results.extend(engine_results)
 
         return results
 
@@ -49,6 +51,7 @@ class DDGS:
         safesearch: str = "moderate",
         timelimit: str | None = None,
         page: int = 1,
+        backend: str = "auto",
     ) -> list[dict[str, Any]]:
         return self._search(
             "text",
@@ -57,6 +60,7 @@ class DDGS:
             safesearch=safesearch,
             timelimit=timelimit,
             page=page,
+            backend=backend,
         )
 
     def images(
@@ -66,6 +70,7 @@ class DDGS:
         safesearch: str = "moderate",
         timelimit: str | None = None,
         page: int = 1,
+        backend: str = "auto",
         **kwargs: Any,
     ) -> list[dict[str, Any]]:
         return self._search(
@@ -75,6 +80,7 @@ class DDGS:
             safesearch=safesearch,
             timelimit=timelimit,
             page=page,
+            backend=backend,
             **kwargs,
         )
 
@@ -85,6 +91,7 @@ class DDGS:
         safesearch: str = "moderate",
         timelimit: str | None = None,
         page: int = 1,
+        backend: str = "auto",
         **kwargs: Any,
     ) -> list[dict[str, Any]]:
         return self._search(
@@ -94,6 +101,7 @@ class DDGS:
             safesearch=safesearch,
             timelimit=timelimit,
             page=page,
+            backend=backend,
             **kwargs,
         )
 
@@ -104,6 +112,7 @@ class DDGS:
         safesearch: str = "moderate",
         timelimit: str | None = None,
         page: int = 1,
+        backend: str = "auto",
         **kwargs: Any,
     ) -> list[dict[str, Any]]:
         return self._search(
@@ -113,5 +122,6 @@ class DDGS:
             safesearch=safesearch,
             timelimit=timelimit,
             page=page,
+            backend=backend,
             **kwargs,
         )
