@@ -2,10 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from lxml import html
-
 from ..base import BaseSearchEngine
-from ..results import SearchResult
+from ..results import TextResult
 
 
 class Duckduckgo(BaseSearchEngine):
@@ -17,7 +15,9 @@ class Duckduckgo(BaseSearchEngine):
     items_xpath = "//div[contains(@class, 'body')]"
     elements_xpath = {"title": ".//h2//text()", "href": "./a/@href", "body": "./a//text()"}
 
-    def build_payload(self, query: str, region: str | None, timelimit: str | None, page: int) -> dict[str, Any]:
+    def build_payload(
+        self, query: str, region: str | None, safesearch: str, timelimit: str | None, page: int, **kwargs: Any
+    ) -> dict[str, Any]:
         payload = {"q": query, "b": ""}
         if region:
             payload["l"] = region
@@ -27,12 +27,13 @@ class Duckduckgo(BaseSearchEngine):
             payload["df"] = timelimit
         return payload
 
-    def extract_results(self, tree: html.Element) -> list[dict[str, Any]]:
-        """Extract search results from lxml tree"""
+    def extract_results(self, html_text: str) -> list[dict[str, Any]]:
+        """Extract search results from html text"""
+        tree = self.extract_tree(html_text)
         items = tree.xpath(self.items_xpath)
         results = []
         for item in items:
-            result = SearchResult()
+            result = TextResult()
             for key, value in self.elements_xpath.items():
                 data = item.xpath(value)
                 data = "".join(x for x in data if x.strip())

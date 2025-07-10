@@ -1,0 +1,62 @@
+from __future__ import annotations
+
+from typing import Any
+
+from ..base import BaseSearchEngine
+from ..results import ImagesResult
+from ..utils import _extract_vqd
+
+
+class DuckduckgoImages(BaseSearchEngine):
+    """Duckduckgo images search engine"""
+
+    search_url = "https://duckduckgo.com/i.js"
+    search_method = "GET"
+    search_headers = {"Referer": "https://duckduckgo.com/", "Sec-Fetch-Mode": "cors"}
+
+    elements = ["title", "image", "thumbnail", "url", "height", "width", "source"]
+
+    def _get_vqd(self, query: str) -> str:
+        """Get vqd value for a search query using DuckDuckGo."""
+        resp_content = self.http_client.request("GET", "https://duckduckgo.com", params={"q": query}).content
+        return _extract_vqd(resp_content, query)
+
+    def build_payload(
+        self, query: str, region: str | None, safesearch: str, timelimit: str | None, page: int, **kwargs: Any
+    ) -> dict[str, Any]:
+        safesearch_base = {"on": "1", "moderate": "1", "off": "-1"}
+        timelimit = f"time:{timelimit}" if timelimit else ""
+        size = kwargs.get("size")
+        size = f"size:{size}" if size else ""
+        color = kwargs.get("color")
+        color = f"color:{color}" if color else ""
+        type_image = kwargs.get("type_image")
+        type_image = f"type:{type_image}" if type_image else ""
+        layout = kwargs.get("layout")
+        layout = f"layout:{layout}" if layout else ""
+        license_image = kwargs.get("license_image")
+        license_image = f"license:{license_image}" if license_image else ""
+        payload = {
+            "o": "json",
+            "q": query,
+            "l": region,
+            "vqd": self._get_vqd(query),
+            "p": safesearch_base[safesearch.lower()],
+            # "f": f"{timelimit},{size},{color},{type_image},{layout},{license_image}",
+        }
+        if page > 1:
+            payload["s"] = f"{(page - 1) * 100}"
+        return payload
+
+    def extract_results(self, html_text: str) -> list[dict[str, Any]]:
+        """Extract search results from html text"""
+        json_data = self.extract_json(html_text)
+        items = json_data.get("results", [])
+        results = []
+        for item in items:
+            result = ImagesResult()
+            for key in self.elements:
+                data = item.get(key)
+                result.__setattr__(key, data)
+            results.append(result.__dict__)
+        return results

@@ -5,10 +5,9 @@ from time import time
 from typing import Any
 from urllib.parse import parse_qs, urlparse
 
-from lxml import html
 
 from ..base import BaseSearchEngine
-from ..results import SearchResult
+from ..results import TextResult
 
 
 class Bing(BaseSearchEngine):
@@ -24,10 +23,12 @@ class Bing(BaseSearchEngine):
         "body": ".//p//text()",
     }
 
-    def build_params(self, query: str, region: str | None, timelimit: str | None, page: int) -> dict[str, Any]:
-        params = {"q": query}
+    def build_payload(
+        self, query: str, region: str | None, safesearch: str, timelimit: str | None, page: int, **kwargs: Any
+    ) -> dict[str, Any]:
+        payload = {"q": query}
         if region:
-            params["cc"] = region.split("-")[0]
+            payload["cc"] = region.split("-")[0]
             cookies = {
                 "_EDGE_CD": f"u={region}&m={region}",
                 "_EDGE_S": f"ui={region}&mkt={region}",
@@ -36,18 +37,19 @@ class Bing(BaseSearchEngine):
         if timelimit:
             d = int(time() // 86400)
             code = f"ez5_{d - 365}_{d}" if timelimit == "y" else "ez" + {"d": "1", "w": "2", "m": "3"}[timelimit]
-            params["filters"] = f'ex1:"{code}"'
+            payload["filters"] = f'ex1:"{code}"'
         if page > 1:
-            params["first"] = f"{(page - 1) * 10}"
-            params["FORM"] = f"PERE{page - 2 if page > 2 else ''}"
-        return params
+            payload["first"] = f"{(page - 1) * 10}"
+            payload["FORM"] = f"PERE{page - 2 if page > 2 else ''}"
+        return payload
 
-    def extract_results(self, tree: html.Element) -> list[dict[str, Any]]:
-        """Extract search results from lxml tree"""
+    def extract_results(self, html_text: str) -> list[dict[str, Any]]:
+        """Extract search results from html text"""
+        tree = self.extract_tree(html_text)
         items = tree.xpath(self.items_xpath)
         results = []
         for item in items:
-            result = SearchResult()
+            result = TextResult()
             for key, value in self.elements_xpath.items():
                 data = item.xpath(value)
                 data = "".join(x for x in data if x.strip())
