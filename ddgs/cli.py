@@ -152,10 +152,13 @@ def version() -> str:
 
 
 @cli.command()
-@click.option("-q", "--query", required=True, help="text search query")
+@click.option("-q", "--query", help="text search query")
+@click.option("-k", "--keywords", help="text search query", deprecated=True)  # deprecated
 @click.option("-r", "--region", help="us-en, ru-ru, etc. -region")
 @click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m", "y"]), help="day, week, month, year")
+@click.option("-n", "--num_results", type=int, help="number of results")
+@click.option("-m", "--max_results", type=int, help="maximum number of results", deprecated=True)
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
 @click.option("-b", "--backend", default="auto", type=click.Choice(["auto", "bing", "duckduckgo", "google"]))
 @click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
@@ -165,10 +168,13 @@ def version() -> str:
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 def text(
-    query: str,
+    query: str | None,
+    keywords: str | None,  # deprecated
     region: str | None,
     safesearch: str,
     timelimit: str | None,
+    num_results: int | None,
+    max_results: int | None,  # deprecated
     page: int,
     backend: str,
     output: str | None,
@@ -179,11 +185,14 @@ def text(
     verify: bool,
 ) -> None:
     """CLI function to perform a DDGS text metasearch."""
+    if not (query := query or keywords):  # type: ignore
+        raise click.UsageError("Please provide a query.")
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).text(
         query=query,
         region=region,
         safesearch=safesearch,
         timelimit=timelimit,
+        num_results=num_results or max_results,
         page=page,
         backend=backend,
     )
@@ -205,10 +214,13 @@ def text(
 
 
 @cli.command()
-@click.option("-q", "--query", required=True, help="images search query")
+@click.option("-q", "--query", help="images search query")
+@click.option("-k", "--keywords", help="images search query", deprecated=True)  # deprecated
 @click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc.")
 @click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
-@click.option("-t", "--timelimit", type=click.Choice(["Day", "Week", "Month", "Year"]))
+@click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m", "y"]))
+@click.option("-n", "--num_results", type=int, help="number of results")
+@click.option("-m", "--max_results", type=int, help="maximum number of results", deprecated=True)
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
 @click.option("-b", "--backend", default="auto", type=click.Choice(["auto", "duckduckgo"]))
 @click.option("-size", "--size", type=click.Choice(["Small", "Medium", "Large", "Wallpaper"]))
@@ -248,10 +260,13 @@ def text(
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 def images(
-    query: str,
+    query: str | None,
+    keywords: str | None,  # deprecated
     region: str,
     safesearch: str,
     timelimit: str | None,
+    num_results: int | None,
+    max_results: int | None,  # deprecated
     page: int,
     backend: str,
     size: str | None,
@@ -267,11 +282,14 @@ def images(
     verify: bool,
 ) -> None:
     """CLI function to perform a DDGS images metasearch."""
+    if not (query := query or keywords):  # type: ignore
+        raise click.UsageError("Please provide a query.")
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).images(
         query=query,
         region=region,
         safesearch=safesearch,
         timelimit=timelimit,
+        num_results=num_results or max_results,
         page=page,
         backend=backend,
         size=size,
@@ -298,10 +316,13 @@ def images(
 
 
 @cli.command()
-@click.option("-q", "--query", required=True, help="videos search query")
+@click.option("-q", "--query", help="videos search query")
+@click.option("-k", "--keywords", help="videos search query", deprecated=True)  # deprecated
 @click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc.")
 @click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m"]), help="day, week, month")
+@click.option("-n", "--num_results", type=int, help="number of results")
+@click.option("-m", "--max_results", type=int, help="maximum number of results", deprecated=True)
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
 @click.option("-b", "--backend", default="auto", type=click.Choice(["auto", "duckduckgo"]))
 @click.option("-res", "--resolution", type=click.Choice(["high", "standart"]))
@@ -311,10 +332,13 @@ def images(
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 def videos(
-    query: str,
+    query: str | None,
+    keywords: str | None,  # deprecated
     region: str,
     safesearch: str,
     timelimit: str | None,
+    num_results: int | None,
+    max_results: int | None,  # deprecated
     page: int,
     backend: str,
     resolution: str | None,
@@ -325,11 +349,14 @@ def videos(
     verify: bool,
 ) -> None:
     """CLI function to perform a DDGS videos metasearch."""
+    if not (query := query or keywords):  # type: ignore
+        raise click.UsageError("Please provide a query.")
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).videos(
         query=query,
         region=region,
         safesearch=safesearch,
         timelimit=timelimit,
+        num_results=num_results or max_results,
         page=page,
         backend=backend,
         resolution=resolution,
@@ -344,20 +371,26 @@ def videos(
 
 
 @cli.command()
-@click.option("-q", "--query", required=True, help="news search query")
+@click.option("-q", "--query", help="news search query")
+@click.option("-k", "--keywords", help="news search query", deprecated=True)  # deprecated
 @click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc.")
 @click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m", "y"]), help="day, week, month, year")
+@click.option("-n", "--num_results", type=int, help="number of results")
+@click.option("-m", "--max_results", type=int, help="maximum number of results", deprecated=True)
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
 @click.option("-b", "--backend", default="auto", type=click.Choice(["auto", "duckduckgo"]))
 @click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 def news(
-    query: str,
+    query: str | None,
+    keywords: str | None,  # deprecated
     region: str,
     safesearch: str,
     timelimit: str | None,
+    num_results: int | None,
+    max_results: int | None,  # deprecated
     page: int,
     backend: str,
     output: str | None,
@@ -365,8 +398,16 @@ def news(
     verify: bool,
 ) -> None:
     """CLI function to perform a DDGS news metasearch."""
+    if not (query := query or keywords):  # type: ignore
+        raise click.UsageError("Please provide a query.")
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).news(
-        query=query, region=region, safesearch=safesearch, timelimit=timelimit, page=page, backend=backend
+        query=query,
+        region=region,
+        safesearch=safesearch,
+        timelimit=timelimit,
+        num_results=num_results or max_results,
+        page=page,
+        backend=backend,
     )
     query = _sanitize_query(query)
     if output:

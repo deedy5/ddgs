@@ -47,35 +47,44 @@ class DDGS:
     def text(
         self,
         query: str,
+        keywords: str | None = None,  # deprecated
         region: str | None = None,
         safesearch: str = "moderate",
         timelimit: str | None = None,
+        num_results: int | None = None,
+        max_results: int | None = None,  # deprecated
         page: int = 1,
         backend: str = "auto",
     ) -> list[dict[str, Any]]:
-        return self._search(
+        results = self._search(
             "text",
-            query,
+            query if keywords is None else keywords,
             region=region,
             safesearch=safesearch,
             timelimit=timelimit,
             page=page,
             backend=backend,
         )
+        if num_results := num_results or max_results:
+            results = results[:num_results]
+        return results
 
     def images(
         self,
         query: str,
+        keywords: str | None = None,  # deprecated
         region: str | None = None,
         safesearch: str = "moderate",
         timelimit: str | None = None,
+        num_results: int | None = None,
+        max_results: int | None = None,  # deprecated
         page: int = 1,
         backend: str = "auto",
         **kwargs: Any,
     ) -> list[dict[str, Any]]:
-        return self._search(
+        results = self._search(
             "images",
-            query,
+            query if keywords is None else keywords,
             region=region,
             safesearch=safesearch,
             timelimit=timelimit,
@@ -83,20 +92,26 @@ class DDGS:
             backend=backend,
             **kwargs,
         )
+        if num_results := num_results or max_results:
+            results = results[:num_results]
+        return results
 
     def news(
         self,
         query: str,
+        keywords: str | None = None,  # deprecated
         region: str = "us-en",
         safesearch: str = "moderate",
         timelimit: str | None = None,
+        num_results: int | None = None,
+        max_results: int | None = None,  # deprecated
         page: int = 1,
         backend: str = "auto",
         **kwargs: Any,
     ) -> list[dict[str, Any]]:
-        return self._search(
+        results = self._search(
             "news",
-            query,
+            query if keywords is None else keywords,
             region=region,
             safesearch=safesearch,
             timelimit=timelimit,
@@ -104,20 +119,26 @@ class DDGS:
             backend=backend,
             **kwargs,
         )
+        if num_results := num_results or max_results:
+            results = results[:num_results]
+        return results
 
     def videos(
         self,
         query: str,
+        keywords: str | None = None,  # deprecated
         region: str | None = None,
         safesearch: str = "moderate",
         timelimit: str | None = None,
+        num_results: int | None = None,
+        max_results: int | None = None,  # deprecated
         page: int = 1,
         backend: str = "auto",
         **kwargs: Any,
     ) -> list[dict[str, Any]]:
-        return self._search(
+        results = self._search(
             "videos",
-            query,
+            query if keywords is None else keywords,
             region=region,
             safesearch=safesearch,
             timelimit=timelimit,
@@ -125,3 +146,6 @@ class DDGS:
             backend=backend,
             **kwargs,
         )
+        if num_results := num_results or max_results:
+            results = results[:num_results]
+        return results
