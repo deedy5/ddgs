@@ -16,7 +16,7 @@ class Duckduckgo(BaseSearchEngine):
     elements_xpath = {"title": ".//h2//text()", "href": "./a/@href", "body": "./a//text()"}
 
     def build_payload(
-        self, query: str, region: str | None, safesearch: str, timelimit: str | None, page: int, **kwargs: Any
+        self, query: str, region: str | None, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
         payload = {"q": query, "b": ""}
         if region:

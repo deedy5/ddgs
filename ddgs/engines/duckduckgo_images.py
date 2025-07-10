@@ -4,7 +4,7 @@ from typing import Any
 
 from ..base import BaseSearchEngine
 from ..results import ImagesResult
-from ..utils import _extract_vqd
+from ..utils import _extract_vqd, json_loads
 
 
 class DuckduckgoImages(BaseSearchEngine):
@@ -22,10 +22,11 @@ class DuckduckgoImages(BaseSearchEngine):
         return _extract_vqd(resp_content, query)
 
     def build_payload(
-        self, query: str, region: str | None, safesearch: str, timelimit: str | None, page: int, **kwargs: Any
+        self, query: str, region: str | None, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
         safesearch_base = {"on": "1", "moderate": "1", "off": "-1"}
-        timelimit = f"time:{timelimit}" if timelimit else ""
+        timelimit_base = {"d": "day", "w": "week", "m": "month", "y": "year"}
+        timelimit = f"time:{timelimit_base[timelimit]}" if timelimit else ""
         size = kwargs.get("size")
         size = f"size:{size}" if size else ""
         color = kwargs.get("color")
@@ -42,7 +43,7 @@ class DuckduckgoImages(BaseSearchEngine):
             "l": region,
             "vqd": self._get_vqd(query),
             "p": safesearch_base[safesearch.lower()],
-            # "f": f"{timelimit},{size},{color},{type_image},{layout},{license_image}",
+            "f": f"{timelimit},{size},{color},{type_image},{layout},{license_image}",
         }
         if page > 1:
             payload["s"] = f"{(page - 1) * 100}"
@@ -50,7 +51,7 @@ class DuckduckgoImages(BaseSearchEngine):
 
     def extract_results(self, html_text: str) -> list[dict[str, Any]]:
         """Extract search results from html text"""
-        json_data = self.extract_json(html_text)
+        json_data = json_loads(html_text)
         items = json_data.get("results", [])
         results = []
         for item in items:

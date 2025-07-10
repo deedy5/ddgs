@@ -21,6 +21,7 @@ class HttpClient:
         self,
         proxy: str | None = None,
         timeout: int | None = 10,
+        verify: bool = True,
     ) -> None:
         """Initialize the HttpClient object.
 
@@ -34,6 +35,7 @@ class HttpClient:
             timeout=timeout,
             impersonate="random",
             impersonate_os=choice(["macos", "linux", "windows"]),
+            verify=verify,
         )
 
     def request(self, *args: Any, **kwargs: Any) -> Response:
