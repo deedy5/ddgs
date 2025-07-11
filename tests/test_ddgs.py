@@ -7,6 +7,10 @@ from ddgs import DDGS
 def pause_between_tests() -> None:
     time.sleep(2)
 
+def test_context_manager() -> None:
+    with DDGS() as ddgs:
+        results = ddgs.text("python")
+        assert len(results) > 0
 
 def test_text_search() -> None:
     query = "wolf"
