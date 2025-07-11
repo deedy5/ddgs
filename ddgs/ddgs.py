@@ -103,7 +103,7 @@ class DDGS:
         self,
         query: str,
         keywords: str | None = None,  # deprecated
-        region: str = "us-en",
+        region: str | None = None,
         safesearch: str = "moderate",
         timelimit: str | None = None,
         num_results: int | None = None,

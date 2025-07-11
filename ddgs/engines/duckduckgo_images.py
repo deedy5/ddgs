@@ -40,7 +40,7 @@ class DuckduckgoImages(BaseSearchEngine):
         payload = {
             "o": "json",
             "q": query,
-            "l": region,
+            "l": region or "",
             "vqd": self._get_vqd(query),
             "p": safesearch_base[safesearch.lower()],
             "f": f"{timelimit},{size},{color},{type_image},{layout},{license_image}",

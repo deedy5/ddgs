@@ -11,9 +11,9 @@ from urllib.parse import unquote
 import click
 import primp
 
+from . import __version__
 from .ddgs import DDGS
 from .utils import _expand_proxy_tb_alias, json_dumps
-from .version import __version__
 
 logger = logging.getLogger(__name__)
 
@@ -153,12 +153,12 @@ def version() -> str:
 
 @cli.command()
 @click.option("-q", "--query", help="text search query")
-@click.option("-k", "--keywords", help="text search query", deprecated=True)  # deprecated
+@click.option("-k", "--keywords", help="(Deprecated) text search query")  # deprecated
 @click.option("-r", "--region", help="us-en, ru-ru, etc. -region")
 @click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m", "y"]), help="day, week, month, year")
 @click.option("-n", "--num_results", type=int, help="number of results")
-@click.option("-m", "--max_results", type=int, help="maximum number of results", deprecated=True)
+@click.option("-m", "--max_results", type=int, help="(Deprecated) maximum number of results")  # deprecated
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
 @click.option("-b", "--backend", default="auto", type=click.Choice(["auto", "bing", "duckduckgo", "google"]))
 @click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
@@ -215,12 +215,12 @@ def text(
 
 @cli.command()
 @click.option("-q", "--query", help="images search query")
-@click.option("-k", "--keywords", help="images search query", deprecated=True)  # deprecated
+@click.option("-k", "--keywords", help="(Deprecated) images search query")  # deprecated
 @click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc.")
 @click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m", "y"]))
 @click.option("-n", "--num_results", type=int, help="number of results")
-@click.option("-m", "--max_results", type=int, help="maximum number of results", deprecated=True)
+@click.option("-m", "--max_results", type=int, help="(Deprecated) maximum number of results")  # deprecated
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
 @click.option("-b", "--backend", default="auto", type=click.Choice(["auto", "duckduckgo"]))
 @click.option("-size", "--size", type=click.Choice(["Small", "Medium", "Large", "Wallpaper"]))
@@ -317,12 +317,12 @@ def images(
 
 @cli.command()
 @click.option("-q", "--query", help="videos search query")
-@click.option("-k", "--keywords", help="videos search query", deprecated=True)  # deprecated
+@click.option("-k", "--keywords", help="(Deprecated) videos search query")  # deprecated
 @click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc.")
 @click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m"]), help="day, week, month")
 @click.option("-n", "--num_results", type=int, help="number of results")
-@click.option("-m", "--max_results", type=int, help="maximum number of results", deprecated=True)
+@click.option("-m", "--max_results", type=int, help="(Deprecated) maximum number of results")  # deprecated
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
 @click.option("-b", "--backend", default="auto", type=click.Choice(["auto", "duckduckgo"]))
 @click.option("-res", "--resolution", type=click.Choice(["high", "standart"]))
@@ -372,12 +372,12 @@ def videos(
 
 @cli.command()
 @click.option("-q", "--query", help="news search query")
-@click.option("-k", "--keywords", help="news search query", deprecated=True)  # deprecated
+@click.option("-k", "--keywords", help="(Deprecated) news search query")  # deprecated
 @click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc.")
 @click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m", "y"]), help="day, week, month, year")
 @click.option("-n", "--num_results", type=int, help="number of results")
-@click.option("-m", "--max_results", type=int, help="maximum number of results", deprecated=True)
+@click.option("-m", "--max_results", type=int, help="(Deprecated) maximum number of results")  # deprecated
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
 @click.option("-b", "--backend", default="auto", type=click.Choice(["auto", "duckduckgo"]))
 @click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
