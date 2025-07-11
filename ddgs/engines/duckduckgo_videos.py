@@ -13,21 +13,21 @@ class DuckduckgoVideos(BaseSearchEngine):
     search_url = "https://duckduckgo.com/v.js"
     search_method = "GET"
 
-    elements = [
-        "content",
-        "description",
-        "duration",
-        "embed_html",
-        "embed_url",
-        "image_token",
-        "images",
-        "provider",
-        "published",
-        "publisher",
-        "statistics",
-        "title",
-        "uploader",
-    ]
+    elements_replace = {
+        "content": "content",
+        "description": "description",
+        "duration": "duration",
+        "embed_html": "embed_html",
+        "embed_url": "embed_url",
+        "image_token": "image_token",
+        "images": "images",
+        "provider": "provider",
+        "published": "published",
+        "publisher": "publisher",
+        "statistics": "statistics",
+        "title": "title",
+        "uploader": "uploader",
+    }
 
     def _get_vqd(self, query: str) -> str:
         """Get vqd value for a search query using DuckDuckGo."""
@@ -64,8 +64,8 @@ class DuckduckgoVideos(BaseSearchEngine):
         results = []
         for item in items:
             result = VideosResult()
-            for key in self.elements:
+            for key, value in self.elements_replace.items():
                 data = item.get(key)
-                result.__setattr__(key, data)
+                result.__setattr__(value, data)
             results.append(result.__dict__)
         return results

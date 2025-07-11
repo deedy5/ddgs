@@ -13,7 +13,14 @@ class DuckduckgoNews(BaseSearchEngine):
     search_url = "https://duckduckgo.com/news.js"
     search_method = "GET"
 
-    elements = ["date", "title", "body", "url", "image", "source"]
+    elements_replace = {
+        "date": "date",
+        "title": "title",
+        "excerpt": "body",
+        "url": "url",
+        "image": "image",
+        "source": "source",
+    }
 
     def _get_vqd(self, query: str) -> str:
         """Get vqd value for a search query using DuckDuckGo."""
@@ -45,8 +52,8 @@ class DuckduckgoNews(BaseSearchEngine):
         results = []
         for item in items:
             result = NewsResult()
-            for key in self.elements:
+            for key, value in self.elements_replace.items():
                 data = item.get(key)
-                result.__setattr__(key, data)
+                result.__setattr__(value, data)
             results.append(result.__dict__)
         return results

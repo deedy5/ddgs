@@ -14,7 +14,15 @@ class DuckduckgoImages(BaseSearchEngine):
     search_method = "GET"
     search_headers = {"Referer": "https://duckduckgo.com/", "Sec-Fetch-Mode": "cors"}
 
-    elements = ["title", "image", "thumbnail", "url", "height", "width", "source"]
+    elements_replace = {
+        "title": "title",
+        "image": "image",
+        "thumbnail": "thumbnail",
+        "url": "url",
+        "height": "height",
+        "width": "width",
+        "source": "source",
+    }
 
     def _get_vqd(self, query: str) -> str:
         """Get vqd value for a search query using DuckDuckGo."""
@@ -56,8 +64,8 @@ class DuckduckgoImages(BaseSearchEngine):
         results = []
         for item in items:
             result = ImagesResult()
-            for key in self.elements:
+            for key, value in self.elements_replace.items():
                 data = item.get(key)
-                result.__setattr__(key, data)
+                result.__setattr__(value, data)
             results.append(result.__dict__)
         return results

@@ -20,7 +20,7 @@ class BaseSearchEngine(ABC):
     search_headers: dict[str, str] = {}
     items_xpath: str
     elements_xpath: dict[str, str]
-    elements: list[str]
+    elements_replace: dict[str, str]
 
     def __init__(self, proxy: str | None = None, timeout: int | None = None, verify: bool = True):
         self.http_client = HttpClient(proxy=proxy, timeout=timeout, verify=verify)
