@@ -17,6 +17,19 @@ class Response:
 
 
 class HttpClient:
+    _impersonates = (
+                "chrome_100", "chrome_101", "chrome_104", "chrome_105", "chrome_106", "chrome_107",
+                "chrome_108", "chrome_109", "chrome_114", "chrome_116", "chrome_117", "chrome_118",
+                "chrome_119", "chrome_120", "chrome_123", "chrome_124", "chrome_126", "chrome_127",
+                "chrome_128", "chrome_129", "chrome_130", "chrome_131", "chrome_133",
+                "safari_15.3", "safari_15.5", "safari_15.6.1", "safari_16", "safari_16.5",
+                "safari_17.0", "safari_17.2.1", "safari_17.4.1", "safari_17.5",
+                "safari_18", "safari_18.2",
+                "edge_101", "edge_122", "edge_127", "edge_131",
+                "firefox_109", "firefox_117", "firefox_128", "firefox_133", "firefox_135"
+            )  # fmt: skip
+    _impersonates_os = ("macos", "linux", "windows")
+
     def __init__(
         self,
         proxy: str | None = None,
@@ -33,8 +46,8 @@ class HttpClient:
         self.client = primp.Client(
             proxy=proxy,
             timeout=timeout,
-            impersonate="random",
-            impersonate_os=choice(["macos", "linux", "windows"]),
+            impersonate=choice(self._impersonates),  # type: ignore
+            impersonate_os=choice(self._impersonates_os),  # type: ignore
             verify=verify,
         )
 
