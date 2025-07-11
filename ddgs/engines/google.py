@@ -30,22 +30,29 @@ class Google(BaseSearchEngine):
     items_xpath = "//div[@data-snc]"
     elements_xpath = {
         "title": ".//h3//text()",
-        "href": ".//a/@href[1]",
+        "href": ".//a[h3]/@href",
         "body": "./div[2]//text()",
     }
 
     def build_payload(
         self, query: str, region: str | None, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
+        safesearch_base = {"on": "2", "moderate": "1", "off": "0"}
         start = (page - 1) * 10
         payload = {
             "q": query,
+            "filter": safesearch_base[safesearch.lower()],
             "start": str(start),
             "asearch": "arc",
             "async": ui_async(start),
+            "ie": "UTF-8",
+            "oe": "UTF-8",
         }
-        if region:
-            payload["hl"] = f"{region.split('-')[1]}-{region.split('-')[0].upper()}"
+        if region:  # eg: "us-en"
+            country, lang = region.split("-")
+            payload["hl"] = f"{lang}-{country.upper()}"  # interface language
+            payload["lr"] = f"lang_{lang}"  # restricts to results written in a particular language
+            payload["cr"] = f"country{country.upper()}"  # restricts to results written in a particular country
         if timelimit:
             payload["tbs"] = f"qdr:{timelimit}"
         return payload
