@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from types import TracebackType
 from typing import Any
 
 from .base import BaseSearchEngine
@@ -15,6 +16,17 @@ class DDGS:
             "news": [E(proxy, timeout, verify) for E in news_engines_dict.values()],
             "videos": [E(proxy, timeout, verify) for E in videos_engines_dict.values()],
         }
+
+    def __enter__(self) -> DDGS:
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None = None,
+        exc_val: BaseException | None = None,
+        exc_tb: TracebackType | None = None,
+    ) -> None:
+        pass
 
     def _search(
         self,
