@@ -31,19 +31,19 @@ ddgs --help
 CLI examples:
 ```python3
 # text search
-ddgs text -k "Assyrian siege of Jerusalem"
+ddgs text -q "Assyrian siege of Jerusalem"
 # find and download pdf files via proxy
-ddgs text -k "Economics in one lesson filetype:pdf" -r wt-wt -m 50 -p https://1.2.3.4:1234 -d -dd economics_reading
+ddgs text -q "Economics in one lesson filetype:pdf" -r wt-wt -n 50 -p https://1.2.3.4:1234 -d -dd economics_reading
 # using Tor Browser as a proxy (`tb` is an alias for `socks5://127.0.0.1:9150`)
-ddgs text -k "'The history of the Standard Oil Company' filetype:doc" -m 50 -d -p tb
+ddgs text -q "'The history of the Standard Oil Company' filetype:doc" -n 50 -d -p tb
 # find and save to csv
-ddgs text -k "'neuroscience exploring the brain' filetype:pdf" -m 70 -o neuroscience_list.csv
+ddgs text -q "'neuroscience exploring the brain' filetype:pdf" -n 70 -o neuroscience_list.csv
 # don't verify SSL when making the request
-ddgs text -k "Mississippi Burning" -v false
+ddgs text -q "Mississippi Burning" -v false
 # find and download images
-ddgs images -k "beware of false prophets" -r wt-wt -type photo -m 500 -d
+ddgs images -q "beware of false prophets" -r wt-wt -type photo -n 500 -d
 # get news for the last day and save to json
-ddgs news -k "sanctions" -m 100 -t d -o json
+ddgs news -q "sanctions" -n 100 -t d -o json
 ```
 [Go To TOP](#TOP)
 
@@ -237,9 +237,9 @@ def text(
 ```
 ***Example***
 ```python
-results = DDGS().text('live free or die', region='wt-wt', safesearch='off', timelimit='y', page=1, backend="auto")
+results = DDGS().text('live free or die', region='us-en', safesearch='off', timelimit='y', page=1, backend="auto")
 # Searching for pdf files
-results = DDGS().text('russia filetype:pdf', region='wt-wt', safesearch='off', timelimit='y', page=1, backend="auto")
+results = DDGS().text('russia filetype:pdf', region='us-en', safesearch='off', timelimit='y', page=1, backend="auto")
 print(results)
 [
     {
@@ -257,7 +257,7 @@ print(results)
 ```python
 def images(
     query: str,
-    region: str = "us-en",
+    region: str | None = None,
     safesearch: str = "moderate",
     timelimit: str | None = None,
     num_results: int | None = None,
@@ -273,7 +273,7 @@ def images(
 
     Args:
         query: images search query.
-        region: us-en, uk-en, ru-ru, etc. Defaults to "us-en".
+        region: us-en, uk-en, ru-ru, etc. Defaults to None.
         safesearch: on, moderate, off. Defaults to "moderate".
         timelimit: d, w, m, y. Defaults to None.
         num_results: number of results. Defaults to None.
@@ -300,7 +300,7 @@ def images(
 ```python
 results = DDGS().images(
     query="butterfly",
-    region="en-us",
+    region="us-en",
     safesearch="off",
     timelimit="m",
     page=1,
@@ -332,7 +332,7 @@ print(images)
 ```python
 def videos(
     query: str,
-    region: str = "us-en",
+    region: str | None = None,
     safesearch: str = "moderate",
     timelimit: str | None = None,
     num_results: int | None = None,
@@ -346,7 +346,7 @@ def videos(
 
     Args:
         query: videos search query.
-        region: us-en, uk-en, ru-ru, etc. Defaults to "us-en".
+        region: us-en, uk-en, ru-ru, etc. Defaults to None.
         safesearch: on, moderate, off. Defaults to "moderate".
         timelimit: d, w, m. Defaults to None.
         num_results: number of results. Defaults to None.
@@ -406,7 +406,7 @@ print(results)
 ```python
 def news(
     query: str,
-    region: str = "us-en",
+    region: str | None = None,
     safesearch: str = "moderate",
     timelimit: str | None = None,
     num_results: int | None = None,
@@ -417,7 +417,7 @@ def news(
 
     Args:
         query: news search query.
-        region: us-en, uk-en, ru-ru, etc. Defaults to "us-en".
+        region: us-en, uk-en, ru-ru, etc. Defaults to None.
         safesearch: on, moderate, off. Defaults to "moderate".
         timelimit: d, w, m. Defaults to None.
         num_results: number of results. Defaults to None.
@@ -432,7 +432,7 @@ def news(
 ```
 ***Example***
 ```python
-results = DDGS().news(query="sun", region="wt-wt", safesearch="off", timelimit="m", page=1, backend="auto")
+results = DDGS().news(query="sun", region="us-en", safesearch="off", timelimit="m", page=1, backend="auto")
 print(results)
 [
     {

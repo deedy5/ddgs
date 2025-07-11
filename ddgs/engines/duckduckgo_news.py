@@ -25,7 +25,7 @@ class DuckduckgoNews(BaseSearchEngine):
     ) -> dict[str, Any]:
         safesearch_base = {"on": "1", "moderate": "-1", "off": "-2"}
         payload = {
-            "l": region,
+            "l": region or "",
             "o": "json",
             "noamp": "1",
             "q": query,

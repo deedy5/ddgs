@@ -46,7 +46,7 @@ class DuckduckgoVideos(BaseSearchEngine):
         duration = f"videoDuration:{duration}" if duration else ""
         license_videos = f"videoLicense:{license_videos}" if license_videos else ""
         payload = {
-            "l": region,
+            "l": region or "",
             "o": "json",
             "q": query,
             "vqd": self._get_vqd(query),

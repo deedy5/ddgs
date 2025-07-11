@@ -20,7 +20,7 @@ class Duckduckgo(BaseSearchEngine):
     ) -> dict[str, Any]:
         payload = {"q": query, "b": ""}
         if region:
-            payload["l"] = region
+            payload["l"] = region or ""
         if page > 1:
             payload["s"] = f"{10 + (page - 2) * 15}"
         if timelimit:
