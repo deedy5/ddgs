@@ -17,20 +17,21 @@ class Bing(BaseSearchEngine):
 
     items_xpath = "//li[contains(@class, 'b_algo')]"
     elements_xpath = {
-        "title": "./h2/a//text() | ./div[contains(@class, 'header')]/a/h2//text()",
-        "href": "./h2/a/@href | ./div[contains(@class, 'header')]/a/@href",
+        "title": ".//h2/a//text()",
+        "href": ".//h2/a/@href",
         "body": ".//p//text()",
     }
 
     def build_payload(
         self, query: str, region: str | None, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
-        payload = {"q": query}
+        payload = {"q": query, "pq": query}
         if region:
-            payload["cc"] = region.split("-")[0]
+            country, lang = region.lower().split("-")
+            payload["cc"] = lang
             cookies = {
-                "_EDGE_CD": f"u={region}&m={region}",
-                "_EDGE_S": f"ui={region}&mkt={region}",
+                "_EDGE_CD": f"m={lang}-{country}&u={lang}-{country}",
+                "_EDGE_S": f"mkt={lang}-{country}&ui={lang}-{country}",
             }
             self.http_client.client.set_cookies("https://www.bing.com", cookies)
         if timelimit:
