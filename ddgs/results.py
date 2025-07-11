@@ -1,8 +1,8 @@
 class TextResult:
     def __init__(self) -> None:
-        self.body = ""
-        self.href = ""
         self.title = ""
+        self.href = ""
+        self.body = ""
 
     def __str__(self) -> str:
         return f"{self.title}\n{self.href}\n{self.body}"
@@ -46,6 +46,7 @@ class NewsResult:
 
 class VideosResult:
     def __init__(self) -> None:
+        self.title: str
         self.content: str
         self.description: str
         self.duration: str
@@ -57,7 +58,6 @@ class VideosResult:
         self.published: str
         self.publisher: str
         self.statistics: dict[str, str]
-        self.title: str
         self.uploader: str
 
     def __str__(self) -> str:
