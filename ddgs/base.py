@@ -60,11 +60,16 @@ class BaseSearchEngine(ABC):
     def normalize_results(self, results: list[dict[str, Any]]) -> list[dict[str, Any]]:
         for result in results:
             for key, value in result.items():
-                if key in ("title", "body"):
+                # skip empty
+                if key in {"title", "body", "href", "url", "image"} and not (
+                    value := value.strip() if isinstance(value, str) else value
+                ):
+                    continue
+                if key in {"title", "body"}:
                     result[key] = _normalize_text(value)
-                elif key in ("href", "url", "thumbnail", "image"):
+                elif key in {"href", "url", "thumbnail", "image"}:
                     result[key] = _normalize_url(value)
-                elif key in ("date",) and isinstance(value, int):
+                elif key == "date" and isinstance(value, int):
                     result[key] = datetime.fromtimestamp(value, timezone.utc).isoformat()  # int to readable date
                 else:
                     result[key] = value
