@@ -35,7 +35,7 @@ class Google(BaseSearchEngine):
     }
 
     def build_payload(
-        self, query: str, region: str | None, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
+        self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
         safesearch_base = {"on": "2", "moderate": "1", "off": "0"}
         start = (page - 1) * 10
@@ -48,11 +48,10 @@ class Google(BaseSearchEngine):
             "ie": "UTF-8",
             "oe": "UTF-8",
         }
-        if region:  # eg: "us-en"
-            country, lang = region.split("-")
-            payload["hl"] = f"{lang}-{country.upper()}"  # interface language
-            payload["lr"] = f"lang_{lang}"  # restricts to results written in a particular language
-            payload["cr"] = f"country{country.upper()}"  # restricts to results written in a particular country
+        country, lang = region.split("-")
+        payload["hl"] = f"{lang}-{country.upper()}"  # interface language
+        payload["lr"] = f"lang_{lang}"  # restricts to results written in a particular language
+        payload["cr"] = f"country{country.upper()}"  # restricts to results written in a particular country
         if timelimit:
             payload["tbs"] = f"qdr:{timelimit}"
         return payload

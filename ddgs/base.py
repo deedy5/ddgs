@@ -28,7 +28,7 @@ class BaseSearchEngine(ABC):
 
     @abstractmethod
     def build_payload(
-        self, query: str, region: str | None, safesearch: str, timelimit: str | None, page: int, **kwargs: Any
+        self, query: str, region: str, safesearch: str, timelimit: str | None, page: int, **kwargs: Any
     ) -> dict[str, Any]:
         """Build a payload for the search request."""
         raise NotImplementedError
@@ -78,7 +78,7 @@ class BaseSearchEngine(ABC):
     def search(
         self,
         query: str,
-        region: str | None = None,
+        region: str = "us-en",
         safesearch: str = "moderate",
         timelimit: str | None = None,
         page: int = 1,

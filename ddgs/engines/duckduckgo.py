@@ -16,11 +16,9 @@ class Duckduckgo(BaseSearchEngine):
     elements_xpath = {"title": ".//h2//text()", "href": "./a/@href", "body": "./a//text()"}
 
     def build_payload(
-        self, query: str, region: str | None, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
+        self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
-        payload = {"q": query, "b": ""}
-        if region:
-            payload["l"] = region or ""
+        payload = {"q": query, "b": "", "l": region}
         if page > 1:
             payload["s"] = f"{10 + (page - 2) * 15}"
         if timelimit:

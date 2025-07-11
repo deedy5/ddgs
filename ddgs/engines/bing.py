@@ -23,17 +23,15 @@ class Bing(BaseSearchEngine):
     }
 
     def build_payload(
-        self, query: str, region: str | None, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
+        self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
-        payload = {"q": query, "pq": query}
-        if region:
-            country, lang = region.lower().split("-")
-            payload["cc"] = lang
-            cookies = {
-                "_EDGE_CD": f"m={lang}-{country}&u={lang}-{country}",
-                "_EDGE_S": f"mkt={lang}-{country}&ui={lang}-{country}",
-            }
-            self.http_client.client.set_cookies("https://www.bing.com", cookies)
+        country, lang = region.lower().split("-")
+        payload = {"q": query, "pq": query, "cc": lang}
+        cookies = {
+            "_EDGE_CD": f"m={lang}-{country}&u={lang}-{country}",
+            "_EDGE_S": f"mkt={lang}-{country}&ui={lang}-{country}",
+        }
+        self.http_client.client.set_cookies("https://www.bing.com", cookies)
         if timelimit:
             d = int(time() // 86400)
             code = f"ez5_{d - 365}_{d}" if timelimit == "y" else "ez" + {"d": "1", "w": "2", "m": "3"}[timelimit]
