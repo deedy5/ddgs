@@ -6,6 +6,7 @@ from typing import Any
 from .base import BaseSearchEngine
 from .engines import images_engines_dict, news_engines_dict, text_engines_dict, videos_engines_dict
 from .engines.google import Google
+from .engines.bing import Bing
 
 
 class DDGS:
@@ -33,7 +34,7 @@ class DDGS:
         category: str,
         query: str,
         *,
-        region: str | None = None,
+        region: str = "us-en",
         safesearch: str = "moderate",
         timelimit: str | None = None,
         page: int = 1,
@@ -63,7 +64,7 @@ class DDGS:
         self,
         query: str,
         keywords: str | None = None,  # deprecated
-        region: str | None = None,
+        region: str = "us-en",
         safesearch: str = "moderate",
         timelimit: str | None = None,
         num_results: int | None = None,
@@ -88,7 +89,7 @@ class DDGS:
         self,
         query: str,
         keywords: str | None = None,  # deprecated
-        region: str | None = None,
+        region: str = "us-en",
         safesearch: str = "moderate",
         timelimit: str | None = None,
         num_results: int | None = None,
@@ -115,7 +116,7 @@ class DDGS:
         self,
         query: str,
         keywords: str | None = None,  # deprecated
-        region: str | None = None,
+        region: str = "us-en",
         safesearch: str = "moderate",
         timelimit: str | None = None,
         num_results: int | None = None,
@@ -142,7 +143,7 @@ class DDGS:
         self,
         query: str,
         keywords: str | None = None,  # deprecated
-        region: str | None = None,
+        region: str = "us-en",
         safesearch: str = "moderate",
         timelimit: str | None = None,
         num_results: int | None = None,

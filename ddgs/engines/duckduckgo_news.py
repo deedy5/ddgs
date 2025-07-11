@@ -28,11 +28,11 @@ class DuckduckgoNews(BaseSearchEngine):
         return _extract_vqd(resp_content, query)
 
     def build_payload(
-        self, query: str, region: str | None, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
+        self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
         safesearch_base = {"on": "1", "moderate": "-1", "off": "-2"}
         payload = {
-            "l": region or "",
+            "l": region,
             "o": "json",
             "noamp": "1",
             "q": query,

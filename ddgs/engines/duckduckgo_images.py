@@ -30,7 +30,7 @@ class DuckduckgoImages(BaseSearchEngine):
         return _extract_vqd(resp_content, query)
 
     def build_payload(
-        self, query: str, region: str | None, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
+        self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
         safesearch_base = {"on": "1", "moderate": "1", "off": "-1"}
         timelimit_base = {"d": "day", "w": "week", "m": "month", "y": "year"}
@@ -48,7 +48,7 @@ class DuckduckgoImages(BaseSearchEngine):
         payload = {
             "o": "json",
             "q": query,
-            "l": region or "",
+            "l": region,
             "vqd": self._get_vqd(query),
             "p": safesearch_base[safesearch.lower()],
             "f": f"{timelimit},{size},{color},{type_image},{layout},{license_image}",

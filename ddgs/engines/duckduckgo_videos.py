@@ -35,7 +35,7 @@ class DuckduckgoVideos(BaseSearchEngine):
         return _extract_vqd(resp_content, query)
 
     def build_payload(
-        self, query: str, region: str | None, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
+        self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
         safesearch_base = {"on": "1", "moderate": "-1", "off": "-2"}
         timelimit = f"publishedAfter:{timelimit}" if timelimit else ""
@@ -46,7 +46,7 @@ class DuckduckgoVideos(BaseSearchEngine):
         duration = f"videoDuration:{duration}" if duration else ""
         license_videos = f"videoLicense:{license_videos}" if license_videos else ""
         payload = {
-            "l": region or "",
+            "l": region,
             "o": "json",
             "q": query,
             "vqd": self._get_vqd(query),

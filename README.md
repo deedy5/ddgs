@@ -208,7 +208,7 @@ Exceptions:
 ```python
 def text(
     query: str,
-    region: str | None = None,
+    region: str = "us-en",
     safesearch: str = "moderate",
     timelimit: str | None = None,
     num_results: int | None = None,
@@ -219,7 +219,7 @@ def text(
 
     Args:
         query: text search query.
-        region: us-en, uk-en, ru-ru, etc. Defaults to None.
+        region: us-en, uk-en, ru-ru, etc. Defaults to us-en.
         safesearch: on, moderate, off. Defaults to "moderate".
         timelimit: d, w, m, y. Defaults to None.
         num_results: number of results. Defaults to None.
@@ -256,7 +256,7 @@ print(results)
 ```python
 def images(
     query: str,
-    region: str | None = None,
+    region: str = "us-en",
     safesearch: str = "moderate",
     timelimit: str | None = None,
     num_results: int | None = None,
@@ -272,7 +272,7 @@ def images(
 
     Args:
         query: images search query.
-        region: us-en, uk-en, ru-ru, etc. Defaults to None.
+        region: us-en, uk-en, ru-ru, etc. Defaults to us-en.
         safesearch: on, moderate, off. Defaults to "moderate".
         timelimit: d, w, m, y. Defaults to None.
         num_results: number of results. Defaults to None.
@@ -331,7 +331,7 @@ print(images)
 ```python
 def videos(
     query: str,
-    region: str | None = None,
+    region: str = "us-en",
     safesearch: str = "moderate",
     timelimit: str | None = None,
     num_results: int | None = None,
@@ -345,7 +345,7 @@ def videos(
 
     Args:
         query: videos search query.
-        region: us-en, uk-en, ru-ru, etc. Defaults to None.
+        region: us-en, uk-en, ru-ru, etc. Defaults to us-en.
         safesearch: on, moderate, off. Defaults to "moderate".
         timelimit: d, w, m. Defaults to None.
         num_results: number of results. Defaults to None.
@@ -405,7 +405,7 @@ print(results)
 ```python
 def news(
     query: str,
-    region: str | None = None,
+    region: str = "us-en",
     safesearch: str = "moderate",
     timelimit: str | None = None,
     num_results: int | None = None,
@@ -416,7 +416,7 @@ def news(
 
     Args:
         query: news search query.
-        region: us-en, uk-en, ru-ru, etc. Defaults to None.
+        region: us-en, uk-en, ru-ru, etc. Defaults to us-en.
         safesearch: on, moderate, off. Defaults to "moderate".
         timelimit: d, w, m. Defaults to None.
         num_results: number of results. Defaults to None.

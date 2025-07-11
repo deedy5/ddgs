@@ -154,7 +154,7 @@ def version() -> str:
 @cli.command()
 @click.option("-q", "--query", help="text search query")
 @click.option("-k", "--keywords", help="(Deprecated) text search query")  # deprecated
-@click.option("-r", "--region", help="us-en, ru-ru, etc. -region")
+@click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc.")
 @click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m", "y"]), help="day, week, month, year")
 @click.option("-n", "--num_results", type=int, help="number of results")
@@ -170,7 +170,7 @@ def version() -> str:
 def text(
     query: str | None,
     keywords: str | None,  # deprecated
-    region: str | None,
+    region: str,
     safesearch: str,
     timelimit: str | None,
     num_results: int | None,
