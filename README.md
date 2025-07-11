@@ -33,7 +33,7 @@ CLI examples:
 # text search
 ddgs text -q "Assyrian siege of Jerusalem"
 # find and download pdf files via proxy
-ddgs text -q "Economics in one lesson filetype:pdf" -r wt-wt -n 50 -p https://1.2.3.4:1234 -d -dd economics_reading
+ddgs text -q "Economics in one lesson filetype:pdf" -r us-en -n 50 -p https://1.2.3.4:1234 -d -dd economics_reading
 # using Tor Browser as a proxy (`tb` is an alias for `socks5://127.0.0.1:9150`)
 ddgs text -q "'The history of the Standard Oil Company' filetype:doc" -n 50 -d -p tb
 # find and save to csv
@@ -41,7 +41,7 @@ ddgs text -q "'neuroscience exploring the brain' filetype:pdf" -n 70 -o neurosci
 # don't verify SSL when making the request
 ddgs text -q "Mississippi Burning" -v false
 # find and download images
-ddgs images -q "beware of false prophets" -r wt-wt -type photo -n 500 -d
+ddgs images -q "beware of false prophets" -r ar-es -type photo -n 500 -d
 # get news for the last day and save to json
 ddgs news -q "sanctions" -n 100 -t d -o json
 ```
@@ -134,7 +134,6 @@ ddgs news -q "sanctions" -n 100 -t d -o json
     ue-es for United States (es)
     ve-es for Venezuela
     vn-vi for Vietnam
-    wt-wt for No region
 ___
 </details>
 
