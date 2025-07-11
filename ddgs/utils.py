@@ -15,6 +15,8 @@ except ImportError:
     HAS_ORJSON = False
     import json
 
+_REGEX_STRIP_TAGS = re.compile(r"<[^>]+>")
+
 
 def json_dumps(obj: Any) -> str:
     try:
@@ -56,38 +58,37 @@ def _normalize_url(url: str) -> str:
 
 
 def _normalize_text(
-    raw: str, normalize_form: Literal["NFC", "NFD", "NFKC", "NFKD"] = "NFC", collapse_spaces: bool = True
+    raw: str,
+    normalize_form: Literal["NFC", "NFD", "NFKC", "NFKD"] = "NFC",
+    collapse_spaces: bool = True,
 ) -> str:
-    # 1) Unescape HTML entities (&amp;, &eacute;, &#169;, etc.)
-    """Normalize text by unescaping HTML entities, applying Unicode normalization,
-    mapping Unicode separators to spaces, and optionally collapsing whitespace.
-
-    Args:
-        raw: The raw text input to be normalized.
-        normalize_form: The Unicode normalization form to apply. Options are "NFC", "NFD", "NFKC", "NFKD".
-        collapse_spaces: If True, collapse multiple whitespace characters into a single space.
-
-    Returns:
-        The normalized text as a string.
     """
-    if raw is None:
+    Strip HTML tags, unescape HTML entities, normalize Unicode,
+    replace all separator-like characters with spaces, then
+    optionally collapse consecutive whitespace into a single space.
+    """
+    if not raw:
         return ""
 
-    s = unescape(raw)
+    # 1. Strip HTML tags
+    stripped = _REGEX_STRIP_TAGS.sub("", raw)
 
-    # 2) Unicode normalize
-    s = unicodedata.normalize(normalize_form, s)
+    # 2. Unescape HTML entities
+    unescaped = unescape(stripped)
 
-    # 3) Map *all* Unicode separator characters (category 'Z*') to U+0020
-    sep_to_space = {ord(ch): " " for ch in set(s) if unicodedata.category(ch).startswith("Z")}
-    s = s.translate(sep_to_space)
+    # 3. Unicode normalization
+    normalized = unicodedata.normalize(normalize_form, unescaped)
 
-    # 4) Optionally collapse whitespace
+    # 4. Map all Z* (separator) categories to space
+    sep_to_space = {ord(ch): " " for ch in set(normalized) if unicodedata.category(ch).startswith("Z")}
+    translated = normalized.translate(sep_to_space)
+
+    # 5. Collapse whitespace if requested
     if collapse_spaces:
-        # \s covers spaces, tabs, newlines; collapse them to a single space
-        s = re.sub(r"\s+", " ", s).strip()
+        # \s covers all whitespace including separators we translated
+        translated = re.sub(r"\s+", " ", translated).strip()
 
-    return s
+    return translated
 
 
 def _expand_proxy_tb_alias(proxy: str | None) -> str | None:
