@@ -33,9 +33,9 @@ CLI examples:
 # text search
 ddgs text -q "Assyrian siege of Jerusalem"
 # find and download pdf files via proxy
-ddgs text -q "Economics in one lesson filetype:pdf" -r us-en -n 50 -p https://1.2.3.4:1234 -d -dd economics_reading
+ddgs text -q "Economics in one lesson filetype:pdf" -r us-en -n 50 -pr https://1.2.3.4:1234 -d -dd economics_reading
 # using Tor Browser as a proxy (`tb` is an alias for `socks5://127.0.0.1:9150`)
-ddgs text -q "'The history of the Standard Oil Company' filetype:doc" -n 50 -d -p tb
+ddgs text -q "'The history of the Standard Oil Company' filetype:doc" -n 50 -d -pr tb
 # find and save to csv
 ddgs text -q "'neuroscience exploring the brain' filetype:pdf" -n 70 -o neuroscience_list.csv
 # don't verify SSL when making the request
