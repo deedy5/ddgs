@@ -40,9 +40,11 @@ jobs:
       run: |
         mypy --install-types --non-interactive .
     - name: Pytest
+      id: pytest
       continue-on-error: true
       run: |
         pytest -v
     - name: Pytest re-run failures
+      if: steps.pytest.conclusion == 'failure'
       run: |
         pytest -v --lf
