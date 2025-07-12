@@ -10,9 +10,9 @@ from .google import Google
 
 ENGINES: dict[str, dict[str, type[BaseSearchEngine]]] = {
     "text": {
-        "duckduckgo": Duckduckgo,
-        "bing": Bing,
         "google": Google,
+        "bing": Bing,
+        "duckduckgo": Duckduckgo,
     },
     "images": {
         "duckduckgo": DuckduckgoImages,

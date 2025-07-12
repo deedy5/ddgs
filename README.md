@@ -34,7 +34,7 @@ CLI examples:
 ddgs text -q "Assyrian siege of Jerusalem"
 # find and download pdf files via proxy
 ddgs text -q "Economics in one lesson filetype:pdf" -r us-en -n 50 -pr https://1.2.3.4:1234 -d -dd economics_reading
-# using Tor Browser as a proxy (`tb` is an alias for `socks5://127.0.0.1:9150`)
+# using Tor Browser as a proxy (`tb` is an alias for `socks5h://127.0.0.1:9150`)
 ddgs text -q "'The history of the Standard Oil Company' filetype:doc" -n 50 -d -pr tb
 # find and save to csv
 ddgs text -q "'neuroscience exploring the brain' filetype:pdf" -n 70 -o neuroscience_list.csv
@@ -171,7 +171,7 @@ Use a rotating proxy. Otherwise, use a new proxy with each DDGS class initializa
 
 *1. The easiest way. Launch the Tor Browser*
 ```python3
-ddgs = DDGS(proxy="tb", timeout=20)  # "tb" is an alias for "socks5://127.0.0.1:9150"
+ddgs = DDGS(proxy="tb", timeout=20)  # "tb" is an alias for "socks5h://127.0.0.1:9150"
 results = ddgs.text("something you need", max_results=50)
 ```
 *2. Use any proxy server* (*example with [iproyal rotating residential proxies](https://iproyal.com?r=residential_proxies)*)
@@ -213,7 +213,7 @@ def text(
     timelimit: str | None = None,
     num_results: int | None = None,
     page: int = 1,
-    backend: str = "auto",
+    backend: str | list[str] = "auto",
 ) -> list[dict[str, str]]:
     """DDGS text metasearch.
 
@@ -224,11 +224,7 @@ def text(
         timelimit: d, w, m, y. Defaults to None.
         num_results: number of results. Defaults to None.
         page: page of results. Defaults to 1.
-        backend: auto, bing, duckduckgo, google. Defaults to auto.
-            auto - try all backends in random order,
-            bing - collect data from https://www.bing.com,
-            duckduckgo - collect data from https://html.duckduckgo.com,
-            google - collect data from https://www.google.com.
+        backend: A single or list of backends. Defaults to "auto" (first two).
 
     Returns:
         List of dictionaries with search results.
@@ -261,7 +257,7 @@ def images(
     timelimit: str | None = None,
     num_results: int | None = None,
     page: int = 1,
-    backend: str = "auto",
+    backend: str | list[str] = "auto",
     size: str | None = None,
     color: str | None = None,
     type_image: str | None = None,
@@ -277,9 +273,7 @@ def images(
         timelimit: d, w, m, y. Defaults to None.
         num_results: number of results. Defaults to None.
         page: page of results. Defaults to 1.
-        backend: auto, duckduckgo. Defaults to auto.
-            auto - try all backends in random order,
-            duckduckgo - collect data from https://duckduckgo.com.
+        backend: A single or list of backends. Defaults to "auto" (first two).
         size: Small, Medium, Large, Wallpaper. Defaults to None.
         color: color, Monochrome, Red, Orange, Yellow, Green, Blue,
             Purple, Pink, Brown, Black, Gray, Teal, White. Defaults to None.
@@ -336,7 +330,7 @@ def videos(
     timelimit: str | None = None,
     num_results: int | None = None,
     page: int = 1,
-    backend: str = "auto",
+    backend: str | list[str] = "auto",
     resolution: str | None = None,
     duration: str | None = None,
     license_videos: str | None = None,
@@ -350,9 +344,7 @@ def videos(
         timelimit: d, w, m. Defaults to None.
         num_results: number of results. Defaults to None.
         page: page of results. Defaults to 1.
-        backend: auto, duckduckgo. Defaults to auto.
-            auto - try all backends in random order,
-            duckduckgo - collect data from https://duckduckgo.com.
+        backend: A single or list of backends. Defaults to "auto" (first two).
         resolution: high, standart. Defaults to None.
         duration: short, medium, long. Defaults to None.
         license_videos: creativeCommon, youtube. Defaults to None.
@@ -410,7 +402,7 @@ def news(
     timelimit: str | None = None,
     num_results: int | None = None,
     page: int = 1,
-    backend: str = "auto",
+    backend: str | list[str] = "auto",
 ) -> list[dict[str, str]]:
     """DDGS news metasearch.
 
@@ -421,9 +413,7 @@ def news(
         timelimit: d, w, m. Defaults to None.
         num_results: number of results. Defaults to None.
         page: page of results. Defaults to 1.
-        backend: auto, duckduckgo. Defaults to auto.
-            auto - try all backends in random order,
-            duckduckgo - collect data from https://duckduckgo.com.
+        backend: A single or list of backends. Defaults to "auto" (first two).
 
     Returns:
         List of dictionaries with news search results.

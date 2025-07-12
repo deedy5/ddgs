@@ -160,12 +160,12 @@ def version() -> str:
 @click.option("-n", "--num_results", type=int, help="number of results")
 @click.option("-m", "--max_results", type=int, help="(Deprecated) maximum number of results")  # deprecated
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
-@click.option("-b", "--backend", default="auto", type=click.Choice(["auto", "bing", "duckduckgo", "google"]))
+@click.option("-b", "--backend", type=click.Choice(["auto", "bing", "duckduckgo", "google"]), multiple=True)
 @click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
 @click.option("-d", "--download", is_flag=True, default=False, help="download results. -dd to set custom directory")
 @click.option("-dd", "--download-directory", help="Specify custom download directory")
 @click.option("-th", "--threads", default=10, help="download threads, default=10")
-@click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5://127.0.0.1:9150")
+@click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 def text(
     query: str | None,
@@ -176,7 +176,7 @@ def text(
     num_results: int | None,
     max_results: int | None,  # deprecated
     page: int,
-    backend: str,
+    backend: str | list[str],
     output: str | None,
     download: bool,
     download_directory: str | None,
@@ -187,6 +187,7 @@ def text(
     """CLI function to perform a DDGS text metasearch."""
     if not (query := query or keywords):  # type: ignore
         raise click.UsageError("Please provide a query.")
+    backend = list(backend) or "auto"
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).text(
         query=query,
         region=region,
@@ -222,7 +223,7 @@ def text(
 @click.option("-n", "--num_results", type=int, help="number of results")
 @click.option("-m", "--max_results", type=int, help="(Deprecated) maximum number of results")  # deprecated
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
-@click.option("-b", "--backend", default="auto", type=click.Choice(["auto", "duckduckgo"]))
+@click.option("-b", "--backend", type=click.Choice(["auto", "duckduckgo"]), multiple=True)
 @click.option("-size", "--size", type=click.Choice(["Small", "Medium", "Large", "Wallpaper"]))
 @click.option(
     "-c",
@@ -257,7 +258,7 @@ def text(
 @click.option("-d", "--download", is_flag=True, default=False, help="download results. -dd to set custom directory")
 @click.option("-dd", "--download-directory", help="Specify custom download directory")
 @click.option("-th", "--threads", default=10, help="download threads, default=10")
-@click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5://127.0.0.1:9150")
+@click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 def images(
     query: str | None,
@@ -268,7 +269,7 @@ def images(
     num_results: int | None,
     max_results: int | None,  # deprecated
     page: int,
-    backend: str,
+    backend: str | list[str],
     size: str | None,
     color: str | None,
     type_image: str | None,
@@ -284,6 +285,7 @@ def images(
     """CLI function to perform a DDGS images metasearch."""
     if not (query := query or keywords):  # type: ignore
         raise click.UsageError("Please provide a query.")
+    backend = list(backend) or "auto"
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).images(
         query=query,
         region=region,
@@ -324,12 +326,12 @@ def images(
 @click.option("-n", "--num_results", type=int, help="number of results")
 @click.option("-m", "--max_results", type=int, help="(Deprecated) maximum number of results")  # deprecated
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
-@click.option("-b", "--backend", default="auto", type=click.Choice(["auto", "duckduckgo"]))
+@click.option("-b", "--backend", type=click.Choice(["auto", "duckduckgo"]), multiple=True)
 @click.option("-res", "--resolution", type=click.Choice(["high", "standart"]))
 @click.option("-d", "--duration", type=click.Choice(["short", "medium", "long"]))
 @click.option("-lic", "--license_videos", type=click.Choice(["creativeCommon", "youtube"]))
 @click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
-@click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5://127.0.0.1:9150")
+@click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 def videos(
     query: str | None,
@@ -340,7 +342,7 @@ def videos(
     num_results: int | None,
     max_results: int | None,  # deprecated
     page: int,
-    backend: str,
+    backend: str | list[str],
     resolution: str | None,
     duration: str | None,
     license_videos: str | None,
@@ -351,6 +353,7 @@ def videos(
     """CLI function to perform a DDGS videos metasearch."""
     if not (query := query or keywords):  # type: ignore
         raise click.UsageError("Please provide a query.")
+    backend = list(backend) or "auto"
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).videos(
         query=query,
         region=region,
@@ -379,9 +382,9 @@ def videos(
 @click.option("-n", "--num_results", type=int, help="number of results")
 @click.option("-m", "--max_results", type=int, help="(Deprecated) maximum number of results")  # deprecated
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
-@click.option("-b", "--backend", default="auto", type=click.Choice(["auto", "duckduckgo"]))
+@click.option("-b", "--backend", type=click.Choice(["auto", "duckduckgo"]), multiple=True)
 @click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
-@click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5://127.0.0.1:9150")
+@click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 def news(
     query: str | None,
@@ -392,7 +395,7 @@ def news(
     num_results: int | None,
     max_results: int | None,  # deprecated
     page: int,
-    backend: str,
+    backend: str | list[str],
     output: str | None,
     proxy: str | None,
     verify: bool,
@@ -400,6 +403,7 @@ def news(
     """CLI function to perform a DDGS news metasearch."""
     if not (query := query or keywords):  # type: ignore
         raise click.UsageError("Please provide a query.")
+    backend = list(backend) or "auto"
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).news(
         query=query,
         region=region,

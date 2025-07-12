@@ -93,4 +93,4 @@ def _normalize_text(
 
 def _expand_proxy_tb_alias(proxy: str | None) -> str | None:
     """Expand "tb" to a full proxy URL if applicable."""
-    return "socks5://127.0.0.1:9150" if proxy == "tb" else proxy
+    return "socks5h://127.0.0.1:9150" if proxy == "tb" else proxy
