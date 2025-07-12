@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from random import choice
 from types import TracebackType
 from typing import Any
 
@@ -32,14 +31,14 @@ class DDGS:
     def _get_engines(
         self,
         category: str,
-        backend: str,
+        backend: str | list[str],
     ) -> list[BaseSearchEngine]:
         """
         Retrieve a list of search engine instances for a given category and backend.
 
         Args:
             category: The category of search engines (e.g., 'text', 'images', etc.).
-            backend: The specific backend to use, or 'auto' to use all available backends.
+            backend: A single or list of backends. Defaults to "auto" (first two).
 
         Returns:
             A list of initialized search engine instances corresponding to the specified
@@ -47,7 +46,22 @@ class DDGS:
         """
 
         instances = []
-        engine_classes = ENGINES[category].values() if backend == "auto" else [ENGINES[category][backend]]
+        engine_keys = ENGINES[category].keys()
+
+        # Determine which engine classes to use based on the backend parameter
+        if backend == "auto":
+            keys = list(engine_keys)[:2]
+        elif isinstance(backend, str):
+            keys = [backend]
+        elif isinstance(backend, list):
+            keys = backend
+
+        try:
+            engine_classes = [ENGINES[category][key] for key in keys]
+        except KeyError as ex:
+            raise ValueError(f"Invalid backend: {backend}") from ex
+
+        # Initialize and cache engine instances
         for engine_class in engine_classes:
             if engine_class in self._engines_cache:
                 instances.append(self._engines_cache[engine_class])
@@ -67,7 +81,7 @@ class DDGS:
         timelimit: str | None = None,
         num_results: int | None = None,
         page: int = 1,
-        backend: str = "auto",
+        backend: str | list[str] = "auto",
         # deprecated aliases:
         keywords: str | None = None,
         max_results: int | None = None,
@@ -84,7 +98,7 @@ class DDGS:
             timelimit: The timelimit for the search (e.g., d, w, m, y).
             num_results: The number of results to return.
             page: The page of results to return.
-            backend: The specific backend to use, or 'auto' to use all available backends.
+            backend: A single or list of backends. Defaults to "auto" (first two).
 
         Returns:
             A list of dictionaries containing the search results.
@@ -92,14 +106,10 @@ class DDGS:
         query = keywords or query
         assert query, "Query is mandatory."
 
-        # If num_results <= 10, use a random backend
-        if backend == "auto" and num_results and num_results <= 10:
-            backend = choice(list(ENGINES[category].keys()))
-
-        # Fetch engines and issue concurrent requests
         engines = self._get_engines(category, backend)
-        results: list[dict[str, Any]] = []
 
+        # Perform search
+        results: list[dict[str, Any]] = []
         with ThreadPoolExecutor(max_workers=len(engines)) as executor:
             futures = [
                 executor.submit(
