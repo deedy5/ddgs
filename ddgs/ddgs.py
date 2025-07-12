@@ -8,6 +8,7 @@ from typing import Any
 
 from .base import BaseSearchEngine
 from .engines import ENGINES
+from .similarity import JaccardRanker
 
 
 class DDGS:
@@ -119,6 +120,10 @@ class DDGS:
                         results.extend(partial)
                 except Exception as e:
                     logging.warning("Engine failed:", exc_info=e)
+
+        # Rank results
+        ranker = JaccardRanker()
+        results = ranker.rank(results, query)
 
         # Slice to requested number of results
         if (num_results := num_results or max_results) and num_results < len(results):
