@@ -160,7 +160,12 @@ def version() -> str:
 @click.option("-n", "--num_results", type=int, help="number of results")
 @click.option("-m", "--max_results", type=int, help="(Deprecated) maximum number of results")  # deprecated
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
-@click.option("-b", "--backend", type=click.Choice(["auto", "bing", "duckduckgo", "google", "yandex"]), multiple=True)
+@click.option(
+    "-b",
+    "--backend",
+    type=click.Choice(["auto", "bing", "duckduckgo", "google", "yandex", "yahoo"]),
+    multiple=True,
+)
 @click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
 @click.option("-d", "--download", is_flag=True, default=False, help="download results. -dd to set custom directory")
 @click.option("-dd", "--download-directory", help="Specify custom download directory")
