@@ -110,6 +110,7 @@ class DDGS:
 
         # Perform search
         results: list[dict[str, Any]] = []
+        cache: set[str] = set()
         with ThreadPoolExecutor(max_workers=len(engines)) as executor:
             futures = [
                 executor.submit(
@@ -127,7 +128,14 @@ class DDGS:
                 try:
                     partial = future.result()
                     if partial:
-                        results.extend(partial)
+                        # Filter out duplicate text results
+                        for result in partial:
+                            cached_item = (
+                                result.get("href") or result.get("url") or result.get("image") or result.get("content")
+                            )
+                            if cached_item and cached_item not in cache:
+                                results.append(result)
+                                cache.add(cached_item)
                 except Exception as e:
                     logging.warning("Engine failed:", exc_info=e)
 
