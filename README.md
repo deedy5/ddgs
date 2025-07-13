@@ -9,6 +9,7 @@ A metasearch library that aggregates results from diverse web search services.
 * [CLI version](#cli-version)
 * [DDGS search operators](#ddgs-search-operators)
 * [Regions](#regions)
+* [Engines](#engines)
 * [DDGS class](#ddgs-class)
 * [Proxy](#proxy)
 * [Exceptions](#exceptions)
@@ -139,6 +140,18 @@ ___
 
 [Go To TOP](#TOP)
 
+## Engines
+
+Available backends:
+| DDGS function     | Backends                                                                             |
+| ----------------- |:-------------------------------------------------------------------------------------|
+| text()            | *"bing"*, *"brave"*, *"duckduckgo"*, *"google"*, *"yandex"*, *"yahoo"*, *"wikipedia"*|
+| images()          | *"duckduckgo"*                                                                       |
+| videos()          | *"duckduckgo"*                                                                       |
+| news()            | *"duckduckgo"*                                                                       |
+
+
+[Go To TOP](#TOP)
 
 ## DDGS class
 
