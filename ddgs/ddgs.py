@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from random import sample
 from types import TracebackType
 from typing import Any
 
@@ -38,7 +39,7 @@ class DDGS:
 
         Args:
             category: The category of search engines (e.g., 'text', 'images', etc.).
-            backend: A single or list of backends. Defaults to "auto" (first two).
+            backend: A single or list of backends. Defaults to "auto" (wikipedia + two random).
 
         Returns:
             A list of initialized search engine instances corresponding to the specified
@@ -46,11 +47,15 @@ class DDGS:
         """
 
         instances = []
-        engine_keys = ENGINES[category].keys()
+        engine_keys = sorted(ENGINES[category].keys())
 
         # Determine which engine classes to use based on the backend parameter
         if backend == "auto":
-            keys = list(engine_keys)[:2]
+            if category == "text":  # wikipedia + two random engines
+                non_wikipedia_keys = [k for k in engine_keys if k != "wikipedia"]
+                keys = ["wikipedia"] + sample(non_wikipedia_keys, min(2, len(non_wikipedia_keys)))
+            else:  # two random engines
+                keys = sample(engine_keys, min(2, len(engine_keys)))
         elif isinstance(backend, str):
             keys = [backend]
         elif isinstance(backend, list):
@@ -98,7 +103,7 @@ class DDGS:
             timelimit: The timelimit for the search (e.g., d, w, m, y).
             num_results: The number of results to return.
             page: The page of results to return.
-            backend: A single or list of backends. Defaults to "auto" (first two).
+            backend: A single or list of backends. Defaults to "auto" (wikipedia + two random).
 
         Returns:
             A list of dictionaries containing the search results.

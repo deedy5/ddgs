@@ -224,7 +224,7 @@ def text(
         timelimit: d, w, m, y. Defaults to None.
         num_results: number of results. Defaults to None.
         page: page of results. Defaults to 1.
-        backend: A single or list of backends. Defaults to "auto" (first two).
+        backend: A single or list of backends. Defaults to "auto" (wikipedia + two random).
 
     Returns:
         List of dictionaries with search results.
@@ -273,7 +273,7 @@ def images(
         timelimit: d, w, m, y. Defaults to None.
         num_results: number of results. Defaults to None.
         page: page of results. Defaults to 1.
-        backend: A single or list of backends. Defaults to "auto" (first two).
+        backend: A single or list of backends. Defaults to "auto" (wikipedia + two random).
         size: Small, Medium, Large, Wallpaper. Defaults to None.
         color: color, Monochrome, Red, Orange, Yellow, Green, Blue,
             Purple, Pink, Brown, Black, Gray, Teal, White. Defaults to None.
@@ -344,7 +344,7 @@ def videos(
         timelimit: d, w, m. Defaults to None.
         num_results: number of results. Defaults to None.
         page: page of results. Defaults to 1.
-        backend: A single or list of backends. Defaults to "auto" (first two).
+        backend: A single or list of backends. Defaults to "auto" (wikipedia + two random).
         resolution: high, standart. Defaults to None.
         duration: short, medium, long. Defaults to None.
         license_videos: creativeCommon, youtube. Defaults to None.
@@ -413,7 +413,7 @@ def news(
         timelimit: d, w, m. Defaults to None.
         num_results: number of results. Defaults to None.
         page: page of results. Defaults to 1.
-        backend: A single or list of backends. Defaults to "auto" (first two).
+        backend: A single or list of backends. Defaults to "auto" (wikipedia + two random).
 
     Returns:
         List of dictionaries with news search results.
