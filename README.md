@@ -142,13 +142,12 @@ ___
 
 ## Engines
 
-Available backends:
-| DDGS function     | Backends                                                                             |
-| ----------------- |:-------------------------------------------------------------------------------------|
-| text()            | *"bing"*, *"brave"*, *"duckduckgo"*, *"google"*, *"yandex"*, *"yahoo"*, *"wikipedia"*|
-| images()          | *"duckduckgo"*                                                                       |
-| videos()          | *"duckduckgo"*                                                                       |
-| news()            | *"duckduckgo"*                                                                       |
+| DDGS function     | Available backends                                                               |
+| ----------------- |:---------------------------------------------------------------------------------|
+| text()            | `bing`, `brave`, `duckduckgo`, `google`, `mojeek`, `yandex`, `yahoo`, `wikipedia`|
+| images()          | `duckduckgo`                                                                     |
+| videos()          | `duckduckgo`                                                                     |
+| news()            | `duckduckgo`                                                                     |
 
 
 [Go To TOP](#TOP)

@@ -8,6 +8,7 @@ from .duckduckgo_images import DuckduckgoImages
 from .duckduckgo_news import DuckduckgoNews
 from .duckduckgo_videos import DuckduckgoVideos
 from .google import Google
+from .mojeek import Mojeek
 from .wikipedia import Wikipedia
 from .yahoo import Yahoo
 from .yandex import Yandex
@@ -18,6 +19,7 @@ ENGINES: dict[str, dict[str, type[BaseSearchEngine]]] = {
         "google": Google,
         "bing": Bing,
         "brave": Brave,
+        "mojeek": Mojeek,
         "yahoo": Yahoo,
         "yandex": Yandex,
         "duckduckgo": Duckduckgo,
