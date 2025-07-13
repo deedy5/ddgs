@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from ..base import BaseSearchEngine
 from .bing import Bing
+from .brave import Brave
 from .duckduckgo import Duckduckgo
 from .duckduckgo_images import DuckduckgoImages
 from .duckduckgo_news import DuckduckgoNews
@@ -16,6 +17,7 @@ ENGINES: dict[str, dict[str, type[BaseSearchEngine]]] = {
         "wikipedia": Wikipedia,
         "google": Google,
         "bing": Bing,
+        "brave": Brave,
         "yahoo": Yahoo,
         "yandex": Yandex,
         "duckduckgo": Duckduckgo,

@@ -163,7 +163,7 @@ def version() -> str:
 @click.option(
     "-b",
     "--backend",
-    type=click.Choice(["auto", "bing", "duckduckgo", "google", "yandex", "yahoo", "wikipedia"]),
+    type=click.Choice(["auto", "bing", "brave", "duckduckgo", "google", "yandex", "yahoo", "wikipedia"]),
     multiple=True,
 )
 @click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
