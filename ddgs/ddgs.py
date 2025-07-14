@@ -66,7 +66,7 @@ class DDGS:
             keys = engine_keys
         elif isinstance(backend, str):
             keys = [backend]
-        elif isinstance(backend, list):
+        elif isinstance(backend, (list, tuple)):
             keys = backend
 
         try:
