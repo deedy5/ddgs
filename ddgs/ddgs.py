@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from random import sample
 from types import TracebackType
@@ -16,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 class DDGS:
     def __init__(self, proxy: str | None = None, timeout: int | None = None, verify: bool = True):
-        self._proxy = proxy
+        self._proxy = proxy or os.environ.get("DDGS_PROXY")
         self._timeout = timeout
         self._verify = verify
         self._engines_cache: dict[type[BaseSearchEngine], BaseSearchEngine] = {}  # dict[engine_class, engine_instance]
