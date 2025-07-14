@@ -31,7 +31,7 @@ class Google(BaseSearchEngine):
     elements_xpath = {
         "title": ".//h3//text()",
         "href": ".//a[h3]/@href",
-        "body": "./div[2]//text()",
+        "body": ".//div[starts-with(@data-sncf, '1')]//text()",
     }
 
     def build_payload(
