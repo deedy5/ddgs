@@ -41,12 +41,16 @@ class SimpleFilterRanker:
             # fallback to 'description' if no 'body'
             body = doc.get("body", doc.get("description", ""))
 
-            # 1) Wikipedia check
+            # Skip Wikimedia category pages
+            if all(x in title for x in ["Category:", "Wikimedia"]):
+                continue
+
+            # Wikipedia check
             if "wikipedia.org" in href:
                 wiki_hits.append(doc)
                 continue
 
-            # 2) Title / Body match
+            # Title / Body match
             hit_title = self._has_any_token(title, tokens)
             hit_body = self._has_any_token(body, tokens)
 
