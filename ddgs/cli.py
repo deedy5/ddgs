@@ -193,8 +193,7 @@ def text(
     verify: bool,
 ) -> None:
     """CLI function to perform a DDGS text metasearch."""
-    if not (query := query or keywords):  # type: ignore
-        raise click.UsageError("Please provide a query.")
+    assert (query := query or keywords), "Please provide a query."
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).text(
         query=query,
         region=region,
@@ -290,8 +289,7 @@ def images(
     verify: bool,
 ) -> None:
     """CLI function to perform a DDGS images metasearch."""
-    if not (query := query or keywords):  # type: ignore
-        raise click.UsageError("Please provide a query.")
+    assert (query := query or keywords), "Please provide a query."
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).images(
         query=query,
         region=region,
@@ -357,8 +355,7 @@ def videos(
     verify: bool,
 ) -> None:
     """CLI function to perform a DDGS videos metasearch."""
-    if not (query := query or keywords):  # type: ignore
-        raise click.UsageError("Please provide a query.")
+    assert (query := query or keywords), "Please provide a query."
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).videos(
         query=query,
         region=region,
@@ -406,8 +403,7 @@ def news(
     verify: bool,
 ) -> None:
     """CLI function to perform a DDGS news metasearch."""
-    if not (query := query or keywords):  # type: ignore
-        raise click.UsageError("Please provide a query.")
+    assert (query := query or keywords), "Please provide a query."
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).news(
         query=query,
         region=region,

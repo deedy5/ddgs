@@ -8,6 +8,7 @@ from typing import Any
 
 from .base import BaseSearchEngine
 from .engines import ENGINES
+from .exceptions import DDGSException
 from .similarity import JaccardRanker
 
 logger = logging.getLogger(__name__)
@@ -70,7 +71,7 @@ class DDGS:
         try:
             engine_classes = [ENGINES[category][key] for key in keys]
         except KeyError as ex:
-            raise ValueError(f"Invalid backend: {backend}") from ex
+            raise DDGSException(f"Invalid backend: {backend}") from ex
 
         # Initialize and cache engine instances
         for engine_class in engine_classes:
