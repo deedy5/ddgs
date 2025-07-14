@@ -13,6 +13,8 @@ from .http_client import HttpClient
 from .results import ImagesResult, TextResult
 from .utils import _normalize_text, _normalize_url
 
+logger = logging.getLogger(__name__)
+
 
 class BaseSearchEngine(ABC):
     search_url: str
@@ -40,7 +42,7 @@ class BaseSearchEngine(ABC):
             if resp.status_code == 200:
                 return resp.text
         except Exception as ex:
-            logging.warning(f"{type(ex).__name__}: {ex}", exc_info=True)
+            logger.warning(f"{type(ex).__name__}: {ex}")
         return None
 
     @cached_property

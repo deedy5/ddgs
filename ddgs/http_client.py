@@ -6,6 +6,8 @@ from typing import Any
 
 import primp
 
+logger = logging.getLogger(__name__)
+
 
 class Response:
     __slots__ = ("status_code", "content", "text")
@@ -57,7 +59,7 @@ class HttpClient:
                 resp = self.client.request(*args, **kwargs)
                 return Response(status_code=resp.status_code, content=resp.content, text=resp.text)
             except Exception as ex:
-                logging.warning(f"{type(ex).__name__}: {ex}", exc_info=True)
+                logger.warning(f"{type(ex).__name__}: {ex}")
         return Response(status_code=500, content=b"", text="")
 
     def get(self, *args: Any, **kwargs: Any) -> Response:
