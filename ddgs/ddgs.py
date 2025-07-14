@@ -10,6 +10,8 @@ from .base import BaseSearchEngine
 from .engines import ENGINES
 from .similarity import JaccardRanker
 
+logger = logging.getLogger(__name__)
+
 
 class DDGS:
     def __init__(self, proxy: str | None = None, timeout: int | None = None, verify: bool = True):
@@ -148,7 +150,7 @@ class DDGS:
                                 results.append(result)
                                 cache.add(cached_item)
                 except Exception as e:
-                    logging.warning("Engine failed:", exc_info=e)
+                    logger.warning("Engine failed:", exc_info=e)
 
         # Rank results
         ranker = JaccardRanker()
