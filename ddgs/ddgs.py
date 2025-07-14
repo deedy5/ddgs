@@ -9,7 +9,7 @@ from typing import Any
 from .base import BaseSearchEngine
 from .engines import ENGINES
 from .exceptions import DDGSException
-from .similarity import JaccardRanker
+from .similarity import SimpleFilterRanker
 
 logger = logging.getLogger(__name__)
 
@@ -154,7 +154,7 @@ class DDGS:
                     logger.warning("Engine failed:", exc_info=e)
 
         # Rank results
-        ranker = JaccardRanker()
+        ranker = SimpleFilterRanker()
         results = ranker.rank(results, query)
 
         # Slice to requested number of results
