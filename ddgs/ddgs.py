@@ -55,6 +55,10 @@ class DDGS:
         instances = []
         engine_keys = sorted(ENGINES[category].keys())
 
+        if backend == "bing":
+            backend = "auto"
+            logging.warning("Bing backend is temporarily disabled. Using backend='auto' instead.")
+
         # Determine which engine classes to use based on the backend parameter
         if "auto" in backend:
             if category == "text":  # wikipedia + 3 random engines

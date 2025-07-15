@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from ..base import BaseSearchEngine
-from .bing import Bing
+
+# from .bing import Bing
 from .brave import Brave
 from .duckduckgo import Duckduckgo
 from .duckduckgo_images import DuckduckgoImages
@@ -18,7 +19,7 @@ ENGINES: dict[str, dict[str, type[BaseSearchEngine]]] = {
     "text": {
         "wikipedia": Wikipedia,
         "google": Google,
-        "bing": Bing,
+        # "bing": Bing,  # Disabled until Bing is fixed (returns irrelevant results)
         "brave": Brave,
         "mojeek": Mojeek,
         "mullvad_brave": MullvadLetaBrave,
