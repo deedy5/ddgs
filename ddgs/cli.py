@@ -165,7 +165,20 @@ def version() -> str:
     "--backend",
     default=["auto"],
     type=click.Choice(
-        ["auto", "all", "bing", "brave", "duckduckgo", "google", "mojeek", "yandex", "yahoo", "wikipedia"]
+        [
+            "auto",
+            "all",
+            "bing",
+            "brave",
+            "duckduckgo",
+            "google",
+            "mojeek",
+            "mullvad_brave",
+            "mullvad_google",
+            "yandex",
+            "yahoo",
+            "wikipedia",
+        ]
     ),
     multiple=True,
 )
