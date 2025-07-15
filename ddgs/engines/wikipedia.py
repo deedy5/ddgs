@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+from urllib.parse import quote
 
 from ..base import BaseSearchEngine
 from ..results import TextResult
@@ -17,7 +18,8 @@ class Wikipedia(BaseSearchEngine):
         self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
         country, lang = region.lower().split("-")
-        self.search_url = f"https://{lang}.wikipedia.org/api/rest_v1/page/summary/{query}"
+        encoded_query = quote(query, safe="")
+        self.search_url = f"https://{lang}.wikipedia.org/api/rest_v1/page/summary/{encoded_query}"
         payload: dict[str, Any] = {}
         return payload
 
