@@ -9,6 +9,24 @@ from ..base import BaseSearchEngine
 from ..results import TextResult
 
 
+def unwrap_bing_url(raw_url: str) -> str | None:
+    """Decode the Bing-wrapped raw_url to extract the original url"""
+    parsed = urlparse(raw_url)
+    u_vals = parse_qs(parsed.query).get("u", [])
+    if not u_vals:
+        return None
+
+    u = u_vals[0]
+    if len(u) <= 2:
+        return None
+
+    # Drop the first two characters, pad to a multiple of 4, then decode
+    b64_part = u[2:]
+    padding = "=" * (-len(b64_part) % 4)
+    decoded = base64.urlsafe_b64decode(b64_part + padding)
+    return decoded.decode()
+
+
 class Bing(BaseSearchEngine):
     """Bing search engine"""
 
@@ -51,12 +69,11 @@ class Bing(BaseSearchEngine):
             for key, value in self.elements_xpath.items():
                 data = item.xpath(value)
                 data = "".join(x for x in data if x.strip())
-                if key == "href" and data.startswith("https://www.bing.com/ck/a?"):
-                    data = (
-                        lambda u: base64.urlsafe_b64decode((b := u[2:]) + "=" * ((-len(b)) % 4)).decode()
-                        if u and len(u) > 2
-                        else None
-                    )(parse_qs(urlparse(data).query).get("u", [""])[0])
+                if key == "href":
+                    if data.startswith("https://www.bing.com/aclick?"):
+                        continue
+                    elif data.startswith("https://www.bing.com/ck/a?"):
+                        data = unwrap_bing_url(data)
                 result.__setattr__(key, data)
             results.append(result.__dict__)
         return results
