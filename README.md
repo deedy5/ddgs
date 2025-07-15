@@ -144,7 +144,7 @@ ___
 
 | DDGS function     | Available backends                                                               |
 | ----------------- |:---------------------------------------------------------------------------------|
-| text()            | `bing`, `brave`, `duckduckgo`, `google`, `mojeek`, `yandex`, `yahoo`, `wikipedia`|
+| text()            | `bing`, `brave`, `duckduckgo`, `google`, `mojeek`, `mullvad_brave`, `mullvad_google`, `yandex`, `yahoo`, `wikipedia`|
 | images()          | `duckduckgo`                                                                     |
 | videos()          | `duckduckgo`                                                                     |
 | news()            | `duckduckgo`                                                                     |
