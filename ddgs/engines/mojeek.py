@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from random import randint
 from typing import Any
 
 from ..base import BaseSearchEngine
@@ -27,8 +28,8 @@ class Mojeek(BaseSearchEngine):
             "q": query,
             "arc": country,
             "lb": lang,
-            "tlen": "128",  # Title length limit
-            "dlen": "512",  # Description length limit
+            "tlen": f"{randint(118, 128)}",  # Title length limit (max=128)
+            "dlen": f"{randint(502, 512)}",  # Description length limit (max=512)
         }
         if safesearch == "on":
             payload["safe"] = "1"
