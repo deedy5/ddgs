@@ -7,7 +7,7 @@ from ..base import BaseSearchEngine
 from ..results import TextResult
 
 
-class Yandex(BaseSearchEngine):
+class Yandex(BaseSearchEngine[TextResult]):
     """Yandex search engine"""
 
     search_url = "https://yandex.com/search/site/"
@@ -32,7 +32,7 @@ class Yandex(BaseSearchEngine):
             payload["p"] = f"{page - 1}"
         return payload
 
-    def extract_results(self, html_text: str) -> list[dict[str, Any]]:
+    def extract_results(self, html_text: str) -> list[TextResult]:
         """Extract search results from html text"""
         tree = self.extract_tree(html_text)
         items = tree.xpath(self.items_xpath)
@@ -43,5 +43,5 @@ class Yandex(BaseSearchEngine):
                 data = item.xpath(value)
                 data = "".join(x for x in data if x.strip())
                 result.__setattr__(key, data)
-            results.append(result.__dict__)
+            results.append(result)
         return results

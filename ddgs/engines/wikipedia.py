@@ -11,7 +11,7 @@ from ..utils import json_loads
 logger = logging.getLogger(__name__)
 
 
-class Wikipedia(BaseSearchEngine):
+class Wikipedia(BaseSearchEngine[TextResult]):
     """Wikipedia text search engine"""
 
     search_url = "https://{lang}.wikipedia.org/api/rest_v1/page/summary/{query}"
@@ -27,7 +27,7 @@ class Wikipedia(BaseSearchEngine):
         self.lang = lang  # used in extract_results
         return payload
 
-    def extract_results(self, html_text: str) -> list[dict[str, Any]]:
+    def extract_results(self, html_text: str) -> list[TextResult]:
         """Extract search results from html text"""
         json_data = json_loads(html_text)
         result = TextResult()
@@ -48,5 +48,4 @@ class Wikipedia(BaseSearchEngine):
             except KeyError as ex:
                 logger.warning(f"Error getting robust summary from Wikipedia for title={result.title}:  {ex}")
 
-        results: list[dict[str, Any]] = list([result.__dict__])
-        return results
+        return [result]

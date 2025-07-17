@@ -27,7 +27,7 @@ def unwrap_bing_url(raw_url: str) -> str | None:
     return decoded.decode()
 
 
-class Bing(BaseSearchEngine):
+class Bing(BaseSearchEngine[TextResult]):
     """Bing search engine"""
 
     search_url = "https://www.bing.com/search"
@@ -59,7 +59,7 @@ class Bing(BaseSearchEngine):
             payload["FORM"] = f"PERE{page - 2 if page > 2 else ''}"
         return payload
 
-    def extract_results(self, html_text: str) -> list[dict[str, Any]]:
+    def extract_results(self, html_text: str) -> list[TextResult]:
         """Extract search results from html text"""
         tree = self.extract_tree(html_text)
         items = tree.xpath(self.items_xpath)
@@ -75,5 +75,5 @@ class Bing(BaseSearchEngine):
                     elif data.startswith("https://www.bing.com/ck/a?"):
                         data = unwrap_bing_url(data)
                 result.__setattr__(key, data)
-            results.append(result.__dict__)
+            results.append(result)
         return results

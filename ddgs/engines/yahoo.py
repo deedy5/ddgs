@@ -21,7 +21,7 @@ def extract_url(u: str) -> str:
     return unquote_plus(t.split("/RK=", 1)[0].split("/RS=", 1)[0])
 
 
-class Yahoo(BaseSearchEngine):
+class Yahoo(BaseSearchEngine[TextResult]):
     """Yahoo search engine"""
 
     search_url = "https://search.yahoo.com/search"
@@ -45,7 +45,7 @@ class Yahoo(BaseSearchEngine):
             payload["btf"] = timelimit
         return payload
 
-    def extract_results(self, html_text: str) -> list[dict[str, Any]]:
+    def extract_results(self, html_text: str) -> list[TextResult]:
         """Extract search results from html text"""
         tree = self.extract_tree(html_text)
         items = tree.xpath(self.items_xpath)
@@ -58,5 +58,5 @@ class Yahoo(BaseSearchEngine):
                 if key == "href" and "/RU=" in data:
                     data = extract_url(data)
                 result.__setattr__(key, data)
-            results.append(result.__dict__)
+            results.append(result)
         return results

@@ -6,7 +6,7 @@ from ..base import BaseSearchEngine
 from ..results import TextResult
 
 
-class Duckduckgo(BaseSearchEngine):
+class Duckduckgo(BaseSearchEngine[TextResult]):
     """Duckduckgo search engine"""
 
     search_url = "https://html.duckduckgo.com/html/"
@@ -25,7 +25,7 @@ class Duckduckgo(BaseSearchEngine):
             payload["df"] = timelimit
         return payload
 
-    def extract_results(self, html_text: str) -> list[dict[str, Any]]:
+    def extract_results(self, html_text: str) -> list[TextResult]:
         """Extract search results from html text"""
         tree = self.extract_tree(html_text)
         items = tree.xpath(self.items_xpath)
@@ -36,5 +36,5 @@ class Duckduckgo(BaseSearchEngine):
                 data = item.xpath(value)
                 data = "".join(x for x in data if x.strip())
                 result.__setattr__(key, data)
-            results.append(result.__dict__)
+            results.append(result)
         return results

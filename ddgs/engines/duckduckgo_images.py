@@ -7,7 +7,7 @@ from ..results import ImagesResult
 from ..utils import _extract_vqd, json_loads
 
 
-class DuckduckgoImages(BaseSearchEngine):
+class DuckduckgoImages(BaseSearchEngine[ImagesResult]):
     """Duckduckgo images search engine"""
 
     search_url = "https://duckduckgo.com/i.js"
@@ -57,7 +57,7 @@ class DuckduckgoImages(BaseSearchEngine):
             payload["s"] = f"{(page - 1) * 100}"
         return payload
 
-    def extract_results(self, html_text: str) -> list[dict[str, Any]]:
+    def extract_results(self, html_text: str) -> list[ImagesResult]:
         """Extract search results from html text"""
         json_data = json_loads(html_text)
         items = json_data.get("results", [])
@@ -67,5 +67,5 @@ class DuckduckgoImages(BaseSearchEngine):
             for key, value in self.elements_replace.items():
                 data = item.get(key)
                 result.__setattr__(value, data)
-            results.append(result.__dict__)
+            results.append(result)
         return results

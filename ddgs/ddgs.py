@@ -10,7 +10,7 @@ from typing import Any
 from .base import BaseSearchEngine
 from .engines import ENGINES
 from .exceptions import DDGSException
-from .similarity import SimpleFilterRanker
+from .results import ResultsAggregator
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,9 @@ class DDGS:
         self._proxy = proxy or os.environ.get("DDGS_PROXY")
         self._timeout = timeout
         self._verify = verify
-        self._engines_cache: dict[type[BaseSearchEngine], BaseSearchEngine] = {}  # dict[engine_class, engine_instance]
+        self._engines_cache: dict[
+            type[BaseSearchEngine[Any]], BaseSearchEngine[Any]
+        ] = {}  # dict[engine_class, engine_instance]
 
     def __enter__(self) -> DDGS:
         return self
@@ -37,7 +39,7 @@ class DDGS:
         self,
         category: str,
         backend: str | list[str],
-    ) -> list[BaseSearchEngine]:
+    ) -> list[BaseSearchEngine[Any]]:
         """
         Retrieve a list of search engine instances for a given category and backend.
 
@@ -51,12 +53,11 @@ class DDGS:
             A list of initialized search engine instances corresponding to the specified
             category and backend. Instances are cached for reuse.
         """
-
-        instances = []
+        backend = [backend] if isinstance(backend, str) else list(backend) if isinstance(backend, tuple) else backend
         engine_keys = sorted(ENGINES[category].keys())
 
-        if backend == "bing":
-            backend = "auto"
+        if backend == ["bing"]:
+            backend = ["auto"]
             logging.warning("Bing backend is temporarily disabled. Using backend='auto' instead.")
 
         # Determine which engine classes to use based on the backend parameter
@@ -68,9 +69,7 @@ class DDGS:
                 keys = sample(engine_keys, min(3, len(engine_keys)))
         elif "all" in backend:
             keys = engine_keys
-        elif isinstance(backend, str):
-            keys = [backend]
-        elif isinstance(backend, (list, tuple)):
+        else:
             keys = backend
 
         try:
@@ -79,6 +78,7 @@ class DDGS:
             raise DDGSException(f"Invalid backend: {backend}") from ex
 
         # Initialize and cache engine instances
+        instances = []
         for engine_class in engine_classes:
             if engine_class in self._engines_cache:
                 instances.append(self._engines_cache[engine_class])
@@ -128,8 +128,7 @@ class DDGS:
         engines = self._get_engines(category, backend)
 
         # Perform search
-        results: list[dict[str, Any]] = []
-        cache: set[str] = set()
+        results_aggregator: ResultsAggregator[set[str]] = ResultsAggregator(set(["href", "image", "url", "embed_url"]))
         with ThreadPoolExecutor(max_workers=len(engines)) as executor:
             futures = [
                 executor.submit(
@@ -147,25 +146,16 @@ class DDGS:
                 try:
                     partial = future.result()
                     if partial:
-                        # Filter out duplicate text results
-                        for result in partial:
-                            cached_item = (
-                                result.get("href") or result.get("url") or result.get("image") or result.get("content")
-                            )
-                            if cached_item and cached_item not in cache:
-                                results.append(result)
-                                cache.add(cached_item)
+                        results_aggregator.extend(partial)
                 except Exception as e:
                     logger.warning("Engine failed:", exc_info=e)
 
         # Rank results
-        ranker = SimpleFilterRanker()
-        results = ranker.rank(results, query)
+        # ranker = SimpleFilterRanker()
+        # results = ranker.rank(results, query)
 
-        # Slice to requested number of results
-        if (num_results := num_results or max_results) and num_results < len(results):
-            return results[:num_results]
-        return results
+        results = results_aggregator.extract_dicts()
+        return results[:num_results] if num_results else results
 
     def text(self, query: str, **kwargs: Any) -> list[dict[str, Any]]:
         return self._search("text", query, **kwargs)
