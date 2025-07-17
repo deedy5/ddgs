@@ -17,7 +17,7 @@ class Wikipedia(BaseSearchEngine[TextResult]):
     name = "wikipedia"
     category = "text"
 
-    search_url = "https://{lang}.wikipedia.org/api/rest_v1/page/summary/{query}"
+    search_url = "https://{lang}.wikipedia.org/w/api.php?action=opensearch&search={query}"
     search_method = "GET"
 
     def build_payload(
@@ -25,7 +25,9 @@ class Wikipedia(BaseSearchEngine[TextResult]):
     ) -> dict[str, Any]:
         country, lang = region.lower().split("-")
         encoded_query = quote(query)
-        self.search_url = f"https://{lang}.wikipedia.org/api/rest_v1/page/summary/{encoded_query}"
+        self.search_url = (
+            f"https://{lang}.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search={encoded_query}"
+        )
         payload: dict[str, Any] = {}
         self.lang = lang  # used in extract_results
         return payload
@@ -33,12 +35,14 @@ class Wikipedia(BaseSearchEngine[TextResult]):
     def extract_results(self, html_text: str) -> list[TextResult]:
         """Extract search results from html text"""
         json_data = json_loads(html_text)
-        result = TextResult()
-        result.title = json_data.get("title")
-        result.href = json_data.get("content_urls", {}).get("desktop", {}).get("page")
-        result.body = json_data.get("extract")
+        if not json_data[1]:
+            return []
 
-        # Add more robust summary
+        result = TextResult()
+        result.title = json_data[1][0]
+        result.href = json_data[3][0]
+
+        # Add body
         encoded_query = quote(result.title)
         resp_data = self.request(
             "GET",
@@ -49,6 +53,6 @@ class Wikipedia(BaseSearchEngine[TextResult]):
             try:
                 result.body = list(json_data["query"]["pages"].values())[0]["extract"]
             except KeyError as ex:
-                logger.warning(f"Error getting robust summary from Wikipedia for title={result.title}:  {ex}")
+                logger.warning(f"Error getting body from Wikipedia for title={result.title}:  {ex}")
 
         return [result]
