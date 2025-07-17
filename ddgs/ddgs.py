@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import os
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, TimeoutError
 from random import sample
 from types import TracebackType
 from typing import Any
@@ -22,6 +22,7 @@ class DDGS:
         self._engines_cache: dict[
             type[BaseSearchEngine[Any]], BaseSearchEngine[Any]
         ] = {}  # dict[engine_class, engine_instance]
+        self._executor = ThreadPoolExecutor()
 
     def __enter__(self) -> DDGS:
         return self
@@ -32,7 +33,7 @@ class DDGS:
         exc_val: BaseException | None = None,
         exc_tb: TracebackType | None = None,
     ) -> None:
-        pass
+        self._executor.shutdown()
 
     def _get_engines(
         self,
@@ -128,33 +129,38 @@ class DDGS:
 
         # Perform search
         results_aggregator: ResultsAggregator[set[str]] = ResultsAggregator(set(["href", "image", "url", "embed_url"]))
-        with ThreadPoolExecutor(max_workers=len(engines)) as executor:
-            futures = [
-                executor.submit(
-                    engine.search,
-                    query,
-                    region=region,
-                    safesearch=safesearch,
-                    timelimit=timelimit,
-                    page=page,
-                    **kwargs,
-                )
-                for engine in engines
-            ]
-            for future in as_completed(futures):
-                try:
-                    partial = future.result()
-                    if partial:
-                        results_aggregator.extend(partial)
-                except Exception as e:
-                    logger.warning("Engine failed:", exc_info=e)
+        futures = {
+            self._executor.submit(
+                engine.search,
+                query,
+                region=region,
+                safesearch=safesearch,
+                timelimit=timelimit,
+                page=page,
+                **kwargs,
+            ): engine
+            for engine in engines
+        }
+        for future, engine in futures.items():
+            try:
+                partial = future.result(timeout=self._timeout)
+                if partial:
+                    results_aggregator.extend(partial)
+            except TimeoutError:
+                future.cancel()
+                logger.warning(f"{engine.name=} timed out:")
+            except Exception as e:
+                future.cancel()
+                logger.warning(f"{engine.name=} failed:", exc_info=e)
 
         # Rank results
         # ranker = SimpleFilterRanker()
         # results = ranker.rank(results, query)
 
         results = results_aggregator.extract_dicts()
-        return results[:num_results] if num_results else results
+        if (num_results := num_results or max_results) and num_results < len(results):
+            return results[:num_results]
+        return results
 
     def text(self, query: str, **kwargs: Any) -> list[dict[str, Any]]:
         return self._search("text", query, **kwargs)
