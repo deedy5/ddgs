@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from functools import cached_property
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic, Literal, TypeVar
 
 from lxml import html
 from lxml.etree import HTMLParser as LHTMLParser
@@ -16,6 +16,15 @@ T = TypeVar("T")
 
 
 class BaseSearchEngine(ABC, Generic[T]):
+    """
+    Abstract base for all search-engine backends.
+    """
+
+    name: str  # unique key, e.g. "google"
+    category: Literal["text", "images", "videos", "news"]
+    provider: str | None = None  # if proxy, the real engine, else None
+    disabled: bool = False  # if True, the engine is disabled
+
     search_url: str
     search_method: str  # GET or POST
     search_headers: dict[str, str] = {}

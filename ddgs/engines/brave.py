@@ -9,6 +9,9 @@ from ..results import TextResult
 class Brave(BaseSearchEngine[TextResult]):
     """Brave search engine"""
 
+    name = "brave"
+    category = "text"
+
     search_url = "https://search.brave.com/search"
     search_method = "GET"
 

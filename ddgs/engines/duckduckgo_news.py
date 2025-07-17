@@ -10,6 +10,10 @@ from ..utils import _extract_vqd, json_loads
 class DuckduckgoNews(BaseSearchEngine[NewsResult]):
     """Duckduckgo news search engine"""
 
+    name = "duckduckgo_news"
+    category = "news"
+    provider = "bing"
+
     search_url = "https://duckduckgo.com/news.js"
     search_method = "GET"
 

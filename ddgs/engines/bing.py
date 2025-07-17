@@ -30,6 +30,10 @@ def unwrap_bing_url(raw_url: str) -> str | None:
 class Bing(BaseSearchEngine[TextResult]):
     """Bing search engine"""
 
+    name = "bing"
+    category = "text"
+    disabled = True  # Disabled until Bing is fixed (returns irrelevant results)
+
     search_url = "https://www.bing.com/search"
     search_method = "GET"
 
