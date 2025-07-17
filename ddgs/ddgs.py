@@ -4,7 +4,7 @@ import logging
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from math import ceil
-from random import sample
+from random import shuffle
 from types import TracebackType
 from typing import Any, Literal
 
@@ -46,8 +46,6 @@ class DDGS:
         Args:
             category: The category of search engines (e.g., 'text', 'images', etc.).
             backend: A single or list of backends. Defaults to "auto".
-                - "all" : all engines are used
-                - "auto" : random 3 engines are used
 
         Returns:
             A list of initialized search engine instances corresponding to the specified
@@ -55,17 +53,11 @@ class DDGS:
         """
         backend = [backend] if isinstance(backend, str) else list(backend) if isinstance(backend, tuple) else backend
         engine_keys = list(ENGINES[category].keys())
+        shuffle(engine_keys)
+        keys = engine_keys if "auto" in backend or "all" in backend else backend
 
-        # Determine which engine classes to use based on the backend parameter
-        if "auto" in backend:  # 3 random engines
-            keys = sample(engine_keys, min(3, len(engine_keys)))
-        elif "all" in backend:
-            keys = engine_keys
-        else:
-            keys = backend
-
-        # ensure Wikipedia is always included and in the first position
         if category == "text":
+            # ensure Wikipedia is always included and in the first position
             keys = ["wikipedia"] + [key for key in keys if key != "wikipedia"]
 
         try:
@@ -96,7 +88,7 @@ class DDGS:
         region: str = "us-en",
         safesearch: str = "moderate",
         timelimit: str | None = None,
-        num_results: int | None = None,
+        num_results: int | None = 10,
         page: int = 1,
         backend: str | list[str] = "auto",
         # deprecated aliases:
@@ -113,19 +105,17 @@ class DDGS:
             region: The region to use for the search (e.g., us-en, uk-en, ru-ru, etc.).
             safesearch: The safesearch setting (e.g., on, moderate, off).
             timelimit: The timelimit for the search (e.g., d, w, m, y).
-            num_results: The number of results to return.
-            page: The page of results to return.
+            num_results: The number of results to return. Defaults to 10.
+            page: The page of results to return. Defaults to 1.
             backend: A single or list of backends. Defaults to "auto".
-                - "all" : all engines are used
-                - "auto" : random 3 engines are used
 
         Returns:
             A list of dictionaries containing the search results.
         """
         query = keywords or query
         assert query, "Query is mandatory."
+        num_results = max_results or num_results
 
-        num_results = num_results or max_results
         engines = self._get_engines(category, backend)
         seen_providers: dict[str, Literal["working", "seen"]] = {}  # dict[provider, state]
 

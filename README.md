@@ -223,7 +223,7 @@ def text(
     region: str = "us-en",
     safesearch: str = "moderate",
     timelimit: str | None = None,
-    num_results: int | None = None,
+    num_results: int | None = 10,
     page: int = 1,
     backend: str | list[str] = "auto",
 ) -> list[dict[str, str]]:
@@ -234,11 +234,9 @@ def text(
         region: us-en, uk-en, ru-ru, etc. Defaults to us-en.
         safesearch: on, moderate, off. Defaults to "moderate".
         timelimit: d, w, m, y. Defaults to None.
-        num_results: number of results. Defaults to None.
+        num_results: number of results. Defaults to 10.
         page: page of results. Defaults to 1.
         backend: A single or list of backends. Defaults to "auto".
-                - "all" : all engines are used
-                - "auto" : "wikipedia" + random 3 engines are used
 
     Returns:
         List of dictionaries with search results.
@@ -269,7 +267,7 @@ def images(
     region: str = "us-en",
     safesearch: str = "moderate",
     timelimit: str | None = None,
-    num_results: int | None = None,
+    num_results: int | None = 10,
     page: int = 1,
     backend: str | list[str] = "auto",
     size: str | None = None,
@@ -285,11 +283,9 @@ def images(
         region: us-en, uk-en, ru-ru, etc. Defaults to us-en.
         safesearch: on, moderate, off. Defaults to "moderate".
         timelimit: d, w, m, y. Defaults to None.
-        num_results: number of results. Defaults to None.
+        num_results: number of results. Defaults to 10.
         page: page of results. Defaults to 1.
         backend: A single or list of backends. Defaults to "auto".
-                - "all" : all engines are used
-                - "auto" : random 3 engines are used
         size: Small, Medium, Large, Wallpaper. Defaults to None.
         color: color, Monochrome, Red, Orange, Yellow, Green, Blue,
             Purple, Pink, Brown, Black, Gray, Teal, White. Defaults to None.
@@ -344,7 +340,7 @@ def videos(
     region: str = "us-en",
     safesearch: str = "moderate",
     timelimit: str | None = None,
-    num_results: int | None = None,
+    num_results: int | None = 10,
     page: int = 1,
     backend: str | list[str] = "auto",
     resolution: str | None = None,
@@ -358,11 +354,9 @@ def videos(
         region: us-en, uk-en, ru-ru, etc. Defaults to us-en.
         safesearch: on, moderate, off. Defaults to "moderate".
         timelimit: d, w, m. Defaults to None.
-        num_results: number of results. Defaults to None.
+        num_results: number of results. Defaults to 10.
         page: page of results. Defaults to 1.
         backend: A single or list of backends. Defaults to "auto".
-                - "all" : all engines are used
-                - "auto" : random 3 engines are used
         resolution: high, standart. Defaults to None.
         duration: short, medium, long. Defaults to None.
         license_videos: creativeCommon, youtube. Defaults to None.
@@ -418,7 +412,7 @@ def news(
     region: str = "us-en",
     safesearch: str = "moderate",
     timelimit: str | None = None,
-    num_results: int | None = None,
+    num_results: int | None = 10,
     page: int = 1,
     backend: str | list[str] = "auto",
 ) -> list[dict[str, str]]:
@@ -429,11 +423,9 @@ def news(
         region: us-en, uk-en, ru-ru, etc. Defaults to us-en.
         safesearch: on, moderate, off. Defaults to "moderate".
         timelimit: d, w, m. Defaults to None.
-        num_results: number of results. Defaults to None.
+        num_results: number of results. Defaults to 10.
         page: page of results. Defaults to 1.
         backend: A single or list of backends. Defaults to "auto".
-                - "all" : all engines are used
-                - "auto" : random 3 engines are used
 
     Returns:
         List of dictionaries with news search results.
