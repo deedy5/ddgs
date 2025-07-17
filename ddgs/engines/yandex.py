@@ -12,6 +12,7 @@ class Yandex(BaseSearchEngine[TextResult]):
 
     name = "yandex"
     category = "text"
+    provider = "yandex"
 
     search_url = "https://yandex.com/search/site/"
     search_method = "GET"

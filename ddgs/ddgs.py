@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import logging
 import os
-from concurrent.futures import ThreadPoolExecutor, TimeoutError
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from math import ceil
 from random import sample
 from types import TracebackType
-from typing import Any
+from typing import Any, Literal
 
 from .base import BaseSearchEngine
 from .engines import ENGINES
@@ -15,14 +16,13 @@ logger = logging.getLogger(__name__)
 
 
 class DDGS:
-    def __init__(self, proxy: str | None = None, timeout: int | None = None, verify: bool = True):
+    def __init__(self, proxy: str | None = None, timeout: int | None = 10, verify: bool = True):
         self._proxy = proxy or os.environ.get("DDGS_PROXY")
         self._timeout = timeout
         self._verify = verify
         self._engines_cache: dict[
             type[BaseSearchEngine[Any]], BaseSearchEngine[Any]
         ] = {}  # dict[engine_class, engine_instance]
-        self._executor = ThreadPoolExecutor()
 
     def __enter__(self) -> DDGS:
         return self
@@ -33,7 +33,7 @@ class DDGS:
         exc_val: BaseException | None = None,
         exc_tb: TracebackType | None = None,
     ) -> None:
-        self._executor.shutdown()
+        pass
 
     def _get_engines(
         self,
@@ -65,7 +65,7 @@ class DDGS:
             keys = backend
 
         # ensure Wikipedia is always included and in the first position
-        if category == "text" and "wikipedia" not in keys:
+        if category == "text":
             keys = ["wikipedia"] + [key for key in keys if key != "wikipedia"]
 
         try:
@@ -125,40 +125,38 @@ class DDGS:
         query = keywords or query
         assert query, "Query is mandatory."
 
+        num_results = num_results or max_results
         engines = self._get_engines(category, backend)
+        seen_providers: dict[str, Literal["working", "seen"]] = {}  # dict[provider, state]
 
         # Perform search
         results_aggregator: ResultsAggregator[set[str]] = ResultsAggregator(set(["href", "image", "url", "embed_url"]))
-        futures = {
-            self._executor.submit(
-                engine.search,
-                query,
-                region=region,
-                safesearch=safesearch,
-                timelimit=timelimit,
-                page=page,
-                **kwargs,
-            ): engine
-            for engine in engines
-        }
-        for future, engine in futures.items():
-            try:
-                partial = future.result(timeout=self._timeout)
-                if partial:
-                    results_aggregator.extend(partial)
-            except TimeoutError:
-                future.cancel()
-                logger.warning(f"{engine.name=} timed out:")
-            except Exception as e:
-                future.cancel()
-                logger.warning(f"{engine.name=} failed:", exc_info=e)
+        max_workers = min(len(engines), ceil(num_results / 10)) if num_results else len(engines)
+        with ThreadPoolExecutor(max_workers=max_workers) as self._executor:
+            futures = {}
+            for engine in engines:
+                if seen_providers.setdefault(engine.provider, "working") == "seen":
+                    continue
+                futures[self._executor.submit(engine.search, query, **kwargs)] = engine
+
+                if len(futures) >= max_workers:
+                    for future in as_completed(futures):
+                        try:
+                            r = future.result(timeout=self._timeout)
+                            if r:
+                                results_aggregator.extend(r)
+                                seen_providers[futures[future].provider] = "seen"
+                        except Exception as ex:
+                            logger.warning(f"{type(ex).__name__}: {ex}")
+                if num_results and len(results_aggregator) >= num_results:
+                    break
 
         # Rank results
         # ranker = SimpleFilterRanker()
         # results = ranker.rank(results, query)
 
         results = results_aggregator.extract_dicts()
-        if (num_results := num_results or max_results) and num_results < len(results):
+        if num_results and num_results < len(results):
             return results[:num_results]
         return results
 
