@@ -11,6 +11,7 @@ class Brave(BaseSearchEngine[TextResult]):
 
     name = "brave"
     category = "text"
+    provider = "brave"
 
     search_url = "https://search.brave.com/search"
     search_method = "GET"

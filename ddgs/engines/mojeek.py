@@ -12,6 +12,7 @@ class Mojeek(BaseSearchEngine[TextResult]):
 
     name = "mojeek"
     category = "text"
+    provider = "mojeek"
 
     search_url = "https://www.mojeek.com/search"
     search_method = "GET"

@@ -22,7 +22,7 @@ class BaseSearchEngine(ABC, Generic[T]):
 
     name: str  # unique key, e.g. "google"
     category: Literal["text", "images", "videos", "news"]
-    provider: str | None = None  # if proxy, the real engine, else None
+    provider: str  # source of the search results (e.g. "google" for MullVadLetaGoogle)
     disabled: bool = False  # if True, the engine is disabled
 
     search_url: str

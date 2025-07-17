@@ -26,6 +26,7 @@ class Google(BaseSearchEngine[TextResult]):
 
     name = "google"
     category = "text"
+    provider = "google"
 
     search_url = "https://www.google.com/search"
     search_method = "GET"
