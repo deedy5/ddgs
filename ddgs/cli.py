@@ -157,7 +157,7 @@ def version() -> str:
 @click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc.")
 @click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m", "y"]), help="day, week, month, year")
-@click.option("-n", "--num_results", type=int, help="number of results")
+@click.option("-n", "--num_results", default=10, type=int, help="number of results")
 @click.option("-m", "--max_results", type=int, help="(Deprecated) maximum number of results")  # deprecated
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
 @click.option(
@@ -189,7 +189,7 @@ def version() -> str:
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 def text(
-    query: str | None,
+    query: str,
     keywords: str | None,  # deprecated
     region: str,
     safesearch: str,
@@ -206,7 +206,7 @@ def text(
     verify: bool,
 ) -> None:
     """CLI function to perform a DDGS text metasearch."""
-    assert (query := query or keywords), "Please provide a query."
+    assert (query := keywords or query), "Please provide a query."
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).text(
         query=query,
         region=region,
@@ -239,7 +239,7 @@ def text(
 @click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc.")
 @click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m", "y"]))
-@click.option("-n", "--num_results", type=int, help="number of results")
+@click.option("-n", "--num_results", default=10, type=int, help="number of results")
 @click.option("-m", "--max_results", type=int, help="(Deprecated) maximum number of results")  # deprecated
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
 @click.option("-b", "--backend", default=["auto"], type=click.Choice(["auto", "all", "duckduckgo"]), multiple=True)
@@ -280,7 +280,7 @@ def text(
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 def images(
-    query: str | None,
+    query: str,
     keywords: str | None,  # deprecated
     region: str,
     safesearch: str,
@@ -302,7 +302,7 @@ def images(
     verify: bool,
 ) -> None:
     """CLI function to perform a DDGS images metasearch."""
-    assert (query := query or keywords), "Please provide a query."
+    assert (query := keywords or query), "Please provide a query."
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).images(
         query=query,
         region=region,
@@ -340,7 +340,7 @@ def images(
 @click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc.")
 @click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m"]), help="day, week, month")
-@click.option("-n", "--num_results", type=int, help="number of results")
+@click.option("-n", "--num_results", default=10, type=int, help="number of results")
 @click.option("-m", "--max_results", type=int, help="(Deprecated) maximum number of results")  # deprecated
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
 @click.option("-b", "--backend", default=["auto"], type=click.Choice(["auto", "all", "duckduckgo"]), multiple=True)
@@ -351,7 +351,7 @@ def images(
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 def videos(
-    query: str | None,
+    query: str,
     keywords: str | None,  # deprecated
     region: str,
     safesearch: str,
@@ -368,7 +368,7 @@ def videos(
     verify: bool,
 ) -> None:
     """CLI function to perform a DDGS videos metasearch."""
-    assert (query := query or keywords), "Please provide a query."
+    assert (query := keywords or query), "Please provide a query."
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).videos(
         query=query,
         region=region,
@@ -394,7 +394,7 @@ def videos(
 @click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc.")
 @click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m", "y"]), help="day, week, month, year")
-@click.option("-n", "--num_results", type=int, help="number of results")
+@click.option("-n", "--num_results", default=10, type=int, help="number of results")
 @click.option("-m", "--max_results", type=int, help="(Deprecated) maximum number of results")  # deprecated
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
 @click.option("-b", "--backend", default=["auto"], type=click.Choice(["auto", "all", "duckduckgo"]), multiple=True)
@@ -402,7 +402,7 @@ def videos(
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 def news(
-    query: str | None,
+    query: str,
     keywords: str | None,  # deprecated
     region: str,
     safesearch: str,
@@ -416,7 +416,7 @@ def news(
     verify: bool,
 ) -> None:
     """CLI function to perform a DDGS news metasearch."""
-    assert (query := query or keywords), "Please provide a query."
+    assert (query := keywords or query), "Please provide a query."
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).news(
         query=query,
         region=region,
