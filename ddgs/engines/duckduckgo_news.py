@@ -7,7 +7,7 @@ from ..results import NewsResult
 from ..utils import _extract_vqd, json_loads
 
 
-class DuckduckgoNews(BaseSearchEngine):
+class DuckduckgoNews(BaseSearchEngine[NewsResult]):
     """Duckduckgo news search engine"""
 
     search_url = "https://duckduckgo.com/news.js"
@@ -45,7 +45,7 @@ class DuckduckgoNews(BaseSearchEngine):
             payload["s"] = f"{(page - 1) * 30}"
         return payload
 
-    def extract_results(self, html_text: str) -> list[dict[str, Any]]:
+    def extract_results(self, html_text: str) -> list[NewsResult]:
         """Extract search results from lxml tree"""
         json_data = json_loads(html_text)
         items = json_data.get("results", [])
@@ -55,5 +55,5 @@ class DuckduckgoNews(BaseSearchEngine):
             for key, value in self.elements_replace.items():
                 data = item.get(key)
                 result.__setattr__(value, data)
-            results.append(result.__dict__)
+            results.append(result)
         return results

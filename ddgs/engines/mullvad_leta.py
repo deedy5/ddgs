@@ -8,7 +8,7 @@ from ..results import TextResult
 from ..utils import json_loads
 
 
-class BaseMullvadLeta(BaseSearchEngine, ABC):
+class BaseMullvadLeta(BaseSearchEngine[TextResult], ABC):
     """Generic Mullvad leta search engine"""
 
     # sentinel default; subclasses should set this to "google" or "brave"
@@ -36,7 +36,7 @@ class BaseMullvadLeta(BaseSearchEngine, ABC):
             payload["page"] = f"{page}"
         return payload
 
-    def extract_results(self, html_text: str) -> list[dict[str, Any]]:
+    def extract_results(self, html_text: str) -> list[TextResult]:
         """Extract search results from html text"""
         json_data = json_loads(html_text)
         data = json_data["nodes"][2]["data"]
@@ -50,7 +50,7 @@ class BaseMullvadLeta(BaseSearchEngine, ABC):
             result.title = data[record["title"]]
             result.href = data[record["link"]]
             result.body = data[record["snippet"]]
-            results.append(result.__dict__)
+            results.append(result)
         return results
 
 

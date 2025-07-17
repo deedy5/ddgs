@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from ..base import BaseSearchEngine
 
 # from .bing import Bing
@@ -15,7 +17,7 @@ from .wikipedia import Wikipedia
 from .yahoo import Yahoo
 from .yandex import Yandex
 
-ENGINES: dict[str, dict[str, type[BaseSearchEngine]]] = {
+ENGINES: dict[str, dict[str, type[BaseSearchEngine[Any]]]] = {
     "text": {
         "wikipedia": Wikipedia,
         "google": Google,

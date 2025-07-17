@@ -21,7 +21,7 @@ def ui_async(start: int) -> str:
     return f"arc_id:srp_{_arcid_random[0]}_1{start:02},use_ac:true,_fmt:prog"
 
 
-class Google(BaseSearchEngine):
+class Google(BaseSearchEngine[TextResult]):
     """Google search engine"""
 
     search_url = "https://www.google.com/search"
@@ -56,7 +56,7 @@ class Google(BaseSearchEngine):
             payload["tbs"] = f"qdr:{timelimit}"
         return payload
 
-    def extract_results(self, html_text: str) -> list[dict[str, Any]]:
+    def extract_results(self, html_text: str) -> list[TextResult]:
         """Extract search results from html text"""
         tree = self.extract_tree(html_text)
         items = tree.xpath(self.items_xpath)
@@ -67,5 +67,5 @@ class Google(BaseSearchEngine):
                 data = item.xpath(value)
                 data = "".join(x for x in data if x.strip())
                 result.__setattr__(key, data)
-            results.append(result.__dict__)
+            results.append(result)
         return results
