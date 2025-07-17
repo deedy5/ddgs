@@ -53,19 +53,19 @@ class DDGS:
             category and backend. Instances are cached for reuse.
         """
         backend = [backend] if isinstance(backend, str) else list(backend) if isinstance(backend, tuple) else backend
-        engine_keys = sorted(ENGINES[category].keys())
+        engine_keys = list(ENGINES[category].keys())
 
         # Determine which engine classes to use based on the backend parameter
-        if "auto" in backend:
-            if category == "text":  # wikipedia + 3 random engines
-                non_wikipedia_keys = [k for k in engine_keys if k != "wikipedia"]
-                keys = ["wikipedia"] + sample(non_wikipedia_keys, min(3, len(non_wikipedia_keys)))
-            else:  # 3 random engines
-                keys = sample(engine_keys, min(3, len(engine_keys)))
+        if "auto" in backend:  # 3 random engines
+            keys = sample(engine_keys, min(3, len(engine_keys)))
         elif "all" in backend:
             keys = engine_keys
         else:
             keys = backend
+
+        # ensure Wikipedia is always included and in the first position
+        if category == "text" and "wikipedia" not in keys:
+            keys = ["wikipedia"] + [key for key in keys if key != "wikipedia"]
 
         try:
             engine_classes = [ENGINES[category][key] for key in keys]
