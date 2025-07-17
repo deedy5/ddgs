@@ -10,6 +10,10 @@ from ..utils import _extract_vqd, json_loads
 class DuckduckgoImages(BaseSearchEngine[ImagesResult]):
     """Duckduckgo images search engine"""
 
+    name = "duckduckgo_images"
+    category = "images"
+    provider = "bing"
+
     search_url = "https://duckduckgo.com/i.js"
     search_method = "GET"
     search_headers = {"Referer": "https://duckduckgo.com/", "Sec-Fetch-Mode": "cors"}

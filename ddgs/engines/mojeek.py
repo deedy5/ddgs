@@ -10,6 +10,9 @@ from ..results import TextResult
 class Mojeek(BaseSearchEngine[TextResult]):
     """Mojeek search engine"""
 
+    name = "mojeek"
+    category = "text"
+
     search_url = "https://www.mojeek.com/search"
     search_method = "GET"
 

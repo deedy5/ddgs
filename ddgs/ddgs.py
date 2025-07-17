@@ -9,7 +9,6 @@ from typing import Any
 
 from .base import BaseSearchEngine
 from .engines import ENGINES
-from .exceptions import DDGSException
 from .results import ResultsAggregator
 
 logger = logging.getLogger(__name__)
@@ -56,10 +55,6 @@ class DDGS:
         backend = [backend] if isinstance(backend, str) else list(backend) if isinstance(backend, tuple) else backend
         engine_keys = sorted(ENGINES[category].keys())
 
-        if backend == ["bing"]:
-            backend = ["auto"]
-            logging.warning("Bing backend is temporarily disabled. Using backend='auto' instead.")
-
         # Determine which engine classes to use based on the backend parameter
         if "auto" in backend:
             if category == "text":  # wikipedia + 3 random engines
@@ -74,19 +69,23 @@ class DDGS:
 
         try:
             engine_classes = [ENGINES[category][key] for key in keys]
-        except KeyError as ex:
-            raise DDGSException(f"Invalid backend: {backend}") from ex
-
-        # Initialize and cache engine instances
-        instances = []
-        for engine_class in engine_classes:
-            if engine_class in self._engines_cache:
-                instances.append(self._engines_cache[engine_class])
-            else:
-                engine_instance = engine_class(proxy=self._proxy, timeout=self._timeout, verify=self._verify)
-                self._engines_cache[engine_class] = engine_instance
-                instances.append(engine_instance)
-        return instances
+            # Initialize and cache engine instances
+            instances = []
+            for engine_class in engine_classes:
+                # If already cached, use the cached instance
+                if engine_class in self._engines_cache:
+                    instances.append(self._engines_cache[engine_class])
+                # If not cached, create a new instance
+                else:
+                    engine_instance = engine_class(proxy=self._proxy, timeout=self._timeout, verify=self._verify)
+                    self._engines_cache[engine_class] = engine_instance
+                    instances.append(engine_instance)
+            return instances
+        except KeyError:
+            logger.warning(
+                f"Invalid backend: {backend}. Available backends: {', '.join(engine_keys)}. Falling back to 'auto'."
+            )
+            return self._get_engines(category, "auto")
 
     def _search(
         self,

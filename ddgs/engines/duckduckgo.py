@@ -9,6 +9,10 @@ from ..results import TextResult
 class Duckduckgo(BaseSearchEngine[TextResult]):
     """Duckduckgo search engine"""
 
+    name = "duckduckgo"
+    category = "text"
+    provider = "bing"
+
     search_url = "https://html.duckduckgo.com/html/"
     search_method = "POST"
 

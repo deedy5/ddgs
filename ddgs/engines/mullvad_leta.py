@@ -11,9 +11,9 @@ from ..utils import json_loads
 class BaseMullvadLeta(BaseSearchEngine[TextResult], ABC):
     """Generic Mullvad leta search engine"""
 
-    # sentinel default; subclasses should set this to "google" or "brave"
-    engine: Literal["google", "brave"] | None = None
-
+    name: str = "base_mullvad_leta"
+    category = "text"
+    provider: Literal["google", "brave"]
     search_url = "https://leta.mullvad.net/search/__data.json"
     search_method = "GET"
 
@@ -23,7 +23,7 @@ class BaseMullvadLeta(BaseSearchEngine[TextResult], ABC):
         country, lang = region.lower().split("-")
         payload = {
             "q": query,
-            "engine": self.engine,
+            "engine": self.provider,
             "x-sveltekit-invalidated": "001",
         }
         if country:
@@ -55,8 +55,10 @@ class BaseMullvadLeta(BaseSearchEngine[TextResult], ABC):
 
 
 class MullvadLetaBrave(BaseMullvadLeta):
-    engine = "brave"
+    name = "mullvad_brave"
+    provider = "brave"
 
 
 class MullvadLetaGoogle(BaseMullvadLeta):
-    engine = "google"
+    name = "mullvad_google"
+    provider = "google"

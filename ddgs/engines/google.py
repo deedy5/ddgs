@@ -24,6 +24,9 @@ def ui_async(start: int) -> str:
 class Google(BaseSearchEngine[TextResult]):
     """Google search engine"""
 
+    name = "google"
+    category = "text"
+
     search_url = "https://www.google.com/search"
     search_method = "GET"
 

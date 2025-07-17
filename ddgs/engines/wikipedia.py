@@ -14,6 +14,9 @@ logger = logging.getLogger(__name__)
 class Wikipedia(BaseSearchEngine[TextResult]):
     """Wikipedia text search engine"""
 
+    name = "wikipedia"
+    category = "text"
+
     search_url = "https://{lang}.wikipedia.org/api/rest_v1/page/summary/{query}"
     search_method = "GET"
 

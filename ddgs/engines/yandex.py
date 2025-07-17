@@ -10,6 +10,9 @@ from ..results import TextResult
 class Yandex(BaseSearchEngine[TextResult]):
     """Yandex search engine"""
 
+    name = "yandex"
+    category = "text"
+
     search_url = "https://yandex.com/search/site/"
     search_method = "GET"
 

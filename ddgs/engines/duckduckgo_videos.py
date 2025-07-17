@@ -10,6 +10,10 @@ from ..utils import _extract_vqd, json_loads
 class DuckduckgoVideos(BaseSearchEngine[VideosResult]):
     """Duckduckgo videos search engine"""
 
+    name = "duckduckgo_videos"
+    category = "videos"
+    provider = "bing"
+
     search_url = "https://duckduckgo.com/v.js"
     search_method = "GET"
 

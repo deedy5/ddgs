@@ -24,6 +24,10 @@ def extract_url(u: str) -> str:
 class Yahoo(BaseSearchEngine[TextResult]):
     """Yahoo search engine"""
 
+    name = "yahoo"
+    category = "text"
+    provider = "bing"
+
     search_url = "https://search.yahoo.com/search"
     search_method = "GET"
 
