@@ -54,13 +54,12 @@ class HttpClient:
         )
 
     def request(self, *args: Any, **kwargs: Any) -> Response:
-        for _ in range(2):
-            try:
-                resp = self.client.request(*args, **kwargs)
-                return Response(status_code=resp.status_code, content=resp.content, text=resp.text)
-            except Exception as ex:
-                logger.warning(f"{type(ex).__name__}: {ex}")
-        return Response(status_code=500, content=b"", text="")
+        try:
+            resp = self.client.request(*args, **kwargs)
+            return Response(status_code=resp.status_code, content=resp.content, text=resp.text)
+        except Exception as ex:
+            logger.warning(f"{type(ex).__name__}: {ex}")
+            return Response(status_code=500, content=b"", text="")
 
     def get(self, *args: Any, **kwargs: Any) -> Response:
         return self.request(*args, method="GET", **kwargs)
