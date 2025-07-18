@@ -49,14 +49,14 @@ def test_videos_command() -> None:
 @pytest.mark.dependency()
 def test_get_text() -> None:
     global TEXT_RESULTS
-    TEXT_RESULTS = DDGS().text("cow", num_results=10)
+    TEXT_RESULTS = DDGS().text("cow", max_results=5)
     assert TEXT_RESULTS
 
 
 @pytest.mark.dependency()
 def test_get_images() -> None:
     global IMAGES_RESULTS
-    IMAGES_RESULTS = DDGS().images("horse", num_results=10)
+    IMAGES_RESULTS = DDGS().images("horse", max_results=5)
     assert IMAGES_RESULTS
 
 

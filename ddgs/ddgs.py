@@ -89,12 +89,11 @@ class DDGS:
         region: str = "us-en",
         safesearch: str = "moderate",
         timelimit: str | None = None,
-        num_results: int | None = 10,
+        max_results: int | None = 10,
         page: int = 1,
         backend: str | list[str] = "auto",
         # deprecated aliases:
         keywords: str | None = None,
-        max_results: int | None = None,
         **kwargs: Any,
     ) -> list[dict[str, Any]]:
         """
@@ -106,7 +105,7 @@ class DDGS:
             region: The region to use for the search (e.g., us-en, uk-en, ru-ru, etc.).
             safesearch: The safesearch setting (e.g., on, moderate, off).
             timelimit: The timelimit for the search (e.g., d, w, m, y).
-            num_results: The number of results to return. Defaults to 10.
+            max_results: The maximum number of results to return. Defaults to 10.
             page: The page of results to return. Defaults to 1.
             backend: A single or list of backends. Defaults to "auto".
 
@@ -115,14 +114,13 @@ class DDGS:
         """
         query = keywords or query
         assert query, "Query is mandatory."
-        num_results = max_results or num_results
 
         engines = self._get_engines(category, backend)
         seen_providers: dict[str, Literal["working", "seen"]] = {}  # dict[provider, state]
 
         # Perform search
         results_aggregator: ResultsAggregator[set[str]] = ResultsAggregator(set(["href", "image", "url", "embed_url"]))
-        max_workers = min(len(engines), ceil(num_results / 10) + 1) if num_results else len(engines)
+        max_workers = min(len(engines), ceil(max_results / 10) + 1) if max_results else len(engines)
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = {}
             for engine in engines:
@@ -135,7 +133,7 @@ class DDGS:
                     safesearch=safesearch,
                     timelimit=timelimit,
                     page=page,
-                    num_results=num_results,
+                    max_results=max_results,
                     **kwargs,
                 )
                 futures[future] = engine
@@ -149,7 +147,7 @@ class DDGS:
                                 seen_providers[futures[future].provider] = "seen"
                         except Exception as ex:
                             logger.warning(f"{type(ex).__name__}: {ex}")
-                if num_results and len(results_aggregator) >= num_results:
+                if max_results and len(results_aggregator) >= max_results:
                     break
 
         # Rank results
@@ -157,8 +155,8 @@ class DDGS:
         # results = ranker.rank(results, query)
         results = results_aggregator.extract_dicts()
         if results:
-            if num_results and num_results < len(results):
-                return results[:num_results]
+            if max_results and max_results < len(results):
+                return results[:max_results]
             return results
 
         raise DDGSException("No results found.")
