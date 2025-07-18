@@ -122,12 +122,22 @@ class DDGS:
         # Perform search
         results_aggregator: ResultsAggregator[set[str]] = ResultsAggregator(set(["href", "image", "url", "embed_url"]))
         max_workers = min(len(engines), ceil(num_results / 10)) if num_results else len(engines)
-        with ThreadPoolExecutor(max_workers=max_workers) as self._executor:
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = {}
             for engine in engines:
                 if seen_providers.setdefault(engine.provider, "working") == "seen":
                     continue
-                futures[self._executor.submit(engine.search, query, **kwargs)] = engine
+                future = executor.submit(
+                    engine.search,
+                    query,
+                    region=region,
+                    safesearch=safesearch,
+                    timelimit=timelimit,
+                    page=page,
+                    num_results=num_results,
+                    **kwargs,
+                )
+                futures[future] = engine
 
                 if len(futures) >= max_workers:
                     for future in as_completed(futures):
