@@ -3,38 +3,35 @@ from __future__ import annotations
 from abc import ABC
 from collections import Counter
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Generic, TypeVar
+from typing import Any, Callable, Generic, TypeVar
 
-from .utils import _normalize_text, _normalize_url
+from .utils import _normalize_date, _normalize_text, _normalize_url
 
 T = TypeVar("T")
 
 
 class BaseResult:
-    def __post_init__(self) -> None:
-        """
-        Post-processing initialization for a result object. This function iterates over
-        the attributes of the object, normalizes certain fields, and formats date fields.
-        It skips empty values for specific keys, applies text normalization for title and
-        body fields, URL normalization for href, url, thumbnail, and image fields, and
-        converts integer timestamps in the date field to ISO format.
-        """
+    """
+    Base class for all results. Contains normalization functions.
+    """
 
-        for key, value in self.__dict__.items():
-            # skip empty
-            if key in {"title", "body", "href", "url", "image"} and not (
-                value := value.strip() if isinstance(value, str) else value
-            ):
-                continue
-            if key in {"title", "body"}:
-                self.__dict__[key] = _normalize_text(value)
-            elif key in {"href", "url", "thumbnail", "image"}:
-                self.__dict__[key] = _normalize_url(value)
-            elif key == "date" and isinstance(value, int):
-                self.__dict__[key] = datetime.fromtimestamp(value, timezone.utc).isoformat()  # int to readable date
-            else:
-                self.__dict__[key] = value
+    _normalizers: dict[str, Callable[[Any], Any]] = {
+        "title": _normalize_text,
+        "body": _normalize_text,
+        "href": _normalize_url,
+        "url": _normalize_url,
+        "thumbnail": _normalize_url,
+        "image": _normalize_url,
+        "date": _normalize_date,
+    }
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        """
+        Override setattr to apply normalization functions to certain attributes.
+        """
+        if value and (normalizer := self._normalizers.get(name)):
+            value = normalizer(value)
+        object.__setattr__(self, name, value)
 
 
 @dataclass
