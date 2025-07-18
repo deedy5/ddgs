@@ -50,7 +50,7 @@ class BaseSearchEngine(ABC, Generic[T]):
             if resp.status_code == 200:
                 return resp.text
         except Exception as ex:
-            logger.warning(f"{type(ex).__name__}: {ex}")
+            raise ex
         return None
 
     @cached_property

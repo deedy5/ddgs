@@ -161,7 +161,7 @@ class DDGS:
     Args:
         proxy (str, optional): proxy for the HTTP client, supports http/https/socks5 protocols.
             example: "http://user:pass@example.com:3128". Defaults to None.
-        timeout (int, optional): Timeout value for the HTTP client. Defaults to 10.
+        timeout (int, optional): Timeout value for the HTTP client. Defaults to 5.
         verify (bool): SSL verification when making the request. Defaults to True.
     """
 ```
@@ -183,12 +183,12 @@ Use a rotating proxy. Otherwise, use a new proxy with each DDGS class initializa
 
 *1. The easiest way. Launch the Tor Browser*
 ```python3
-ddgs = DDGS(proxy="tb", timeout=20)  # "tb" is an alias for "socks5h://127.0.0.1:9150"
+ddgs = DDGS(proxy="tb", timeout=10)  # "tb" is an alias for "socks5h://127.0.0.1:9150"
 results = ddgs.text("something you need", max_results=50)
 ```
 *2. Use any proxy server* (*example with [iproyal rotating residential proxies](https://iproyal.com?r=residential_proxies)*)
 ```python3
-ddgs = DDGS(proxy="socks5h://user:password@geo.iproyal.com:32325", timeout=20)
+ddgs = DDGS(proxy="socks5h://user:password@geo.iproyal.com:32325", timeout=10)
 results = ddgs.text("something you need", max_results=50)
 ```
 *3. The proxy can also be set using the `DDGS_PROXY` environment variable.*
