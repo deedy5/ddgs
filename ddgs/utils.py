@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 import unicodedata
+from datetime import datetime, timezone
 from html import unescape
 from typing import Any, Literal
 from urllib.parse import unquote
@@ -89,6 +90,11 @@ def _normalize_text(
         translated = re.sub(r"\s+", " ", translated).strip()
 
     return translated
+
+
+def _normalize_date(date: int | str) -> str:
+    """Normalize date from integer to ISO format if applicable."""
+    return datetime.fromtimestamp(date, timezone.utc).isoformat() if isinstance(date, int) else date
 
 
 def _expand_proxy_tb_alias(proxy: str | None) -> str | None:
