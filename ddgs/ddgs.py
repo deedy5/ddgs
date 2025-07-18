@@ -10,6 +10,7 @@ from typing import Any, Literal
 
 from .base import BaseSearchEngine
 from .engines import ENGINES
+from .exceptions import DDGSException
 from .results import ResultsAggregator
 
 logger = logging.getLogger(__name__)
@@ -154,11 +155,13 @@ class DDGS:
         # Rank results
         # ranker = SimpleFilterRanker()
         # results = ranker.rank(results, query)
-
         results = results_aggregator.extract_dicts()
-        if num_results and num_results < len(results):
-            return results[:num_results]
-        return results
+        if results:
+            if num_results and num_results < len(results):
+                return results[:num_results]
+            return results
+
+        raise DDGSException("No results found.")
 
     def text(self, query: str, **kwargs: Any) -> list[dict[str, Any]]:
         return self._search("text", query, **kwargs)
