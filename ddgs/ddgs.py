@@ -12,13 +12,14 @@ from .base import BaseSearchEngine
 from .engines import ENGINES
 from .exceptions import DDGSException, TimeoutException
 from .results import ResultsAggregator
+from .utils import _expand_proxy_tb_alias
 
 logger = logging.getLogger(__name__)
 
 
 class DDGS:
     def __init__(self, proxy: str | None = None, timeout: int | None = 5, verify: bool = True):
-        self._proxy = proxy or os.environ.get("DDGS_PROXY")
+        self._proxy = _expand_proxy_tb_alias(proxy) or os.environ.get("DDGS_PROXY")
         self._timeout = timeout
         self._verify = verify
         self._engines_cache: dict[

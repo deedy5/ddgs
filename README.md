@@ -36,7 +36,7 @@ a) text:
  - *region='ru'*
  - *language='ru'*
  - *max_results=20*
- - *proxy='socks5h://127.0.0.1:9150'* ('tb' is an alias)
+ - *proxy='socks5h://127.0.0.1:9150'* ('tb' is an alias for the Tor browser)
 
 `ddgs text -q 'битва в пути 1961' -r ru-ru -m 20 -pr tb`
 
