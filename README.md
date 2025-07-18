@@ -223,7 +223,7 @@ def text(
     region: str = "us-en",
     safesearch: str = "moderate",
     timelimit: str | None = None,
-    num_results: int | None = 10,
+    max_results: int | None = 10,
     page: int = 1,
     backend: str | list[str] = "auto",
 ) -> list[dict[str, str]]:
@@ -234,7 +234,7 @@ def text(
         region: us-en, uk-en, ru-ru, etc. Defaults to us-en.
         safesearch: on, moderate, off. Defaults to "moderate".
         timelimit: d, w, m, y. Defaults to None.
-        num_results: number of results. Defaults to 10.
+        max_results: maximum number of results. Defaults to 10.
         page: page of results. Defaults to 1.
         backend: A single or list of backends. Defaults to "auto".
 
@@ -267,7 +267,7 @@ def images(
     region: str = "us-en",
     safesearch: str = "moderate",
     timelimit: str | None = None,
-    num_results: int | None = 10,
+    max_results: int | None = 10,
     page: int = 1,
     backend: str | list[str] = "auto",
     size: str | None = None,
@@ -283,7 +283,7 @@ def images(
         region: us-en, uk-en, ru-ru, etc. Defaults to us-en.
         safesearch: on, moderate, off. Defaults to "moderate".
         timelimit: d, w, m, y. Defaults to None.
-        num_results: number of results. Defaults to 10.
+        max_results: maximum number of results. Defaults to 10.
         page: page of results. Defaults to 1.
         backend: A single or list of backends. Defaults to "auto".
         size: Small, Medium, Large, Wallpaper. Defaults to None.
@@ -340,7 +340,7 @@ def videos(
     region: str = "us-en",
     safesearch: str = "moderate",
     timelimit: str | None = None,
-    num_results: int | None = 10,
+    max_results: int | None = 10,
     page: int = 1,
     backend: str | list[str] = "auto",
     resolution: str | None = None,
@@ -354,7 +354,7 @@ def videos(
         region: us-en, uk-en, ru-ru, etc. Defaults to us-en.
         safesearch: on, moderate, off. Defaults to "moderate".
         timelimit: d, w, m. Defaults to None.
-        num_results: number of results. Defaults to 10.
+        max_results: maximum number of results. Defaults to 10.
         page: page of results. Defaults to 1.
         backend: A single or list of backends. Defaults to "auto".
         resolution: high, standart. Defaults to None.
@@ -412,7 +412,7 @@ def news(
     region: str = "us-en",
     safesearch: str = "moderate",
     timelimit: str | None = None,
-    num_results: int | None = 10,
+    max_results: int | None = 10,
     page: int = 1,
     backend: str | list[str] = "auto",
 ) -> list[dict[str, str]]:
@@ -423,7 +423,7 @@ def news(
         region: us-en, uk-en, ru-ru, etc. Defaults to us-en.
         safesearch: on, moderate, off. Defaults to "moderate".
         timelimit: d, w, m. Defaults to None.
-        num_results: number of results. Defaults to 10.
+        max_results: maximum number of results. Defaults to 10.
         page: page of results. Defaults to 1.
         backend: A single or list of backends. Defaults to "auto".
 

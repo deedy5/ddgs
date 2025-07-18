@@ -157,8 +157,7 @@ def version() -> str:
 @click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc.")
 @click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m", "y"]), help="day, week, month, year")
-@click.option("-n", "--num_results", default=10, type=int, help="number of results")
-@click.option("-m", "--max_results", type=int, help="(Deprecated) maximum number of results")  # deprecated
+@click.option("-m", "--max_results", default=10, type=int, help="maximum number of results")
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
 @click.option(
     "-b",
@@ -194,8 +193,7 @@ def text(
     region: str,
     safesearch: str,
     timelimit: str | None,
-    num_results: int | None,
-    max_results: int | None,  # deprecated
+    max_results: int | None,
     page: int,
     backend: str | list[str],
     output: str | None,
@@ -212,7 +210,7 @@ def text(
         region=region,
         safesearch=safesearch,
         timelimit=timelimit,
-        num_results=num_results or max_results,
+        max_results=max_results,
         page=page,
         backend=backend,
     )
@@ -239,8 +237,7 @@ def text(
 @click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc.")
 @click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m", "y"]))
-@click.option("-n", "--num_results", default=10, type=int, help="number of results")
-@click.option("-m", "--max_results", type=int, help="(Deprecated) maximum number of results")  # deprecated
+@click.option("-m", "--max_results", default=10, type=int, help="maximum number of results")
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
 @click.option("-b", "--backend", default=["auto"], type=click.Choice(["auto", "all", "duckduckgo"]), multiple=True)
 @click.option("-size", "--size", type=click.Choice(["Small", "Medium", "Large", "Wallpaper"]))
@@ -285,8 +282,7 @@ def images(
     region: str,
     safesearch: str,
     timelimit: str | None,
-    num_results: int | None,
-    max_results: int | None,  # deprecated
+    max_results: int | None,
     page: int,
     backend: str | list[str],
     size: str | None,
@@ -308,7 +304,7 @@ def images(
         region=region,
         safesearch=safesearch,
         timelimit=timelimit,
-        num_results=num_results or max_results,
+        max_results=max_results,
         page=page,
         backend=backend,
         size=size,
@@ -340,8 +336,7 @@ def images(
 @click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc.")
 @click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m"]), help="day, week, month")
-@click.option("-n", "--num_results", default=10, type=int, help="number of results")
-@click.option("-m", "--max_results", type=int, help="(Deprecated) maximum number of results")  # deprecated
+@click.option("-m", "--max_results", default=10, type=int, help="maximum number of results")
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
 @click.option("-b", "--backend", default=["auto"], type=click.Choice(["auto", "all", "duckduckgo"]), multiple=True)
 @click.option("-res", "--resolution", type=click.Choice(["high", "standart"]))
@@ -356,8 +351,7 @@ def videos(
     region: str,
     safesearch: str,
     timelimit: str | None,
-    num_results: int | None,
-    max_results: int | None,  # deprecated
+    max_results: int | None,
     page: int,
     backend: str | list[str],
     resolution: str | None,
@@ -374,7 +368,7 @@ def videos(
         region=region,
         safesearch=safesearch,
         timelimit=timelimit,
-        num_results=num_results or max_results,
+        max_results=max_results,
         page=page,
         backend=backend,
         resolution=resolution,
@@ -394,8 +388,7 @@ def videos(
 @click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc.")
 @click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m", "y"]), help="day, week, month, year")
-@click.option("-n", "--num_results", default=10, type=int, help="number of results")
-@click.option("-m", "--max_results", type=int, help="(Deprecated) maximum number of results")  # deprecated
+@click.option("-m", "--max_results", default=10, type=int, help="maximum number of results")
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
 @click.option("-b", "--backend", default=["auto"], type=click.Choice(["auto", "all", "duckduckgo"]), multiple=True)
 @click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
@@ -407,8 +400,7 @@ def news(
     region: str,
     safesearch: str,
     timelimit: str | None,
-    num_results: int | None,
-    max_results: int | None,  # deprecated
+    max_results: int | None,
     page: int,
     backend: str | list[str],
     output: str | None,
@@ -422,7 +414,7 @@ def news(
         region=region,
         safesearch=safesearch,
         timelimit=timelimit,
-        num_results=num_results or max_results,
+        max_results=max_results,
         page=page,
         backend=backend,
     )
