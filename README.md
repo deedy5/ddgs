@@ -30,22 +30,16 @@ pip install -U ddgs
 ddgs --help
 ```
 CLI examples:
-```python3
-# text search
-ddgs text -q "Assyrian siege of Jerusalem"
-# find and download pdf files via proxy
-ddgs text -q "Economics in one lesson filetype:pdf" -r us-en -n 50 -pr https://1.2.3.4:1234 -d -dd economics_reading
-# using Tor Browser as a proxy (`tb` is an alias for `socks5h://127.0.0.1:9150`)
-ddgs text -q "'The history of the Standard Oil Company' filetype:doc" -n 50 -d -pr tb
-# find and save to csv
-ddgs text -q "'neuroscience exploring the brain' filetype:pdf" -n 70 -o neuroscience_list.csv
-# don't verify SSL when making the request
-ddgs text -q "Mississippi Burning" -v false
-# find and download images
-ddgs images -q "beware of false prophets" -r ar-es -type photo -n 500 -d
-# get news for the last day and save to json
-ddgs news -q "sanctions" -n 100 -t d -o json
-```
+
+a) text:
+ - *query='битва в пути 1961'*
+ - *region='ru'*
+ - *language='ru'*
+ - *max_results=20*
+ - *proxy='socks5h://127.0.0.1:9150'* ('tb' is an alias)
+
+`ddgs text -q 'битва в пути 1961' -r ru-ru -m 20 -pr tb`
+
 [Go To TOP](#TOP)
 
 ## DDGS search operators
