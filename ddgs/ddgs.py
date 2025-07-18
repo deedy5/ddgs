@@ -10,14 +10,14 @@ from typing import Any, Literal
 
 from .base import BaseSearchEngine
 from .engines import ENGINES
-from .exceptions import DDGSException
+from .exceptions import DDGSException, TimeoutException
 from .results import ResultsAggregator
 
 logger = logging.getLogger(__name__)
 
 
 class DDGS:
-    def __init__(self, proxy: str | None = None, timeout: int | None = 10, verify: bool = True):
+    def __init__(self, proxy: str | None = None, timeout: int | None = 5, verify: bool = True):
         self._proxy = proxy or os.environ.get("DDGS_PROXY")
         self._timeout = timeout
         self._verify = verify
@@ -120,6 +120,7 @@ class DDGS:
 
         # Perform search
         results_aggregator: ResultsAggregator[set[str]] = ResultsAggregator(set(["href", "image", "url", "embed_url"]))
+        err = None
         max_workers = min(len(engines), ceil(max_results / 10) + 1) if max_results else len(engines)
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = {}
@@ -146,20 +147,24 @@ class DDGS:
                                 results_aggregator.extend(r)
                                 seen_providers[futures[future].provider] = "seen"
                         except Exception as ex:
-                            logger.warning(f"{type(ex).__name__}: {ex}")
+                            err = ex
+                            # logger.info(f"{type(ex).__name__}: {ex}")
                 if max_results and len(results_aggregator) >= max_results:
                     break
 
         # Rank results
         # ranker = SimpleFilterRanker()
         # results = ranker.rank(results, query)
+
         results = results_aggregator.extract_dicts()
         if results:
             if max_results and max_results < len(results):
                 return results[:max_results]
             return results
 
-        raise DDGSException("No results found.")
+        if "timed out" in f"{err}":
+            raise TimeoutException(err)
+        raise DDGSException(err or "No results found.")
 
     def text(self, query: str, **kwargs: Any) -> list[dict[str, Any]]:
         return self._search("text", query, **kwargs)
