@@ -122,7 +122,7 @@ class DDGS:
 
         # Perform search
         results_aggregator: ResultsAggregator[set[str]] = ResultsAggregator(set(["href", "image", "url", "embed_url"]))
-        max_workers = min(len(engines), ceil(num_results / 10)) if num_results else len(engines)
+        max_workers = min(len(engines), ceil(num_results / 10) + 1) if num_results else len(engines)
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = {}
             for engine in engines:
