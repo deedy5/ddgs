@@ -1,4 +1,4 @@
-![Python >= 3.9](https://img.shields.io/badge/python->=3.9-red.svg) [![](https://badgen.net/github/release/deedy5/ddgs)](https://github.com/deedy5/ddgs/releases) [![](https://badge.fury.io/py/ddgs.svg)](https://pypi.org/project/ddgs)
+![Python >= 3.9](https://img.shields.io/badge/python->=3.9-red.svg) [![](https://badgen.net/github/release/deedy5/ddgs)](https://github.com/deedy5/ddgs/releases) [![](https://badge.fury.io/py/ddgs.svg)](https://pypi.org/project/ddgs) [![](https://pepy.tech/badge/ddgs/month)](https://pypistats.org/packages/ddgs)
 # D.D.G.S. | Dux Distributed Global Search<a name="TOP"></a>
 
 A metasearch library that aggregates results from diverse web search services.
