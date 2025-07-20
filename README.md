@@ -151,7 +151,7 @@ The library considers:
     - Result repeatability, prioritizing frequently repeated positions
     - Wikipedia summaries at the top of results, if available
 
-To customize backend order, pass a list of backend names (e.g., `backend='google', 'brave', 'yahoo'`). The library will query them in order, falling back to the next one if an error occurs.
+To customize the search engine order, provide the backends as a comma-separated string (for example: `backend="google, brave, yahoo"`). The library will query them in order, falling back to the next one if an error occurs.
 
 The library works in parallel, adjusting concurrent requests based on `max_results`. This ensures efficient and fast retrieval. Note that a single query returns results from one page; iterate over pages for more results. Setting `max_results` to None returns all unique collected results.
 
