@@ -6,6 +6,8 @@ from typing import Any
 
 import primp
 
+from .exceptions import DDGSException, TimeoutException
+
 logger = logging.getLogger(__name__)
 
 
@@ -58,7 +60,9 @@ class HttpClient:
             resp = self.client.request(*args, **kwargs)
             return Response(status_code=resp.status_code, content=resp.content, text=resp.text)
         except Exception as ex:
-            raise ex
+            if "timed out" in f"{ex}":
+                raise TimeoutException(f"Request timed out: {ex!r}") from ex
+            raise DDGSException(f"{type(ex).__name__}: {ex!r}") from ex
 
     def get(self, *args: Any, **kwargs: Any) -> Response:
         return self.request(*args, method="GET", **kwargs)
