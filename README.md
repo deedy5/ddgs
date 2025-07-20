@@ -151,7 +151,7 @@ The library considers:
     - Result repeatability, prioritizing frequently repeated positions
     - Wikipedia summaries at the top of results, if available
 
-To customize backend order, pass a list of backend names (e.g., `backend=['google', 'brave', 'yahoo']`). The library will query them in order, falling back to the next one if an error occurs.
+To customize backend order, pass a list of backend names (e.g., `backend='google', 'brave', 'yahoo'`). The library will query them in order, falling back to the next one if an error occurs.
 
 The library works in parallel, adjusting concurrent requests based on `max_results`. This ensures efficient and fast retrieval. Note that a single query returns results from one page; iterate over pages for more results. Setting `max_results` to None returns all unique collected results.
 
@@ -232,7 +232,7 @@ def text(
     timelimit: str | None = None,
     max_results: int | None = 10,
     page: int = 1,
-    backend: str | list[str] = "auto",
+    backend: str = "auto",
 ) -> list[dict[str, str]]:
     """DDGS text metasearch.
 
@@ -243,7 +243,7 @@ def text(
         timelimit: d, w, m, y. Defaults to None.
         max_results: maximum number of results. Defaults to 10.
         page: page of results. Defaults to 1.
-        backend: A single or list of backends. Defaults to "auto".
+        backend: A single or comma-delimited backends. Defaults to "auto".
 
     Returns:
         List of dictionaries with search results.
@@ -292,7 +292,7 @@ def images(
         timelimit: d, w, m, y. Defaults to None.
         max_results: maximum number of results. Defaults to 10.
         page: page of results. Defaults to 1.
-        backend: A single or list of backends. Defaults to "auto".
+        backend: A single or comma-delimited backends. Defaults to "auto".
         size: Small, Medium, Large, Wallpaper. Defaults to None.
         color: color, Monochrome, Red, Orange, Yellow, Green, Blue,
             Purple, Pink, Brown, Black, Gray, Teal, White. Defaults to None.
@@ -363,7 +363,7 @@ def videos(
         timelimit: d, w, m. Defaults to None.
         max_results: maximum number of results. Defaults to 10.
         page: page of results. Defaults to 1.
-        backend: A single or list of backends. Defaults to "auto".
+        backend: A single or comma-delimited backends. Defaults to "auto".
         resolution: high, standart. Defaults to None.
         duration: short, medium, long. Defaults to None.
         license_videos: creativeCommon, youtube. Defaults to None.
@@ -432,7 +432,7 @@ def news(
         timelimit: d, w, m. Defaults to None.
         max_results: maximum number of results. Defaults to 10.
         page: page of results. Defaults to 1.
-        backend: A single or list of backends. Defaults to "auto".
+        backend: A single or comma-delimited backends. Defaults to "auto".
 
     Returns:
         List of dictionaries with news search results.

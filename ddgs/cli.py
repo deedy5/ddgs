@@ -6,6 +6,7 @@ import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 from urllib.parse import unquote
 
 import click
@@ -35,6 +36,12 @@ COLORS = {
     14: "white",
     15: "bright_white",
 }
+
+
+def _convert_tuple_to_csv(ctx: click.Context, param: click.Parameter, value: Any) -> str:
+    if value is not None and isinstance(value, tuple):
+        return ",".join(value)
+    return ""
 
 
 def _save_data(query: str, data: list[dict[str, str]], function_name: str, filename: str | None) -> None:
@@ -180,6 +187,7 @@ def version() -> str:
         ]
     ),
     multiple=True,
+    callback=_convert_tuple_to_csv,
 )
 @click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
 @click.option("-d", "--download", is_flag=True, default=False, help="download results. -dd to set custom directory")
@@ -195,7 +203,7 @@ def text(
     timelimit: str | None,
     max_results: int | None,
     page: int,
-    backend: str | list[str],
+    backend: str,
     output: str | None,
     download: bool,
     download_directory: str | None,
@@ -239,7 +247,14 @@ def text(
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m", "y"]))
 @click.option("-m", "--max_results", default=10, type=int, help="maximum number of results")
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
-@click.option("-b", "--backend", default=["auto"], type=click.Choice(["auto", "all", "duckduckgo"]), multiple=True)
+@click.option(
+    "-b",
+    "--backend",
+    default=["auto"],
+    type=click.Choice(["auto", "all", "duckduckgo"]),
+    multiple=True,
+    callback=_convert_tuple_to_csv,
+)
 @click.option("-size", "--size", type=click.Choice(["Small", "Medium", "Large", "Wallpaper"]))
 @click.option(
     "-c",
@@ -284,7 +299,7 @@ def images(
     timelimit: str | None,
     max_results: int | None,
     page: int,
-    backend: str | list[str],
+    backend: str,
     size: str | None,
     color: str | None,
     type_image: str | None,
@@ -338,7 +353,14 @@ def images(
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m"]), help="day, week, month")
 @click.option("-m", "--max_results", default=10, type=int, help="maximum number of results")
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
-@click.option("-b", "--backend", default=["auto"], type=click.Choice(["auto", "all", "duckduckgo"]), multiple=True)
+@click.option(
+    "-b",
+    "--backend",
+    default=["auto"],
+    type=click.Choice(["auto", "all", "duckduckgo"]),
+    multiple=True,
+    callback=_convert_tuple_to_csv,
+)
 @click.option("-res", "--resolution", type=click.Choice(["high", "standart"]))
 @click.option("-d", "--duration", type=click.Choice(["short", "medium", "long"]))
 @click.option("-lic", "--license_videos", type=click.Choice(["creativeCommon", "youtube"]))
@@ -353,7 +375,7 @@ def videos(
     timelimit: str | None,
     max_results: int | None,
     page: int,
-    backend: str | list[str],
+    backend: str,
     resolution: str | None,
     duration: str | None,
     license_videos: str | None,
@@ -390,7 +412,14 @@ def videos(
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m", "y"]), help="day, week, month, year")
 @click.option("-m", "--max_results", default=10, type=int, help="maximum number of results")
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
-@click.option("-b", "--backend", default=["auto"], type=click.Choice(["auto", "all", "duckduckgo"]), multiple=True)
+@click.option(
+    "-b",
+    "--backend",
+    default=["auto"],
+    type=click.Choice(["auto", "all", "duckduckgo"]),
+    multiple=True,
+    callback=_convert_tuple_to_csv,
+)
 @click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
@@ -402,7 +431,7 @@ def news(
     timelimit: str | None,
     max_results: int | None,
     page: int,
-    backend: str | list[str],
+    backend: str,
     output: str | None,
     proxy: str | None,
     verify: bool,
