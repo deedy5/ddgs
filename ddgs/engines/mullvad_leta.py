@@ -14,6 +14,8 @@ class BaseMullvadLeta(BaseSearchEngine[TextResult], ABC):
     name: str = "base_mullvad_leta"
     category = "text"
     provider: Literal["google", "brave"]
+    priority = 0.5
+
     search_url = "https://leta.mullvad.net/search/__data.json"
     search_method = "GET"
 

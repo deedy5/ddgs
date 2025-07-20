@@ -17,6 +17,7 @@ class Wikipedia(BaseSearchEngine[TextResult]):
     name = "wikipedia"
     category = "text"
     provider = "wikipedia"
+    priority = 2
 
     search_url = "https://{lang}.wikipedia.org/w/api.php?action=opensearch&search={query}"
     search_method = "GET"
