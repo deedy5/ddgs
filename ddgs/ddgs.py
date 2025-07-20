@@ -50,23 +50,25 @@ class DDGS:
     def _get_engines(
         self,
         category: str,
-        backend: str | list[str],
+        backend: str,
     ) -> list[BaseSearchEngine[Any]]:
         """
         Retrieve a list of search engine instances for a given category and backend.
 
         Args:
             category: The category of search engines (e.g., 'text', 'images', etc.).
-            backend: A single or list of backends. Defaults to "auto".
+            backend: A single or comma-delimited backends. Defaults to "auto".
 
         Returns:
             A list of initialized search engine instances corresponding to the specified
             category and backend. Instances are cached for reuse.
         """
-        backend = [backend] if isinstance(backend, str) else list(backend) if isinstance(backend, tuple) else backend
+        if isinstance(backend, list):  # deprecated
+            backend = ",".join(backend)
+        backend_list = [x.strip() for x in backend.split(",")]
         engine_keys = list(ENGINES[category].keys())
         shuffle(engine_keys)
-        keys = engine_keys if "auto" in backend or "all" in backend else backend
+        keys = engine_keys if "auto" in backend_list or "all" in backend_list else backend_list
 
         if category == "text":
             # ensure Wikipedia is always included and in the first position
@@ -86,9 +88,9 @@ class DDGS:
                     self._engines_cache[engine_class] = engine_instance
                     instances.append(engine_instance)
             return instances
-        except KeyError:
+        except KeyError as ex:
             logger.warning(
-                f"{backend=} is not exist or disabled. Available: {', '.join(sorted(engine_keys))}. Using 'auto'."
+                f"{ex!r} - backend is not exist or disabled. Available: {', '.join(sorted(engine_keys))}. Using 'auto'"
             )
             return self._get_engines(category, "auto")
 
@@ -102,7 +104,7 @@ class DDGS:
         timelimit: str | None = None,
         max_results: int | None = 10,
         page: int = 1,
-        backend: str | list[str] = "auto",
+        backend: str = "auto",
         # deprecated aliases:
         keywords: str | None = None,
         **kwargs: Any,
@@ -118,7 +120,7 @@ class DDGS:
             timelimit: The timelimit for the search (e.g., d, w, m, y).
             max_results: The maximum number of results to return. Defaults to 10.
             page: The page of results to return. Defaults to 1.
-            backend: A single or list of backends. Defaults to "auto".
+            backend: A single or comma-delimited backends. Defaults to "auto".
 
         Returns:
             A list of dictionaries containing the search results.
