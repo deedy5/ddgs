@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import os
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, wait
 from math import ceil
 from random import shuffle
 from types import TracebackType
@@ -18,6 +18,9 @@ logger = logging.getLogger(__name__)
 
 
 class DDGS:
+    threads: int | None = None
+    _executor: ThreadPoolExecutor | None = None
+
     def __init__(self, proxy: str | None = None, timeout: int | None = 5, verify: bool = True):
         self._proxy = _expand_proxy_tb_alias(proxy) or os.environ.get("DDGS_PROXY")
         self._timeout = timeout
@@ -36,6 +39,13 @@ class DDGS:
         exc_tb: TracebackType | None = None,
     ) -> None:
         pass
+
+    @classmethod
+    def get_executor(cls) -> ThreadPoolExecutor:
+        """Get a ThreadPoolExecutor instance and cache it."""
+        if cls._executor is None:
+            cls._executor = ThreadPoolExecutor(max_workers=cls.threads, thread_name_prefix="DDGS")
+        return cls._executor
 
     def _get_engines(
         self,
@@ -78,7 +88,7 @@ class DDGS:
             return instances
         except KeyError:
             logger.warning(
-                f"Invalid backend: {backend}. Available backends: {', '.join(engine_keys)}. Falling back to 'auto'."
+                f"{backend=} is not exist or disabled. Available: {', '.join(sorted(engine_keys))}. Using 'auto'."
             )
             return self._get_engines(category, "auto")
 
@@ -121,37 +131,39 @@ class DDGS:
 
         # Perform search
         results_aggregator: ResultsAggregator[set[str]] = ResultsAggregator(set(["href", "image", "url", "embed_url"]))
-        err = None
         max_workers = min(len(engines), ceil(max_results / 10) + 1) if max_results else len(engines)
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            futures = {}
-            for engine in engines:
-                if seen_providers.setdefault(engine.provider, "working") == "seen":
-                    continue
-                future = executor.submit(
-                    engine.search,
-                    query,
-                    region=region,
-                    safesearch=safesearch,
-                    timelimit=timelimit,
-                    page=page,
-                    max_results=max_results,
-                    **kwargs,
-                )
-                futures[future] = engine
+        executor = self.get_executor()
+        futures, err = {}, None
+        for i, engine in enumerate(engines, start=1):
+            if seen_providers.setdefault(engine.provider, "working") == "seen":
+                continue
+            future = executor.submit(
+                engine.search,
+                query,
+                region=region,
+                safesearch=safesearch,
+                timelimit=timelimit,
+                page=page,
+                max_results=max_results,
+                **kwargs,
+            )
+            futures[future] = engine
 
-                if len(futures) >= max_workers:
-                    for future in as_completed(futures):
-                        try:
-                            r = future.result(timeout=self._timeout)
-                            if r:
-                                results_aggregator.extend(r)
-                                seen_providers[futures[future].provider] = "seen"
-                        except Exception as ex:
-                            err = ex
-                            # logger.info(f"{type(ex).__name__}: {ex}")
-                if max_results and len(results_aggregator) >= max_results:
-                    break
+            if len(futures) >= max_workers or i >= max_workers:
+                done, not_done = wait(futures, timeout=self._timeout, return_when="FIRST_EXCEPTION")
+                for future in done:
+                    try:
+                        r = future.result()
+                        if r:
+                            results_aggregator.extend(r)
+                            seen_providers[futures[future].provider] = "seen"
+                    except Exception as ex:
+                        err = ex
+                        logger.info(f"{type(ex).__name__}: {ex!r}")
+                futures = {f: futures[f] for f in not_done}
+
+            if max_results and len(results_aggregator) >= max_results:
+                break
 
         # Rank results
         # ranker = SimpleFilterRanker()
@@ -159,9 +171,7 @@ class DDGS:
 
         results = results_aggregator.extract_dicts()
         if results:
-            if max_results and max_results < len(results):
-                return results[:max_results]
-            return results
+            return results[:max_results] if max_results else results
 
         if "timed out" in f"{err}":
             raise TimeoutException(err)
