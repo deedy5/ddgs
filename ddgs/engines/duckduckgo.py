@@ -12,6 +12,7 @@ class Duckduckgo(BaseSearchEngine[TextResult]):
     name = "duckduckgo"
     category = "text"
     provider = "bing"
+    disabled = True  # Disabled until ratelimit is fixed
 
     search_url = "https://html.duckduckgo.com/html/"
     search_method = "POST"
