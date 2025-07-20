@@ -24,6 +24,7 @@ class BaseSearchEngine(ABC, Generic[T]):
     category: Literal["text", "images", "videos", "news"]
     provider: str  # source of the search results (e.g. "google" for MullVadLetaGoogle)
     disabled: bool = False  # if True, the engine is disabled
+    priority: float = 1
 
     search_url: str
     search_method: str  # GET or POST

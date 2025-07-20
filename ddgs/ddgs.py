@@ -4,7 +4,7 @@ import logging
 import os
 from concurrent.futures import ThreadPoolExecutor, wait
 from math import ceil
-from random import shuffle
+from random import random, shuffle
 from types import TracebackType
 from typing import Any, Literal
 
@@ -87,6 +87,9 @@ class DDGS:
                     engine_instance = engine_class(proxy=self._proxy, timeout=self._timeout, verify=self._verify)
                     self._engines_cache[engine_class] = engine_instance
                     instances.append(engine_instance)
+
+            # sorting by `engine.priority`
+            instances.sort(key=lambda e: (e.priority, random), reverse=True)
             return instances
         except KeyError as ex:
             logger.warning(
@@ -129,11 +132,12 @@ class DDGS:
         assert query, "Query is mandatory."
 
         engines = self._get_engines(category, backend)
+        len_unique_providers = len({engine.provider for engine in engines})
         seen_providers: dict[str, Literal["working", "seen"]] = {}  # dict[provider, state]
 
         # Perform search
         results_aggregator: ResultsAggregator[set[str]] = ResultsAggregator(set(["href", "image", "url", "embed_url"]))
-        max_workers = min(len(engines), ceil(max_results / 10) + 1) if max_results else len(engines)
+        max_workers = min(len_unique_providers, ceil(max_results / 10) + 1) if max_results else len_unique_providers
         executor = self.get_executor()
         futures, err = {}, None
         for i, engine in enumerate(engines, start=1):
