@@ -133,7 +133,7 @@ class DDGS:
 
         engines = self._get_engines(category, backend)
         len_unique_providers = len({engine.provider for engine in engines})
-        seen_providers: dict[str, Literal["working", "seen"]] = {}  # dict[provider, state]
+        seen_providers: set[str] = set()
 
         # Perform search
         results_aggregator: ResultsAggregator[set[str]] = ResultsAggregator(set(["href", "image", "url", "embed_url"]))
@@ -141,7 +141,7 @@ class DDGS:
         executor = self.get_executor()
         futures, err = {}, None
         for i, engine in enumerate(engines, start=1):
-            if seen_providers.setdefault(engine.provider, "working") == "seen":
+            if engine.provider in seen_providers:
                 continue
             future = executor.submit(
                 engine.search,
@@ -157,15 +157,15 @@ class DDGS:
 
             if len(futures) >= max_workers or i >= max_workers:
                 done, not_done = wait(futures, timeout=self._timeout, return_when="FIRST_EXCEPTION")
-                for future in done:
-                    try:
-                        r = future.result()
-                        if r:
-                            results_aggregator.extend(r)
-                            seen_providers[futures[future].provider] = "seen"
-                    except Exception as ex:
-                        err = ex
-                        logger.info(f"{type(ex).__name__}: {ex!r}")
+                for future in futures:
+                    if future in done:
+                        try:
+                            if r := future.result():
+                                results_aggregator.extend(r)
+                                seen_providers.add(futures[future].provider)
+                        except Exception as ex:
+                            err = ex
+                            logger.info(f"engine:{futures[future].name}: {type(ex).__name__}: {ex!r}")
                 futures = {f: futures[f] for f in not_done}
 
             if max_results and len(results_aggregator) >= max_results:
