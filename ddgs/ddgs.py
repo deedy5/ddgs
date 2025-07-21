@@ -6,12 +6,13 @@ from concurrent.futures import ThreadPoolExecutor, wait
 from math import ceil
 from random import random, shuffle
 from types import TracebackType
-from typing import Any, Literal
+from typing import Any
 
 from .base import BaseSearchEngine
 from .engines import ENGINES
 from .exceptions import DDGSException, TimeoutException
 from .results import ResultsAggregator
+from .similarity import SimpleFilterRanker
 from .utils import _expand_proxy_tb_alias
 
 logger = logging.getLogger(__name__)
@@ -171,11 +172,11 @@ class DDGS:
             if max_results and len(results_aggregator) >= max_results:
                 break
 
-        # Rank results
-        # ranker = SimpleFilterRanker()
-        # results = ranker.rank(results, query)
-
         results = results_aggregator.extract_dicts()
+        # Rank results
+        ranker = SimpleFilterRanker()
+        results = ranker.rank(results, query)
+
         if results:
             return results[:max_results] if max_results else results
 
