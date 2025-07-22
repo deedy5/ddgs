@@ -64,21 +64,13 @@ class Bing(BaseSearchEngine[TextResult]):
             payload["FORM"] = f"PERE{page - 2 if page > 2 else ''}"
         return payload
 
-    def extract_results(self, html_text: str) -> list[TextResult]:
-        """Extract search results from html text"""
-        tree = self.extract_tree(html_text)
-        items = tree.xpath(self.items_xpath)
-        results = []
-        for item in items:
-            result = TextResult()
-            for key, value in self.elements_xpath.items():
-                data = item.xpath(value)
-                data = "".join(x for x in data if x.strip())
-                if key == "href":
-                    if data.startswith("https://www.bing.com/aclick?"):
-                        continue
-                    elif data.startswith("https://www.bing.com/ck/a?"):
-                        data = unwrap_bing_url(data)
-                result.__setattr__(key, data)
-            results.append(result)
-        return results
+    def post_extract_results(self, results: list[TextResult]) -> list[TextResult]:
+        """Post-process search results"""
+        post_results = []
+        for result in results:
+            if result.href.startswith("https://www.bing.com/aclick?"):
+                continue
+            if result.href.startswith("https://www.bing.com/ck/a?"):
+                result.href = unwrap_bing_url(result.href) or result.href
+            post_results.append(result)
+        return post_results
