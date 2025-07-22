@@ -16,7 +16,7 @@ except ImportError:
     HAS_ORJSON = False
     import json
 
-_REGEX_STRIP_TAGS = re.compile(r"<[^>]+>")
+_REGEX_STRIP_TAGS = re.compile("<.*?>")
 
 
 def json_dumps(obj: Any) -> str:
