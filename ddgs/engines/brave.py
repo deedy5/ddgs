@@ -18,7 +18,7 @@ class Brave(BaseSearchEngine[TextResult]):
 
     items_xpath = "//div[@data-type='web']"
     elements_xpath = {
-        "title": ".//div[contains(@class, 'title')]//text()",
+        "title": ".//div[(contains(@class,'title') or contains(@class,'sitename-container')) and position()=last()]//text()",  # noqa: E501
         "href": "./a/@href",
         "body": ".//div[contains(@class, 'description')]//text()",
     }
