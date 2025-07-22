@@ -57,4 +57,7 @@ class Wikipedia(BaseSearchEngine[TextResult]):
             except KeyError as ex:
                 logger.warning(f"Error getting body from Wikipedia for title={result.title}:  {ex}")
 
+        if "may refer to:" in result.body:
+            return []
+
         return [result]
