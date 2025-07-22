@@ -10,6 +10,7 @@ A metasearch library that aggregates results from diverse web search services.
 * [DDGS search operators](#ddgs-search-operators)
 * [Regions](#regions)
 * [Engines](#engines)
+* [Tips](#tips)
 * [DDGS class](#ddgs-class)
 * [Proxy](#proxy)
 * [Exceptions](#exceptions)
@@ -143,6 +144,10 @@ ___
 | videos()          | `duckduckgo`                                                                     |
 | news()            | `duckduckgo`                                                                     |
 
+[Go To TOP](#TOP)
+
+## Tips
+
 ⚠️ **For optimal usage, keep `backend='auto'`** (the default) and specify the desired number of results with `max_results`. This allows the library to automatically handle temporary backend unavailability.
 
 The library considers:
@@ -153,7 +158,11 @@ The library considers:
 
 To customize the search engine order, provide the backends as a comma-separated string (for example: `backend="google, brave, yahoo"`). The library will query them in order, falling back to the next one if an error occurs.
 
-The library works in parallel, adjusting concurrent requests based on `max_results`. This ensures efficient and fast retrieval. Note that a single query returns results from one page; iterate over pages for more results. Setting `max_results` to None returns all unique collected results.
+The library works in parallel, adjusting concurrent requests based on `max_results`. This ensures efficient and fast retrieval. You can change the maximum number of threads using the parameter `DDGS.threads` (for example, `DDGS.threads = 20`).
+
+Note that a single query returns results from one page (`page=1`) of the selected backends; iterate over pages for more results. Setting `max_results` to None returns all unique collected results.
+
+The `region` parameter also has a strong influence on the quality of the search. Set it as `{country}-{language}`: `ar-es`, `pl-pl`, `cn-zh`, etc.
 
 Note that some backends may be temporarily unavailable due to ratelimiting or ISP blockages in certain countries. In such cases, using a proxy server can help bypass these restrictions.
 
