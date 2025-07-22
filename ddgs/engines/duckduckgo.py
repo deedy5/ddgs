@@ -29,17 +29,3 @@ class Duckduckgo(BaseSearchEngine[TextResult]):
         if timelimit:
             payload["df"] = timelimit
         return payload
-
-    def extract_results(self, html_text: str) -> list[TextResult]:
-        """Extract search results from html text"""
-        tree = self.extract_tree(html_text)
-        items = tree.xpath(self.items_xpath)
-        results = []
-        for item in items:
-            result = TextResult()
-            for key, value in self.elements_xpath.items():
-                data = item.xpath(value)
-                data = "".join(x for x in data if x.strip())
-                result.__setattr__(key, data)
-            results.append(result)
-        return results

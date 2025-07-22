@@ -9,7 +9,7 @@ from lxml import html
 from lxml.etree import HTMLParser as LHTMLParser
 
 from .http_client import HttpClient
-from .results import ImagesResult, TextResult
+from .results import ImagesResult, NewsResult, TextResult, VideosResult
 
 logger = logging.getLogger(__name__)
 T = TypeVar("T")
@@ -35,7 +35,18 @@ class BaseSearchEngine(ABC, Generic[T]):
 
     def __init__(self, proxy: str | None = None, timeout: int | None = None, verify: bool = True):
         self.http_client = HttpClient(proxy=proxy, timeout=timeout, verify=verify)
-        self.results: list[TextResult | ImagesResult] = []
+        self.results: list[T] = []
+
+    @property
+    def result_type(self) -> type[T]:
+        """Get result type based on category"""
+        categories = {
+            "text": TextResult,
+            "images": ImagesResult,
+            "videos": VideosResult,
+            "news": NewsResult,
+        }
+        return categories[self.category]
 
     @abstractmethod
     def build_payload(
@@ -63,11 +74,6 @@ class BaseSearchEngine(ABC, Generic[T]):
         """Extract html tree from html text"""
         return html.fromstring(html_text, parser=self.parser)
 
-    @abstractmethod
-    def extract_results(self, html_text: str) -> list[T]:
-        """Extract search results from lxml tree"""
-        raise NotImplementedError
-
     def search(
         self,
         query: str,
@@ -87,4 +93,23 @@ class BaseSearchEngine(ABC, Generic[T]):
             html_text = self.request(self.search_method, self.search_url, data=payload, headers=self.search_headers)
         if not html_text:
             return None
-        return self.extract_results(html_text)
+        results = self.extract_results(html_text)
+        results = self.post_extract_results(results)
+        return results
+
+    def extract_results(self, html_text: str) -> list[T]:
+        """Extract search results from html text"""
+        tree = self.extract_tree(html_text)
+        items = tree.xpath(self.items_xpath)
+        results = []
+        for item in items:
+            result = self.result_type()
+            for key, value in self.elements_xpath.items():
+                data = " ".join(x.strip() for x in item.xpath(value))
+                result.__setattr__(key, data)
+            results.append(result)
+        return results
+
+    def post_extract_results(self, results: list[T]) -> list[T]:
+        """Post-process search results"""
+        return results
