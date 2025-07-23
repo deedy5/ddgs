@@ -80,8 +80,8 @@ def _normalize_text(
     # 3. Unicode normalization
     normalized = unicodedata.normalize(normalize_form, unescaped)
 
-    # 4. Map all Z* (separator) categories to space
-    sep_to_space = {ord(ch): " " for ch in set(normalized) if unicodedata.category(ch).startswith("Z")}
+    # 4. Map both Z* (separators) AND Cf (format) to a plain space
+    sep_to_space = {ord(ch): " " for ch in set(normalized) if unicodedata.category(ch).startswith(("Z", "C"))}
     translated = normalized.translate(sep_to_space)
 
     # 5. Collapse whitespace if requested
