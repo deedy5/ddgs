@@ -10,7 +10,7 @@ from ..utils import _extract_vqd, json_loads
 class DuckduckgoImages(BaseSearchEngine[ImagesResult]):
     """Duckduckgo images search engine"""
 
-    name = "duckduckgo_images"
+    name = "duckduckgo"
     category = "images"
     provider = "bing"
 

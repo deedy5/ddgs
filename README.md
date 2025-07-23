@@ -137,12 +137,12 @@ ___
 
 ## Engines
 
-| DDGS function     | Available backends                                                               |
-| ----------------- |:---------------------------------------------------------------------------------|
-| text()            | `bing`, `brave`, `duckduckgo`, `google`, `mojeek`, `mullvad_brave`, `mullvad_google`, `yandex`, `yahoo`, `wikipedia`|
-| images()          | `duckduckgo`                                                                     |
-| videos()          | `duckduckgo`                                                                     |
-| news()            | `duckduckgo`                                                                     |
+| DDGS function | Available backends |
+| --------------|:-------------------|
+| text()        | `bing`, `brave`, `duckduckgo`, `google`, `mojeek`, `mullvad_brave`, `mullvad_google`, `yandex`, `yahoo`, `wikipedia`|
+| images()      | `duckduckgo` |
+| videos()      | `duckduckgo` |
+| news()        | `duckduckgo`, `yahoo` |
 
 [Go To TOP](#TOP)
 
