@@ -6,21 +6,19 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Callable
 from urllib.parse import unquote_plus
 
-from dateutil.relativedelta import relativedelta
-
 from ..base import BaseSearchEngine
 from ..results import NewsResult
 
 logger = logging.getLogger(__name__)
 
 DATE_RE = re.compile(r"\b(\d+)\s*(year|month|week|day|hour|minute)s?\b", re.IGNORECASE)
-DATE_UNITS: dict[str, Callable[[int], timedelta | relativedelta]] = {
+DATE_UNITS: dict[str, Callable[[int], timedelta]] = {
     "minute": lambda n: timedelta(minutes=n),
     "hour": lambda n: timedelta(hours=n),
     "day": lambda n: timedelta(days=n),
     "week": lambda n: timedelta(weeks=n),
-    "month": lambda n: relativedelta(months=n),
-    "year": lambda n: relativedelta(years=n),
+    "month": lambda n: timedelta(days=30 * n),
+    "year": lambda n: timedelta(days=365 * n),
 }
 
 
@@ -31,11 +29,9 @@ def extract_date(pub_date_str: str) -> str:
         return pub_date_str
 
     number = int(m.group(1))
-    unit = m.group(2).lower()  # “year”, “month”, etc.
+    unit = m.group(2).lower()
     delta = DATE_UNITS[unit](number)
-
-    dt = now - delta
-    dt = dt.replace(microsecond=0)
+    dt = (now - delta).replace(microsecond=0)
     return dt.isoformat()
 
 
