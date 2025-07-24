@@ -2,7 +2,7 @@ import logging
 
 from .ddgs import DDGS
 
-__version__ = "9.4.2"
+__version__ = "9.4.3"
 __all__ = ("DDGS",)
 
 
