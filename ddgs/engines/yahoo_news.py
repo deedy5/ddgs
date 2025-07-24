@@ -65,7 +65,7 @@ class YahooNews(BaseSearchEngine[NewsResult]):
         "title": ".//h4//text()",
         "body": ".//p//text()",
         "url": ".//h4/a/@href",
-        "image": ".//img/@src",
+        "image": "(.//img/@data-src | .//img/@src)[1]",
         "source": ".//span[contains(@class, 'source')]//text()",
     }
 
