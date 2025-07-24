@@ -33,13 +33,22 @@ ddgs --help
 CLI examples:
 
 a) text:
- - *query='битва в пути 1961'*
- - *region='ru'*
- - *language='ru'*
- - *max_results=20*
+ - *query='neurophysiology of the flickering light perception'*
+ - *region='cn'*
+ - *language='zh'*
+ - *max_results=5*
+ - *backend='google, brave'*
  - *proxy='socks5h://127.0.0.1:9150'* ('tb' is an alias for the Tor browser)
 
-`ddgs text -q 'битва в пути 1961' -r ru-ru -m 20 -pr tb`
+`ddgs text -q 'neurophysiology of the flickering light perception' -r cn-zh -m 5 -b google -b brave -pr tb`
+
+b) news:
+ - *query='etna eraption'*
+ - *region='it'*
+ - *language='it'*
+ - *max_results=10*
+
+`ddgs news -q 'etna eruption' -r it-it -m 10`
 
 [Go To TOP](#TOP)
 
