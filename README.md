@@ -211,14 +211,14 @@ Use a rotating proxy. Otherwise, use a new proxy with each DDGS class initializa
 ddgs = DDGS(proxy="tb", timeout=10)  # "tb" is an alias for "socks5h://127.0.0.1:9150"
 results = ddgs.text("something you need", max_results=50)
 ```
-*2. Use any proxy server* (*example with [iproyal rotating residential proxies](https://iproyal.com?r=residential_proxies)*)
+*2. Use any proxy server*
 ```python3
-ddgs = DDGS(proxy="socks5h://user:password@geo.iproyal.com:32325", timeout=10)
+ddgs = DDGS(proxy="socks5h://user:password@1.2.3.4:8080", timeout=10)
 results = ddgs.text("something you need", max_results=50)
 ```
 *3. The proxy can also be set using the `DDGS_PROXY` environment variable.*
 ```python3
-export DDGS_PROXY="socks5h://user:password@geo.iproyal.com:32325"
+export DDGS_PROXY="socks5h://user:password@1.2.3.4:8080"
 ```
 
 [Go To TOP](#TOP)
