@@ -79,6 +79,16 @@ class VideosResult(BaseResult):
     uploader: str = ""
 
 
+@dataclass
+class BooksResult(BaseResult):
+    title: str = ""
+    author: str = ""
+    publisher: str = ""
+    info: str = ""
+    url: str = ""
+    thumbnail: str = ""
+
+
 class ResultsAggregator(Generic[T], ABC):
     """
     Aggregates incoming results. Items are deduplicated by `cache_field`.

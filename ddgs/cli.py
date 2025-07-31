@@ -454,5 +454,45 @@ def news(
         _print_data(data)
 
 
+@cli.command()
+@click.option("-q", "--query", help="books search query")
+@click.option("-k", "--keywords", help="(Deprecated) books search query")  # deprecated
+@click.option("-m", "--max_results", default=10, type=int, help="maximum number of results")
+@click.option("-p", "--page", default=1, type=int, help="page number of results")
+@click.option(
+    "-b",
+    "--backend",
+    default=["auto"],
+    type=click.Choice(["auto", "all", "annasarchive"]),
+    multiple=True,
+    callback=_convert_tuple_to_csv,
+)
+@click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
+@click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
+@click.option("-v", "--verify", default=True, help="verify SSL when making the request")
+def books(
+    query: str,
+    keywords: str | None,  # deprecated
+    max_results: int | None,
+    page: int,
+    backend: str,
+    output: str | None,
+    proxy: str | None,
+    verify: bool,
+) -> None:
+    """CLI function to perform a DDGS books metasearch."""
+    assert (query := keywords or query), "Please provide a query."
+    data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).books(
+        query=query,
+        max_results=max_results,
+        page=page,
+        backend=backend,
+    )
+    if output:
+        _save_data(query, data, function_name="books", filename=output)
+    else:
+        _print_data(data)
+
+
 if __name__ == "__main__":
     cli(prog_name="ddgs")

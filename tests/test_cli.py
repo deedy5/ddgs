@@ -46,6 +46,11 @@ def test_videos_command() -> None:
     assert "title" in result.output
 
 
+def test_books_command() -> None:
+    result = runner.invoke(cli, ["books", "-q", "bee"])
+    assert "title" in result.output
+
+
 @pytest.mark.dependency()
 def test_get_text() -> None:
     global TEXT_RESULTS

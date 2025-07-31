@@ -18,6 +18,7 @@ A metasearch library that aggregates results from diverse web search services.
 * [2. images()](#2-images)
 * [3. videos()](#3-videos)
 * [4. news()](#4-news)
+* [5. books()](#5-books)
 * [Disclaimer](#disclaimer)
 
 ## Install
@@ -49,6 +50,13 @@ b) news:
  - *max_results=10*
 
 `ddgs news -q 'etna eruption' -r it-it -m 10`
+
+c) books:
+ - *query='dolphins cousteau'*
+ - *max_results=100*
+ - *output='csv'* (save as csv file)
+
+`ddgs books -q 'dolphins cousteau' -m 100 -o /tmp/books.csv`
 
 [Go To TOP](#TOP)
 
@@ -152,6 +160,7 @@ ___
 | images()      | `duckduckgo` |
 | videos()      | `duckduckgo` |
 | news()        | `duckduckgo`, `yahoo` |
+| books()       | `annasarchive` |
 
 [Go To TOP](#TOP)
 
@@ -294,7 +303,7 @@ def images(
     timelimit: str | None = None,
     max_results: int | None = 10,
     page: int = 1,
-    backend: str | list[str] = "auto",
+    backend: str = "auto",
     size: str | None = None,
     color: str | None = None,
     type_image: str | None = None,
@@ -367,7 +376,7 @@ def videos(
     timelimit: str | None = None,
     max_results: int | None = 10,
     page: int = 1,
-    backend: str | list[str] = "auto",
+    backend: str = "auto",
     resolution: str | None = None,
     duration: str | None = None,
     license_videos: str | None = None,
@@ -439,7 +448,7 @@ def news(
     timelimit: str | None = None,
     max_results: int | None = 10,
     page: int = 1,
-    backend: str | list[str] = "auto",
+    backend: str = "auto",
 ) -> list[dict[str, str]]:
     """DDGS news metasearch.
 
@@ -468,6 +477,45 @@ print(results)
         "url": "https://www.msn.com/en-us/money/other/murdoch-s-sun-endorses-starmer-s-labour-day-before-uk-vote/ar-BB1plQwl",
         "image": "https://img-s-msn-com.akamaized.net/tenant/amp/entityid/BB1plZil.img?w=2000&h=1333&m=4&q=79",
         "source": "Bloomberg on MSN.com",
+    }, ...
+]
+```
+
+[Go To TOP](#TOP)
+
+## 5. books()
+
+```python
+def books(
+    query: str,
+    max_results: int | None = 10,
+    page: int = 1,
+    backend: str = "auto",
+) -> list[dict[str, str]]:
+    """DDGS books metasearch.
+
+    Args:
+        query: news search query.
+        max_results: maximum number of results. Defaults to 10.
+        page: page of results. Defaults to 1.
+        backend: A single or comma-delimited backends. Defaults to "auto".
+
+    Returns:
+        List of dictionaries with news search results.
+    """
+```
+***Example***
+```python
+results = DDGS().books(query="sea wolf jack london", page=1, backend="auto")
+print(results)
+[
+    {
+        'title': 'The Sea-Wolf',
+        'author': 'Jack London',
+        'publisher': 'DigiCat, 2022',
+        'info': 'English [en], .epub, 🚀/zlib, 0.5MB, 📗 Book (unknown)',
+        'url': 'https://annas-archive.li/md5/574f6556f1df6717de4044e36c7c2782',
+        'thumbnail': 'https://s3proxy.cdn-zlib.sk//covers299/collections/userbooks/da4954486be7c2b2b9f70b2aa5bcf01292de3ea510b5656f892821950ded9ada.jpg',
     }, ...
 ]
 ```

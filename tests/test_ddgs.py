@@ -35,3 +35,9 @@ def test_videos_search() -> None:
     results = DDGS().videos(query)
     assert isinstance(results, list)
     assert len(results) > 0
+
+def test_books_search() -> None:
+    query = "mouse"
+    results = DDGS().books(query)
+    assert isinstance(results, list)
+    assert len(results) > 0
