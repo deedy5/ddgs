@@ -195,3 +195,6 @@ class DDGS:
 
     def videos(self, query: str, **kwargs: Any) -> list[dict[str, Any]]:
         return self._search("videos", query, **kwargs)
+
+    def books(self, query: str, **kwargs: Any) -> list[dict[str, Any]]:
+        return self._search("books", query, **kwargs)

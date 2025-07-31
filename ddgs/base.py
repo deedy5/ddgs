@@ -9,7 +9,7 @@ from lxml import html
 from lxml.etree import HTMLParser as LHTMLParser
 
 from .http_client import HttpClient
-from .results import ImagesResult, NewsResult, TextResult, VideosResult
+from .results import BooksResult, ImagesResult, NewsResult, TextResult, VideosResult
 
 logger = logging.getLogger(__name__)
 T = TypeVar("T")
@@ -21,7 +21,7 @@ class BaseSearchEngine(ABC, Generic[T]):
     """
 
     name: str  # unique key, e.g. "google"
-    category: Literal["text", "images", "videos", "news"]
+    category: Literal["text", "images", "videos", "news", "books"]
     provider: str  # source of the search results (e.g. "google" for MullVadLetaGoogle)
     disabled: bool = False  # if True, the engine is disabled
     priority: float = 1
@@ -45,6 +45,7 @@ class BaseSearchEngine(ABC, Generic[T]):
             "images": ImagesResult,
             "videos": VideosResult,
             "news": NewsResult,
+            "books": BooksResult,
         }
         return categories[self.category]
 
@@ -74,6 +75,28 @@ class BaseSearchEngine(ABC, Generic[T]):
         """Extract html tree from html text"""
         return html.fromstring(html_text, parser=self.parser)
 
+    def pre_process_html(self, html_text: str) -> str:
+        """Pre-process html_text before extracting results"""
+        return html_text
+
+    def extract_results(self, html_text: str) -> list[T]:
+        """Extract search results from html text"""
+        html_text = self.pre_process_html(html_text)
+        tree = self.extract_tree(html_text)
+        items = tree.xpath(self.items_xpath)
+        results = []
+        for item in items:
+            result = self.result_type()
+            for key, value in self.elements_xpath.items():
+                data = " ".join(x.strip() for x in item.xpath(value))
+                result.__setattr__(key, data)
+            results.append(result)
+        return results
+
+    def post_extract_results(self, results: list[T]) -> list[T]:
+        """Post-process search results"""
+        return results
+
     def search(
         self,
         query: str,
@@ -95,21 +118,4 @@ class BaseSearchEngine(ABC, Generic[T]):
             return None
         results = self.extract_results(html_text)
         results = self.post_extract_results(results)
-        return results
-
-    def extract_results(self, html_text: str) -> list[T]:
-        """Extract search results from html text"""
-        tree = self.extract_tree(html_text)
-        items = tree.xpath(self.items_xpath)
-        results = []
-        for item in items:
-            result = self.result_type()
-            for key, value in self.elements_xpath.items():
-                data = " ".join(x.strip() for x in item.xpath(value))
-                result.__setattr__(key, data)
-            results.append(result)
-        return results
-
-    def post_extract_results(self, results: list[T]) -> list[T]:
-        """Post-process search results"""
         return results
