@@ -33,7 +33,6 @@ class Bing(BaseSearchEngine[TextResult]):
     name = "bing"
     category = "text"
     provider = "bing"
-    disabled = True  # Disabled until Bing is fixed (returns irrelevant results)
 
     search_url = "https://www.bing.com/search"
     search_method = "GET"
