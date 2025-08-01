@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from random import randint, sample
 from typing import Any
 
 from ..base import BaseSearchEngine
@@ -31,11 +32,13 @@ class Mojeek(BaseSearchEngine[TextResult]):
             "q": query,
             "arc": country,
             "lb": lang,
-            # "tlen": f"{randint(68, 128)}",  # Title length limit (default=68, max=128)
-            # "dlen": f"{randint(160, 512)}",  # Description length limit (default=160, max=512)
+            "tlen": f"{randint(68, 128)}",  # Title length limit (default=68, max=128)
+            "dlen": f"{randint(160, 512)}",  # Description length limit (default=160, max=512)
         }
         if safesearch == "on":
             payload["safe"] = "1"
         if page > 1:
             payload["s"] = f"{(page - 1) * 10 + 1}"
+        # Randomize payload order
+        payload = dict(sample(list(payload.items()), len(payload)))
         return payload
