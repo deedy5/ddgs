@@ -7,6 +7,7 @@ from urllib.parse import parse_qs, urlparse
 
 from ..base import BaseSearchEngine
 from ..results import TextResult
+from ..utils import _is_custom_date_range, _parse_date_range
 
 
 def unwrap_bing_url(raw_url: str) -> str | None:
@@ -55,9 +56,18 @@ class Bing(BaseSearchEngine[TextResult]):
         }
         self.http_client.client.set_cookies("https://www.bing.com", cookies)
         if timelimit:
-            d = int(time() // 86400)
-            code = f"ez5_{d - 365}_{d}" if timelimit == "y" else "ez" + {"d": "1", "w": "2", "m": "3"}[timelimit]
-            payload["filters"] = f'ex1:"{code}"'
+            if _is_custom_date_range(timelimit):
+                # Handle custom date range: YYYY-MM-DD..YYYY-MM-DD
+                date_range = _parse_date_range(timelimit)
+                if date_range:
+                    start_date, end_date = date_range
+                    # Use freshness parameter for Bing custom date range
+                    payload["freshness"] = f"{start_date}..{end_date}"
+            else:
+                # Handle predefined time limits (d, w, m, y)
+                d = int(time() // 86400)
+                code = f"ez5_{d - 365}_{d}" if timelimit == "y" else "ez" + {"d": "1", "w": "2", "m": "3"}[timelimit]
+                payload["filters"] = f'ex1:"{code}"'
         if page > 1:
             payload["first"] = f"{(page - 1) * 10}"
             payload["FORM"] = f"PERE{page - 2 if page > 2 else ''}"

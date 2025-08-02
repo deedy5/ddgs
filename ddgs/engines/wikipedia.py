@@ -6,7 +6,7 @@ from urllib.parse import quote
 
 from ..base import BaseSearchEngine
 from ..results import TextResult
-from ..utils import json_loads
+from ..utils import _is_custom_date_range, _parse_date_range, json_loads
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +32,18 @@ class Wikipedia(BaseSearchEngine[TextResult]):
         )
         payload: dict[str, Any] = {}
         self.lang = lang  # used in extract_results
+
+        # Wikipedia doesn't support traditional time limits, but we can handle custom date ranges
+        # by adding date constraints to the search query
+        if timelimit and _is_custom_date_range(timelimit):
+            date_range = _parse_date_range(timelimit)
+            if date_range:
+                start_date, end_date = date_range
+                # Wikipedia supports date ranges in search query
+                date_query = f" after:{start_date} before:{end_date}"
+                encoded_query_with_date = quote(query + date_query)
+                self.search_url = f"https://{lang}.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search={encoded_query_with_date}"
+
         return payload
 
     def extract_results(self, html_text: str) -> list[TextResult]:

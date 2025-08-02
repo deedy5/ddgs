@@ -4,6 +4,7 @@ from typing import Any
 
 from ..base import BaseSearchEngine
 from ..results import TextResult
+from ..utils import _is_custom_date_range, _parse_date_range
 
 
 class Brave(BaseSearchEngine[TextResult]):
@@ -33,7 +34,16 @@ class Brave(BaseSearchEngine[TextResult]):
             cookies["safesearch"] = "strict" if safesearch == "on" else "off"
         self.http_client.client.set_cookies("https://search.brave.com", cookies)
         if timelimit:
-            payload["tf"] = {"d": "pd", "w": "pw", "m": "pm", "y": "py"}[timelimit]
+            if _is_custom_date_range(timelimit):
+                # Handle custom date range: YYYY-MM-DD..YYYY-MM-DD
+                date_range = _parse_date_range(timelimit)
+                if date_range:
+                    start_date, end_date = date_range
+                    # Brave supports custom date ranges in query parameter
+                    payload["q"] += f" after:{start_date} before:{end_date}"
+            else:
+                # Handle predefined time limits (d, w, m, y)
+                payload["tf"] = {"d": "pd", "w": "pw", "m": "pm", "y": "py"}[timelimit]
         if page > 1:
             payload["offset"] = f"{page - 1}"
         return payload

@@ -4,7 +4,7 @@ from typing import Any
 
 from ..base import BaseSearchEngine
 from ..results import VideosResult
-from ..utils import _extract_vqd, json_loads
+from ..utils import _extract_vqd, _is_custom_date_range, _parse_date_range, json_loads
 
 
 class DuckduckgoVideos(BaseSearchEngine[VideosResult]):
@@ -42,7 +42,22 @@ class DuckduckgoVideos(BaseSearchEngine[VideosResult]):
         self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
         safesearch_base = {"on": "1", "moderate": "-1", "off": "-2"}
-        timelimit = f"publishedAfter:{timelimit}" if timelimit else ""
+
+        if timelimit:
+            if _is_custom_date_range(timelimit):
+                # Handle custom date range: YYYY-MM-DD..YYYY-MM-DD
+                date_range = _parse_date_range(timelimit)
+                if date_range:
+                    start_date, end_date = date_range
+                    # DuckDuckGo videos uses publishedAfter:start_date,publishedBefore:end_date format
+                    timelimit = f"publishedAfter:{start_date},publishedBefore:{end_date}"
+                else:
+                    timelimit = ""
+            else:
+                # Handle predefined time limits (d, w, m)
+                timelimit = f"publishedAfter:{timelimit}"
+        else:
+            timelimit = ""
         resolution = kwargs.get("resolution")
         duration = kwargs.get("duration")
         license_videos = kwargs.get("license_videos")

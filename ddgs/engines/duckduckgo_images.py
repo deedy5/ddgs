@@ -4,7 +4,7 @@ from typing import Any
 
 from ..base import BaseSearchEngine
 from ..results import ImagesResult
-from ..utils import _extract_vqd, json_loads
+from ..utils import _extract_vqd, _is_custom_date_range, _parse_date_range, json_loads
 
 
 class DuckduckgoImages(BaseSearchEngine[ImagesResult]):
@@ -37,8 +37,23 @@ class DuckduckgoImages(BaseSearchEngine[ImagesResult]):
         self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
         safesearch_base = {"on": "1", "moderate": "1", "off": "-1"}
-        timelimit_base = {"d": "day", "w": "week", "m": "month", "y": "year"}
-        timelimit = f"time:{timelimit_base[timelimit]}" if timelimit else ""
+
+        if timelimit:
+            if _is_custom_date_range(timelimit):
+                # Handle custom date range: YYYY-MM-DD..YYYY-MM-DD
+                date_range = _parse_date_range(timelimit)
+                if date_range:
+                    start_date, end_date = date_range
+                    # DuckDuckGo uses time:YYYY-MM-DD..YYYY-MM-DD format
+                    timelimit = f"time:{start_date}..{end_date}"
+                else:
+                    timelimit = ""
+            else:
+                # Handle predefined time limits (d, w, m, y)
+                timelimit_base = {"d": "day", "w": "week", "m": "month", "y": "year"}
+                timelimit = f"time:{timelimit_base[timelimit]}"
+        else:
+            timelimit = ""
         size = kwargs.get("size")
         size = f"size:{size}" if size else ""
         color = kwargs.get("color")

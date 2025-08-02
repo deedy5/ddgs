@@ -5,6 +5,7 @@ from typing import Any
 
 from ..base import BaseSearchEngine
 from ..results import TextResult
+from ..utils import _is_custom_date_range, _parse_date_range
 
 
 class Yandex(BaseSearchEngine[TextResult]):
@@ -34,4 +35,12 @@ class Yandex(BaseSearchEngine[TextResult]):
         }
         if page > 1:
             payload["p"] = f"{page - 1}"
+        if timelimit and _is_custom_date_range(timelimit):
+            # Handle custom date range: YYYY-MM-DD..YYYY-MM-DD
+            date_range = _parse_date_range(timelimit)
+            if date_range:
+                start_date, end_date = date_range
+                # Yandex supports custom date ranges in query
+                payload["text"] += f" after:{start_date} before:{end_date}"
+        # Note: Yandex doesn't have standard predefined time limits like other engines
         return payload

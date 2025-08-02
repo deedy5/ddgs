@@ -4,7 +4,7 @@ from typing import Any
 
 from ..base import BaseSearchEngine
 from ..results import NewsResult
-from ..utils import _extract_vqd, json_loads
+from ..utils import _extract_vqd, _is_custom_date_range, _parse_date_range, json_loads
 
 
 class DuckduckgoNews(BaseSearchEngine[NewsResult]):
@@ -44,7 +44,16 @@ class DuckduckgoNews(BaseSearchEngine[NewsResult]):
             "p": safesearch_base[safesearch.lower()],
         }
         if timelimit:
-            payload["df"] = timelimit
+            if _is_custom_date_range(timelimit):
+                # Handle custom date range: YYYY-MM-DD..YYYY-MM-DD
+                date_range = _parse_date_range(timelimit)
+                if date_range:
+                    start_date, end_date = date_range
+                    # DuckDuckGo News uses after:YYYY-MM-DD before:YYYY-MM-DD in query
+                    payload["q"] += f" after:{start_date} before:{end_date}"
+            else:
+                # Handle predefined time limits (d, w, m)
+                payload["df"] = timelimit
         if page > 1:
             payload["s"] = f"{(page - 1) * 30}"
         return payload

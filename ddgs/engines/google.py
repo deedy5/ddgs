@@ -7,6 +7,7 @@ from typing import Any
 
 from ..base import BaseSearchEngine
 from ..results import TextResult
+from ..utils import _is_custom_date_range, _parse_date_range
 
 _arcid_random = None  # (random_part, timestamp)
 
@@ -57,5 +58,18 @@ class Google(BaseSearchEngine[TextResult]):
         payload["lr"] = f"lang_{lang}"  # restricts to results written in a particular language
         payload["cr"] = f"country{country.upper()}"  # restricts to results written in a particular country
         if timelimit:
-            payload["tbs"] = f"qdr:{timelimit}"
+            if _is_custom_date_range(timelimit):
+                # Handle custom date range: YYYY-MM-DD..YYYY-MM-DD
+                date_range = _parse_date_range(timelimit)
+                if date_range:
+                    start_date, end_date = date_range
+                    # Convert YYYY-MM-DD to MM/DD/YYYY format for Google
+                    start_parts = start_date.split("-")
+                    end_parts = end_date.split("-")
+                    start_formatted = f"{start_parts[1]}/{start_parts[2]}/{start_parts[0]}"
+                    end_formatted = f"{end_parts[1]}/{end_parts[2]}/{end_parts[0]}"
+                    payload["tbs"] = f"cdr:1,cd_min:{start_formatted},cd_max:{end_formatted}"
+            else:
+                # Handle predefined time limits (d, w, m, y)
+                payload["tbs"] = f"qdr:{timelimit}"
         return payload

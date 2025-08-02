@@ -10,8 +10,9 @@ from urllib.parse import unquote
 from .exceptions import DDGSException
 
 try:
-    HAS_ORJSON = True
     import orjson
+
+    HAS_ORJSON = True
 except ImportError:
     HAS_ORJSON = False
     import json
@@ -95,6 +96,55 @@ def _normalize_text(
 def _normalize_date(date: int | str) -> str:
     """Normalize date from integer to ISO format if applicable."""
     return datetime.fromtimestamp(date, timezone.utc).isoformat() if isinstance(date, int) else date
+
+
+def _parse_date_range(date_range: str) -> tuple[str, str] | None:
+    """Parse date range string in format 'YYYY-MM-DD..YYYY-MM-DD' or 'YYYY-MM-DD...YYYY-MM-DD'.
+
+    Args:
+        date_range: Date range string in format 'start_date..end_date' or 'start_date...end_date'
+
+    Returns:
+        Tuple of (start_date, end_date) in YYYY-MM-DD format, or None if invalid
+    """
+    if not date_range or not isinstance(date_range, str):
+        return None
+
+    # Support both '..' and '...' separators
+    if "..." in date_range:
+        parts = date_range.split("...", 1)
+    elif ".." in date_range:
+        parts = date_range.split("..", 1)
+    else:
+        return None
+
+    if len(parts) != 2:
+        return None
+
+    start_date, end_date = parts[0].strip(), parts[1].strip()
+
+    # Validate date format (YYYY-MM-DD)
+    date_pattern = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+    if not date_pattern.match(start_date) or not date_pattern.match(end_date):
+        return None
+
+    # Validate actual dates
+    try:
+        start_dt = datetime.strptime(start_date, "%Y-%m-%d")
+        end_dt = datetime.strptime(end_date, "%Y-%m-%d")
+        if start_dt > end_dt:
+            return None
+    except ValueError:
+        return None
+
+    return start_date, end_date
+
+
+def _is_custom_date_range(timelimit: str | None) -> bool:
+    """Check if timelimit is a custom date range."""
+    if not timelimit:
+        return False
+    return _parse_date_range(timelimit) is not None
 
 
 def _expand_proxy_tb_alias(proxy: str | None) -> str | None:

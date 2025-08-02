@@ -121,7 +121,7 @@ class DDGS:
             query: The search query.
             region: The region to use for the search (e.g., us-en, uk-en, ru-ru, etc.).
             safesearch: The safesearch setting (e.g., on, moderate, off).
-            timelimit: The timelimit for the search (e.g., d, w, m, y).
+            timelimit: The timelimit for the search (e.g., d, w, m, y) or custom date range.
             max_results: The maximum number of results to return. Defaults to 10.
             page: The page of results to return. Defaults to 1.
             backend: A single or comma-delimited backends. Defaults to "auto".

@@ -5,6 +5,7 @@ from typing import Any
 
 from ..base import BaseSearchEngine
 from ..results import TextResult
+from ..utils import _is_custom_date_range, _parse_date_range
 
 
 class Mojeek(BaseSearchEngine[TextResult]):
@@ -23,6 +24,7 @@ class Mojeek(BaseSearchEngine[TextResult]):
         "href": ".//h2/a/@href",
         "body": ".//p[@class='s']//text()",
     }
+    elements_replace = {}  # Required by BaseSearchEngine for XPath-based engines
 
     def build_payload(
         self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
@@ -39,6 +41,14 @@ class Mojeek(BaseSearchEngine[TextResult]):
             payload["safe"] = "1"
         if page > 1:
             payload["s"] = f"{(page - 1) * 10 + 1}"
+        if timelimit and _is_custom_date_range(timelimit):
+            # Handle custom date range: YYYY-MM-DD..YYYY-MM-DD
+            date_range = _parse_date_range(timelimit)
+            if date_range:
+                start_date, end_date = date_range
+                # Mojeek supports custom date ranges in query
+                payload["q"] += f" after:{start_date} before:{end_date}"
+            # Note: Mojeek doesn't have standard predefined time limits like other engines
         # Randomize payload order
         payload = dict(sample(list(payload.items()), len(payload)))
         return payload

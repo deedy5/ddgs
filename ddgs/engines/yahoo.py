@@ -7,6 +7,7 @@ from urllib.parse import unquote_plus
 
 from ..base import BaseSearchEngine
 from ..results import TextResult
+from ..utils import _is_custom_date_range, _parse_date_range
 
 _TOKEN_CHARS = string.ascii_letters + string.digits + "-_"
 
@@ -46,7 +47,16 @@ class Yahoo(BaseSearchEngine[TextResult]):
         if page > 1:
             payload["b"] = f"{(page - 1) * 7 + 1}"
         if timelimit:
-            payload["btf"] = timelimit
+            if _is_custom_date_range(timelimit):
+                # Handle custom date range: YYYY-MM-DD..YYYY-MM-DD
+                date_range = _parse_date_range(timelimit)
+                if date_range:
+                    start_date, end_date = date_range
+                    # Yahoo supports custom date ranges in query
+                    payload["p"] += f" after:{start_date} before:{end_date}"
+            else:
+                # Handle predefined time limits (d, w, m, y)
+                payload["btf"] = timelimit
         return payload
 
     def post_extract_results(self, results: list[TextResult]) -> list[TextResult]:
