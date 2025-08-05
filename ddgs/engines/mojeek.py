@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from random import randint, sample
+from random import randint
 from typing import Any
 
 from ..base import BaseSearchEngine
@@ -28,10 +28,13 @@ class Mojeek(BaseSearchEngine[TextResult]):
         self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
         country, lang = region.lower().split("-")
-        payload = {
-            "q": query,
+        cookies = {
             "arc": country,
             "lb": lang,
+        }
+        self.http_client.client.set_cookies("https://www.mojeek.com", cookies)
+        payload = {
+            "q": query,
             "tlen": f"{randint(68, 128)}",  # Title length limit (default=68, max=128)
             "dlen": f"{randint(160, 512)}",  # Description length limit (default=160, max=512)
         }
@@ -39,6 +42,4 @@ class Mojeek(BaseSearchEngine[TextResult]):
             payload["safe"] = "1"
         if page > 1:
             payload["s"] = f"{(page - 1) * 10 + 1}"
-        # Randomize payload order
-        payload = dict(sample(list(payload.items()), len(payload)))
         return payload
