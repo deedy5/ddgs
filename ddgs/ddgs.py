@@ -69,11 +69,13 @@ class DDGS:
         backend_list = [x.strip() for x in backend.split(",")]
         engine_keys = list(ENGINES[category].keys())
         shuffle(engine_keys)
-        keys = engine_keys if "auto" in backend_list or "all" in backend_list else backend_list
-
-        if category == "text":
-            # ensure Wikipedia is always included and in the first position
-            keys = ["wikipedia"] + [key for key in keys if key != "wikipedia"]
+        if "auto" in backend_list or "all" in backend_list:
+            keys = engine_keys
+            if category == "text":
+                # ensure Wikipedia is always included and in the first position
+                keys = ["wikipedia"] + [key for key in keys if key != "wikipedia"]
+        else:
+            keys = backend_list
 
         try:
             engine_classes = [ENGINES[category][key] for key in keys]
@@ -121,7 +123,7 @@ class DDGS:
             query: The search query.
             region: The region to use for the search (e.g., us-en, uk-en, ru-ru, etc.).
             safesearch: The safesearch setting (e.g., on, moderate, off).
-            timelimit: The timelimit for the search (e.g., d, w, m, y).
+            timelimit: The timelimit for the search (e.g., d, w, m, y) or custom date range.
             max_results: The maximum number of results to return. Defaults to 10.
             page: The page of results to return. Defaults to 1.
             backend: A single or comma-delimited backends. Defaults to "auto".
