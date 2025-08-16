@@ -2,25 +2,23 @@
 
 from __future__ import annotations
 
-import string
-from random import choices
+from secrets import token_urlsafe
 from time import time
 from typing import Any
 
 from ..base import BaseSearchEngine
 from ..results import TextResult
 
-_arcid_random = None  # (random_part, timestamp)
+_arcid_random = None  # (random_token, timestamp)
 
 
 def ui_async(start: int) -> str:
-    """Generate 'async' payload param for Google."""
+    """Generate 'async' payload param."""
     global _arcid_random
     now = int(time())
-    # regen if first call or TTL expired
     if not _arcid_random or now - _arcid_random[1] > 3600:
-        rnd = "".join(choices(string.ascii_letters + string.digits + "_-", k=23))
-        _arcid_random = (rnd, now)
+        rnd_token = token_urlsafe(23 * 3 // 4)
+        _arcid_random = (rnd_token, now)
     return f"arc_id:srp_{_arcid_random[0]}_1{start:02},use_ac:true,_fmt:prog"
 
 

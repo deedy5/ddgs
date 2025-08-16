@@ -2,20 +2,12 @@
 
 from __future__ import annotations
 
-import string
-from random import choice
+from secrets import token_urlsafe
 from typing import Any
 from urllib.parse import unquote_plus
 
 from ..base import BaseSearchEngine
 from ..results import TextResult
-
-_TOKEN_CHARS = string.ascii_letters + string.digits + "-_"
-
-
-def _random_token(length: int) -> str:
-    """Generate a random token."""
-    return "".join(choice(_TOKEN_CHARS) for _ in range(length))
 
 
 def extract_url(u: str) -> str:
@@ -45,7 +37,9 @@ class Yahoo(BaseSearchEngine[TextResult]):
         self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
         """Build a payload for the search request."""
-        self.search_url = f"https://search.yahoo.com/search;_ylt={_random_token(24)};_ylu={_random_token(47)}"
+        self.search_url = (
+            f"https://search.yahoo.com/search;_ylt={token_urlsafe(24 * 3 // 4)};_ylu={token_urlsafe(47 * 3 // 4)}"
+        )
         payload = {"p": query}
         if page > 1:
             payload["b"] = f"{(page - 1) * 7 + 1}"
