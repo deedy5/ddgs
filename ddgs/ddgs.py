@@ -131,6 +131,7 @@ class DDGS:
         self,
         category: str,
         query: str,
+        keywords: str | None = None,  # deprecated
         *,
         region: str = "us-en",
         safesearch: str = "moderate",
@@ -138,8 +139,6 @@ class DDGS:
         max_results: int | None = 10,
         page: int = 1,
         backend: str = "auto",
-        # deprecated aliases:
-        keywords: str | None = None,
         **kwargs: Any,
     ) -> list[dict[str, Any]]:
         """Perform a search across engines in the given category.
@@ -147,13 +146,13 @@ class DDGS:
         Args:
             category: The category of search engines (e.g., 'text', 'images', etc.).
             query: The search query.
+            keywords: Deprecated alias for `query`.
             region: The region to use for the search (e.g., us-en, uk-en, ru-ru, etc.).
             safesearch: The safesearch setting (e.g., on, moderate, off).
             timelimit: The timelimit for the search (e.g., d, w, m, y) or custom date range.
             max_results: The maximum number of results to return. Defaults to 10.
             page: The page of results to return. Defaults to 1.
             backend: A single or comma-delimited backends. Defaults to "auto".
-            keywords: Deprecated alias for `query`.
             **kwargs: Additional keyword arguments to pass to the search engines.
 
         Returns:
@@ -161,7 +160,8 @@ class DDGS:
 
         """
         query = keywords or query
-        assert query, "Query is mandatory."
+        if not query:
+            raise DDGSException("query is mandatory.")
 
         engines = self._get_engines(category, backend)
         len_unique_providers = len({engine.provider for engine in engines})

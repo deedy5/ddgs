@@ -64,6 +64,7 @@ select = [
     "SIM",  # flake8-simplify
     "I",  # isort
     "D",  # pydocstyle
+    "S",  # flake8-bandit
 ]
 
 [tool.mypy]

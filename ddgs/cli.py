@@ -216,9 +216,9 @@ def text(
     verify: bool,
 ) -> None:
     """CLI function to perform a DDGS text metasearch."""
-    assert (query := keywords or query), "Please provide a query."
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).text(
         query=query,
+        keywords=keywords,  # deprecated
         region=region,
         safesearch=safesearch,
         timelimit=timelimit,
@@ -317,9 +317,9 @@ def images(
     verify: bool,
 ) -> None:
     """CLI function to perform a DDGS images metasearch."""
-    assert (query := keywords or query), "Please provide a query."
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).images(
         query=query,
+        keywords=keywords,  # deprecated
         region=region,
         safesearch=safesearch,
         timelimit=timelimit,
@@ -388,9 +388,9 @@ def videos(
     verify: bool,
 ) -> None:
     """CLI function to perform a DDGS videos metasearch."""
-    assert (query := keywords or query), "Please provide a query."
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).videos(
         query=query,
+        keywords=keywords,  # deprecated
         region=region,
         safesearch=safesearch,
         timelimit=timelimit,
@@ -441,9 +441,9 @@ def news(
     verify: bool,
 ) -> None:
     """CLI function to perform a DDGS news metasearch."""
-    assert (query := keywords or query), "Please provide a query."
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).news(
         query=query,
+        keywords=keywords,  # deprecated
         region=region,
         safesearch=safesearch,
         timelimit=timelimit,
@@ -485,9 +485,9 @@ def books(
     verify: bool,
 ) -> None:
     """CLI function to perform a DDGS books metasearch."""
-    assert (query := keywords or query), "Please provide a query."
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).books(
         query=query,
+        keywords=keywords,  # deprecated
         max_results=max_results,
         page=page,
         backend=backend,

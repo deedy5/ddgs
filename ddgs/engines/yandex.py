@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from random import randint
+from secrets import randbelow
 from typing import Any
 
 from ..base import BaseSearchEngine
@@ -33,7 +33,7 @@ class Yandex(BaseSearchEngine[TextResult]):
         payload = {
             "text": query,
             "web": "1",
-            "searchid": f"{randint(1000000, 9999999)}",
+            "searchid": f"{randbelow(9999999 - 1000000 + 1) + 1000000}",  # == randint(1000000, 9999999),
         }
         if page > 1:
             payload["p"] = f"{page - 1}"
