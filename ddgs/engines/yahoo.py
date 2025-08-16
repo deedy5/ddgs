@@ -1,3 +1,5 @@
+"""Yahoo search engine."""
+
 from __future__ import annotations
 
 import string
@@ -17,12 +19,13 @@ def _random_token(length: int) -> str:
 
 
 def extract_url(u: str) -> str:
+    """Sanitize url."""
     t = u.split("/RU=", 1)[1]
     return unquote_plus(t.split("/RK=", 1)[0].split("/RS=", 1)[0])
 
 
 class Yahoo(BaseSearchEngine[TextResult]):
-    """Yahoo search engine"""
+    """Yahoo search engine."""
 
     name = "yahoo"
     category = "text"
@@ -41,6 +44,7 @@ class Yahoo(BaseSearchEngine[TextResult]):
     def build_payload(
         self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
+        """Build a payload for the search request."""
         self.search_url = f"https://search.yahoo.com/search;_ylt={_random_token(24)};_ylu={_random_token(47)}"
         payload = {"p": query}
         if page > 1:
@@ -50,7 +54,7 @@ class Yahoo(BaseSearchEngine[TextResult]):
         return payload
 
     def post_extract_results(self, results: list[TextResult]) -> list[TextResult]:
-        """Post-process search results"""
+        """Post-process search results."""
         post_results = []
         for result in results:
             if result.href.startswith("https://www.bing.com/aclick?"):

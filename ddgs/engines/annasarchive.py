@@ -1,3 +1,5 @@
+"""Anna's Archive search engine implementation."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -7,7 +9,7 @@ from ..results import BooksResult
 
 
 class AnnasArchive(BaseSearchEngine[BooksResult]):
-    """Anna's Archive search engine"""
+    """Anna's Archive search engine."""
 
     name = "annasarchive"
     category = "books"
@@ -29,13 +31,16 @@ class AnnasArchive(BaseSearchEngine[BooksResult]):
     def build_payload(
         self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
+        """Build a payload for the search request."""
         payload = {"q": query, "page": f"{page}"}
         return payload
 
     def pre_process_html(self, html_text: str) -> str:
+        """Pre-process the HTML text before parsing it."""
         return html_text.replace("<!--", "").replace("-->", "")
 
     def post_extract_results(self, results: list[BooksResult]) -> list[BooksResult]:
+        """Post-process search results."""
         base_url = self.search_url.split("/search")[0]
         for result in results:
             result.url = f"{base_url}{result.url}"

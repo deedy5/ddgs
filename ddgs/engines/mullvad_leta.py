@@ -1,3 +1,5 @@
+"""Mullvad leta search engine implementation."""
+
 from __future__ import annotations
 
 from abc import ABC
@@ -9,7 +11,7 @@ from ..utils import json_loads
 
 
 class BaseMullvadLeta(BaseSearchEngine[TextResult], ABC):
-    """Generic Mullvad leta search engine"""
+    """Generic Mullvad leta search engine."""
 
     name: str = "base_mullvad_leta"
     category = "text"
@@ -22,6 +24,7 @@ class BaseMullvadLeta(BaseSearchEngine[TextResult], ABC):
     def build_payload(
         self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
+        """Build a payload for the search request."""
         country, lang = region.lower().split("-")
         payload = {
             "q": query,
@@ -39,7 +42,7 @@ class BaseMullvadLeta(BaseSearchEngine[TextResult], ABC):
         return payload
 
     def extract_results(self, html_text: str) -> list[TextResult]:
-        """Extract search results from html text"""
+        """Extract search results from html text."""
         json_data = json_loads(html_text)
         data = json_data["nodes"][2]["data"]
         # locate the real list of item-pointers
@@ -57,10 +60,14 @@ class BaseMullvadLeta(BaseSearchEngine[TextResult], ABC):
 
 
 class MullvadLetaBrave(BaseMullvadLeta):
+    """Mullvad leta search engine for Brave."""
+
     name = "mullvad_brave"
     provider = "brave"
 
 
 class MullvadLetaGoogle(BaseMullvadLeta):
+    """Mullvad leta search engine for Google."""
+
     name = "mullvad_google"
     provider = "google"

@@ -1,3 +1,5 @@
+"""Yandex search engine."""
+
 from __future__ import annotations
 
 from random import randint
@@ -8,7 +10,7 @@ from ..results import TextResult
 
 
 class Yandex(BaseSearchEngine[TextResult]):
-    """Yandex search engine"""
+    """Yandex search engine."""
 
     name = "yandex"
     category = "text"
@@ -27,6 +29,7 @@ class Yandex(BaseSearchEngine[TextResult]):
     def build_payload(
         self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
+        """Build a payload for the search request."""
         payload = {
             "text": query,
             "web": "1",

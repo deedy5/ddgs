@@ -1,8 +1,11 @@
+"""Simple filter ranker."""
+
 import re
 
 
 class SimpleFilterRanker:
-    """
+    """Simple filter ranker.
+
     1) Pull any doc with 'wikipedia.org' in its href to the top.
     2) Bucket the rest according to where query tokens appear:
        - both title & body/description
@@ -15,6 +18,7 @@ class SimpleFilterRanker:
     _splitter = re.compile(r"\W+")
 
     def __init__(self, min_token_length: int = 3):
+        """Initialize the SimpleFilterRanker instance."""
         self.min_token_length = min_token_length
 
     def _extract_tokens(self, query: str) -> set[str]:
@@ -27,6 +31,7 @@ class SimpleFilterRanker:
         return any(tok in lower_text for tok in tokens)
 
     def rank(self, docs: list[dict[str, str]], query: str) -> list[dict[str, str]]:
+        """Rank a list of docs based on a query string."""
         tokens = self._extract_tokens(query)
 
         wiki_hits = []

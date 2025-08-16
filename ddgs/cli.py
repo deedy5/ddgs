@@ -1,3 +1,5 @@
+"""CLI tool for DDGS."""
+
 from __future__ import annotations
 
 import csv
@@ -141,11 +143,12 @@ def _download_results(
 
 @click.group(chain=True)
 def cli() -> None:
-    """DDGS CLI tool"""
+    """DDGS CLI tool."""
     pass
 
 
 def safe_entry_point() -> None:
+    """Run the CLI tool in try-except block to catch all exceptions."""
     try:
         cli()
     except Exception as ex:
@@ -154,6 +157,7 @@ def safe_entry_point() -> None:
 
 @cli.command()
 def version() -> str:
+    """Print and return version."""
     print(__version__)
     return __version__
 

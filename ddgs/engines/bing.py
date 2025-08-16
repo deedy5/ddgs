@@ -1,3 +1,5 @@
+"""Bing search engine implementation."""
+
 from __future__ import annotations
 
 import base64
@@ -10,7 +12,7 @@ from ..results import TextResult
 
 
 def unwrap_bing_url(raw_url: str) -> str | None:
-    """Decode the Bing-wrapped raw_url to extract the original url"""
+    """Decode the Bing-wrapped raw_url to extract the original url."""
     parsed = urlparse(raw_url)
     u_vals = parse_qs(parsed.query).get("u", [])
     if not u_vals:
@@ -28,7 +30,7 @@ def unwrap_bing_url(raw_url: str) -> str | None:
 
 
 class Bing(BaseSearchEngine[TextResult]):
-    """Bing search engine"""
+    """Bing search engine."""
 
     name = "bing"
     category = "text"
@@ -47,6 +49,7 @@ class Bing(BaseSearchEngine[TextResult]):
     def build_payload(
         self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
+        """Build a payload for the Bing search request."""
         country, lang = region.lower().split("-")
         payload = {"q": query, "pq": query, "cc": lang}
         cookies = {
@@ -64,7 +67,7 @@ class Bing(BaseSearchEngine[TextResult]):
         return payload
 
     def post_extract_results(self, results: list[TextResult]) -> list[TextResult]:
-        """Post-process search results"""
+        """Post-process search results."""
         post_results = []
         for result in results:
             if result.href.startswith("https://www.bing.com/aclick?"):

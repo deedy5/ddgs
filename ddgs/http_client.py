@@ -1,3 +1,5 @@
+"""HTTP client."""
+
 from __future__ import annotations
 
 import logging
@@ -12,15 +14,20 @@ logger = logging.getLogger(__name__)
 
 
 class Response:
+    """HTTP response."""
+
     __slots__ = ("status_code", "content", "text")
 
     def __init__(self, status_code: int, content: bytes, text: str):
+        """Initialize the Response class."""
         self.status_code = status_code
         self.content = content
         self.text = text
 
 
 class HttpClient:
+    """HTTP client."""
+
     _impersonates = (
                 "chrome_100", "chrome_101", "chrome_104", "chrome_105", "chrome_106", "chrome_107",
                 "chrome_108", "chrome_109", "chrome_114", "chrome_116", "chrome_117", "chrome_118",
@@ -46,6 +53,8 @@ class HttpClient:
             proxy (str, optional): proxy for the HTTP client, supports http/https/socks5 protocols.
                 example: "http://user:pass@example.com:3128". Defaults to None.
             timeout (int, optional): Timeout value for the HTTP client. Defaults to 10.
+            verify (bool, optional): Whether to verify the SSL certificate. Defaults to True.
+
         """
         self.client = primp.Client(
             proxy=proxy,
@@ -56,6 +65,7 @@ class HttpClient:
         )
 
     def request(self, *args: Any, **kwargs: Any) -> Response:
+        """Make a request to the HTTP client."""
         try:
             resp = self.client.request(*args, **kwargs)
             return Response(status_code=resp.status_code, content=resp.content, text=resp.text)
@@ -65,7 +75,9 @@ class HttpClient:
             raise DDGSException(f"{type(ex).__name__}: {ex!r}") from ex
 
     def get(self, *args: Any, **kwargs: Any) -> Response:
+        """Make a GET request to the HTTP client."""
         return self.request(*args, method="GET", **kwargs)
 
     def post(self, *args: Any, **kwargs: Any) -> Response:
+        """Make a POST request to the HTTP client."""
         return self.request(*args, method="POST", **kwargs)

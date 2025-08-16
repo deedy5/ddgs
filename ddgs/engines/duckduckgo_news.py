@@ -1,3 +1,5 @@
+"""Duckduckgo news search engine implementation."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -8,7 +10,7 @@ from ..utils import _extract_vqd, json_loads
 
 
 class DuckduckgoNews(BaseSearchEngine[NewsResult]):
-    """Duckduckgo news search engine"""
+    """Duckduckgo news search engine."""
 
     name = "duckduckgo"
     category = "news"
@@ -34,6 +36,7 @@ class DuckduckgoNews(BaseSearchEngine[NewsResult]):
     def build_payload(
         self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
+        """Build a payload for the search request."""
         safesearch_base = {"on": "1", "moderate": "-1", "off": "-2"}
         payload = {
             "l": region,
@@ -50,7 +53,7 @@ class DuckduckgoNews(BaseSearchEngine[NewsResult]):
         return payload
 
     def extract_results(self, html_text: str) -> list[NewsResult]:
-        """Extract search results from lxml tree"""
+        """Extract search results from lxml tree."""
         json_data = json_loads(html_text)
         items = json_data.get("results", [])
         results = []

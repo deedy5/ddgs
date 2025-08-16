@@ -1,3 +1,5 @@
+"""Utilities."""
+
 from __future__ import annotations
 
 import re
@@ -20,6 +22,7 @@ _REGEX_STRIP_TAGS = re.compile("<.*?>")
 
 
 def json_dumps(obj: Any) -> str:
+    """JSON encode an object."""
     try:
         return (
             orjson.dumps(obj, option=orjson.OPT_INDENT_2).decode()
@@ -31,6 +34,7 @@ def json_dumps(obj: Any) -> str:
 
 
 def json_loads(obj: str | bytes) -> Any:
+    """JSON decode an object."""
     try:
         return orjson.loads(obj) if HAS_ORJSON else json.loads(obj)
     except Exception as ex:
@@ -63,7 +67,8 @@ def _normalize_text(
     normalize_form: Literal["NFC", "NFD", "NFKC", "NFKD"] = "NFC",
     collapse_spaces: bool = True,
 ) -> str:
-    """
+    """Normalize text.
+
     Strip HTML tags, unescape HTML entities, normalize Unicode,
     replace all separator-like characters with spaces, then
     optionally collapse consecutive whitespace into a single space.
