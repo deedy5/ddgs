@@ -68,6 +68,7 @@ select = [
     "B",  # flake8-bugbear
     "A",  # flake8-builtins
     "C4",  # flake8-comprehensions
+    "DTZ",  # flake8-datetimez
     "EM",  # flake8-errmsg
     "LOG",  # flake8-logging
     "G",  # flake8-logging-format
