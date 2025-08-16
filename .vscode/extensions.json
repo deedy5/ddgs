@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "ms-python.python",
+        "ms-python.mypy-type-checker",
+        "charliermarsh.ruff",
+        "usernamehw.errorlens",
+        "fill-labs.dependi"
+    ]
+}
