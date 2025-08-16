@@ -87,7 +87,7 @@ def _print_data(data: list[dict[str, str]]) -> None:
 
 
 def _sanitize_query(query: str) -> str:
-    query = (
+    return (
         query.replace("filetype", "")
         .replace(":", "")
         .replace('"', "'")
@@ -97,7 +97,6 @@ def _sanitize_query(query: str) -> str:
         .replace("\\", "_")
         .replace(" ", "")
     )
-    return query
 
 
 def _download_file(url: str, dir_path: str, filename: str, proxy: str | None, verify: bool) -> None:
