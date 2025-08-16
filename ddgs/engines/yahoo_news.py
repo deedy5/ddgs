@@ -95,6 +95,6 @@ class YahooNews(BaseSearchEngine[NewsResult]):
                 result.url = extract_url(result.url)
                 result.image = extract_image(result.image)
                 result.source = extract_source(result.source)
-        except Exception:
-            logger.exception("Error post-processing results", exc_info=True)
+        except Exception as ex:
+            logger.warning("Error post-processing results: %r", ex)
         return results

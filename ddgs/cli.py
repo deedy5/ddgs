@@ -108,7 +108,7 @@ def _download_file(url: str, dir_path: str, filename: str, proxy: str | None, ve
             with open(os.path.join(dir_path, filename[:200]), "wb") as file:
                 file.write(resp.content)
     except Exception as ex:
-        logger.debug(f"download_file url={url} {type(ex).__name__} {ex}")
+        logger.debug("Error download_file url=%s: %r", url, ex)
 
 
 def _download_results(
