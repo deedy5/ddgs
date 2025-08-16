@@ -1,3 +1,5 @@
+"""Base class for search engines."""
+
 from __future__ import annotations
 
 import logging
@@ -16,9 +18,7 @@ T = TypeVar("T")
 
 
 class BaseSearchEngine(ABC, Generic[T]):
-    """
-    Abstract base for all search-engine backends.
-    """
+    """Abstract base class for all search-engine backends."""
 
     name: str  # unique key, e.g. "google"
     category: Literal["text", "images", "videos", "news", "books"]
@@ -34,12 +34,13 @@ class BaseSearchEngine(ABC, Generic[T]):
     elements_replace: dict[str, str]
 
     def __init__(self, proxy: str | None = None, timeout: int | None = None, verify: bool = True):
+        """Initialize the search engine."""
         self.http_client = HttpClient(proxy=proxy, timeout=timeout, verify=verify)
         self.results: list[T] = []
 
     @property
     def result_type(self) -> type[T]:
-        """Get result type based on category"""
+        """Get result type based on category."""
         categories = {
             "text": TextResult,
             "images": ImagesResult,
@@ -57,7 +58,7 @@ class BaseSearchEngine(ABC, Generic[T]):
         raise NotImplementedError
 
     def request(self, *args: Any, **kwargs: Any) -> str | None:
-        """Make a request to the search engine"""
+        """Make a request to the search engine."""
         try:
             resp = self.http_client.request(*args, **kwargs)
             if resp.status_code == 200:
@@ -72,15 +73,15 @@ class BaseSearchEngine(ABC, Generic[T]):
         return LHTMLParser(remove_blank_text=True, remove_comments=True, remove_pis=True, collect_ids=False)
 
     def extract_tree(self, html_text: str) -> html.Element:
-        """Extract html tree from html text"""
+        """Extract html tree from html text."""
         return html.fromstring(html_text, parser=self.parser)
 
     def pre_process_html(self, html_text: str) -> str:
-        """Pre-process html_text before extracting results"""
+        """Pre-process html_text before extracting results."""
         return html_text
 
     def extract_results(self, html_text: str) -> list[T]:
-        """Extract search results from html text"""
+        """Extract search results from html text."""
         html_text = self.pre_process_html(html_text)
         tree = self.extract_tree(html_text)
         items = tree.xpath(self.items_xpath)
@@ -94,7 +95,7 @@ class BaseSearchEngine(ABC, Generic[T]):
         return results
 
     def post_extract_results(self, results: list[T]) -> list[T]:
-        """Post-process search results"""
+        """Post-process search results."""
         return results
 
     def search(
@@ -106,7 +107,7 @@ class BaseSearchEngine(ABC, Generic[T]):
         page: int = 1,
         **kwargs: Any,
     ) -> list[T] | None:
-        """Search the engine"""
+        """Search the engine."""
         payload = self.build_payload(
             query=query, region=region, safesearch=safesearch, timelimit=timelimit, page=page, **kwargs
         )

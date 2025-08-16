@@ -1,3 +1,5 @@
+"""Wikipedia text search engine."""
+
 from __future__ import annotations
 
 import logging
@@ -12,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class Wikipedia(BaseSearchEngine[TextResult]):
-    """Wikipedia text search engine"""
+    """Wikipedia text search engine."""
 
     name = "wikipedia"
     category = "text"
@@ -25,6 +27,7 @@ class Wikipedia(BaseSearchEngine[TextResult]):
     def build_payload(
         self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
+        """Build a payload for the search request."""
         country, lang = region.lower().split("-")
         encoded_query = quote(query)
         self.search_url = (
@@ -35,7 +38,7 @@ class Wikipedia(BaseSearchEngine[TextResult]):
         return payload
 
     def extract_results(self, html_text: str) -> list[TextResult]:
-        """Extract search results from html text"""
+        """Extract search results from html text."""
         json_data = json_loads(html_text)
         if not json_data[1]:
             return []

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import pathlib
 import shutil
 import time
@@ -15,6 +14,7 @@ from ddgs.cli import _download_results, _save_csv, _save_json, cli
 runner = CliRunner()
 TEXT_RESULTS = []
 IMAGES_RESULTS = []
+
 
 @pytest.fixture(autouse=True)
 def pause_between_tests() -> None:

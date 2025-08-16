@@ -1,3 +1,5 @@
+"""Google search engine implementation."""
+
 from __future__ import annotations
 
 import string
@@ -12,6 +14,7 @@ _arcid_random = None  # (random_part, timestamp)
 
 
 def ui_async(start: int) -> str:
+    """Generate 'async' payload param for Google."""
     global _arcid_random
     now = int(time())
     # regen if first call or TTL expired
@@ -22,7 +25,7 @@ def ui_async(start: int) -> str:
 
 
 class Google(BaseSearchEngine[TextResult]):
-    """Google search engine"""
+    """Google search engine."""
 
     name = "google"
     category = "text"
@@ -41,6 +44,7 @@ class Google(BaseSearchEngine[TextResult]):
     def build_payload(
         self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
+        """Build a payload for the Google search request."""
         safesearch_base = {"on": "2", "moderate": "1", "off": "0"}
         start = (page - 1) * 10
         payload = {

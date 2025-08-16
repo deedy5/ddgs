@@ -1,3 +1,5 @@
+"""Result classes."""
+
 from __future__ import annotations
 
 from abc import ABC
@@ -11,9 +13,7 @@ T = TypeVar("T")
 
 
 class BaseResult:
-    """
-    Base class for all results. Contains normalization functions.
-    """
+    """Base class for all results. Contains normalization functions."""
 
     _normalizers: dict[str, Callable[[Any], Any]] = {
         "title": _normalize_text,
@@ -26,9 +26,7 @@ class BaseResult:
     }
 
     def __setattr__(self, name: str, value: Any) -> None:
-        """
-        Override setattr to apply normalization functions to certain attributes.
-        """
+        """Override setattr to apply normalization functions to certain attributes."""
         if value and (normalizer := self._normalizers.get(name)):
             value = normalizer(value)
         object.__setattr__(self, name, value)
@@ -36,6 +34,8 @@ class BaseResult:
 
 @dataclass
 class TextResult(BaseResult):
+    """Text search result."""
+
     title: str = ""
     href: str = ""
     body: str = ""
@@ -43,6 +43,8 @@ class TextResult(BaseResult):
 
 @dataclass
 class ImagesResult(BaseResult):
+    """Image search result."""
+
     title: str = ""
     image: str = ""
     thumbnail: str = ""
@@ -54,6 +56,8 @@ class ImagesResult(BaseResult):
 
 @dataclass
 class NewsResult(BaseResult):
+    """News search result."""
+
     date: str = ""
     title: str = ""
     body: str = ""
@@ -64,6 +68,8 @@ class NewsResult(BaseResult):
 
 @dataclass
 class VideosResult(BaseResult):
+    """Video search result."""
+
     title: str = ""
     content: str = ""
     description: str = ""
@@ -81,6 +87,8 @@ class VideosResult(BaseResult):
 
 @dataclass
 class BooksResult(BaseResult):
+    """Book search result."""
+
     title: str = ""
     author: str = ""
     publisher: str = ""
@@ -90,13 +98,14 @@ class BooksResult(BaseResult):
 
 
 class ResultsAggregator(Generic[T], ABC):
-    """
-    Aggregates incoming results. Items are deduplicated by `cache_field`.
-    Append just increments a counter; `extract_results` returns items
-    sorted by descending frequency.
+    """Aggregates incoming results.
+
+    Items are deduplicated by `cache_field`. Append just increments a counter;
+    `extract_results` returns items sorted by descending frequency.
     """
 
     def __init__(self, cache_fields: set[str]) -> None:
+        """Initialize the ResultsAggregator instance."""
         if not cache_fields:
             raise ValueError("At least one cache_field must be provided")
         self.cache_fields = set(cache_fields)
@@ -110,10 +119,12 @@ class ResultsAggregator(Generic[T], ABC):
         raise AttributeError(f"Item {item!r} has none of the cache fields {self.cache_fields}")
 
     def __len__(self) -> int:
+        """Return the number of items in the cache."""
         return len(self._cache)
 
     def append(self, item: T) -> None:
-        """
+        """Add an item to the cache.
+
         Register an occurrence of `item`. First time we see its key,
         we store the item; every time we bump the counter.
         """
@@ -127,11 +138,10 @@ class ResultsAggregator(Generic[T], ABC):
         self._counter[key] += 1
 
     def extend(self, items: list[T]) -> None:
+        """Add a list of items to the cache."""
         for item in items:
             self.append(item)
 
     def extract_dicts(self) -> list[dict[str, Any]]:
-        """
-        Return a list of items, sorted by descending frequency. Each item is returned as a dict.
-        """
+        """Return a list of items, sorted by descending frequency. Each item is returned as a dict."""
         return [self._cache[key].__dict__ for key, _ in self._counter.most_common()]

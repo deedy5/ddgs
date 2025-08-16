@@ -1,3 +1,5 @@
+"""Duckduckgo search engine implementation."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -7,7 +9,7 @@ from ..results import TextResult
 
 
 class Duckduckgo(BaseSearchEngine[TextResult]):
-    """Duckduckgo search engine"""
+    """Duckduckgo search engine."""
 
     name = "duckduckgo"
     category = "text"
@@ -23,6 +25,7 @@ class Duckduckgo(BaseSearchEngine[TextResult]):
     def build_payload(
         self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
+        """Build a payload for the search request."""
         payload = {"q": query, "b": "", "l": region}
         if page > 1:
             payload["s"] = f"{10 + (page - 2) * 15}"

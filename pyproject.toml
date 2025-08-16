@@ -57,12 +57,13 @@ exclude = ["tests"]
 
 [tool.ruff.lint]
 select = [
-    "E",  # pycodestyle
+    "E", "W", # pycodestyle
     "F",  # Pyflakes
     "UP",  # pyupgrade
     "B",  # flake8-bugbear
     "SIM",  # flake8-simplify
     "I",  # isort
+    "D",  # pydocstyle
 ]
 
 [tool.mypy]

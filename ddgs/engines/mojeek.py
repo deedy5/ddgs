@@ -1,3 +1,5 @@
+"""Mojeek search engine implementation."""
+
 from __future__ import annotations
 
 from random import randint
@@ -8,7 +10,7 @@ from ..results import TextResult
 
 
 class Mojeek(BaseSearchEngine[TextResult]):
-    """Mojeek search engine"""
+    """Mojeek search engine."""
 
     name = "mojeek"
     category = "text"
@@ -27,6 +29,7 @@ class Mojeek(BaseSearchEngine[TextResult]):
     def build_payload(
         self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
+        """Build a payload for the search request."""
         country, lang = region.lower().split("-")
         cookies = {
             "arc": country,

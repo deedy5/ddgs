@@ -1,15 +1,22 @@
-from __future__ import annotations
+"""Automatically build registry of search engines.
 
-import importlib
-import inspect
-import pkgutil
-from collections import defaultdict
-from typing import Any
+This module defines the module-level variable ENGINES, which is a dictionary
+of dictionaries. The keys of the outer dictionary are the categories of search
+engines, and the keys of the inner dictionaries are the names of the search
+engines. The values of the inner dictionaries are the classes of the search
+engines.
 
-from ..base import BaseSearchEngine
+The search engines are automatically discovered by looking for classes in the
+module that are subclasses of :class:`ddgs.base.BaseSearchEngine` and
+subclasses of the base class do not have names starting with "Base", and
+do not have a class attribute "disabled" set to True.
 
-"""
-# from .bing import Bing
+The module automatically builds the ENGINES dictionary, so it should not be
+imported directly by user code.
+
+Example of resulting dictionary ENGINES:
+
+from .bing import Bing
 from .brave import Brave
 from .duckduckgo import Duckduckgo
 from .duckduckgo_images import DuckduckgoImages
@@ -47,7 +54,16 @@ ENGINES: dict[str, dict[str, type[BaseSearchEngine[Any]]]] = {
 }
 """
 
-# Auto‐built engines registry:
+from __future__ import annotations
+
+import importlib
+import inspect
+import pkgutil
+from collections import defaultdict
+from typing import Any
+
+from ..base import BaseSearchEngine
+
 # ENGINES[category][name] = class
 ENGINES: dict[str, dict[str, type[BaseSearchEngine[Any]]]] = defaultdict(dict)
 

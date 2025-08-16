@@ -1,3 +1,6 @@
+"""DDGS exceptions."""
+
+
 class DDGSException(Exception):
     """Base exception class for ddgs."""
 

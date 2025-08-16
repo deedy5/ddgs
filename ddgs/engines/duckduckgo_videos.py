@@ -1,3 +1,5 @@
+"""Duckduckgo videos search engine implementation."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -8,7 +10,7 @@ from ..utils import _extract_vqd, json_loads
 
 
 class DuckduckgoVideos(BaseSearchEngine[VideosResult]):
-    """Duckduckgo videos search engine"""
+    """Duckduckgo videos search engine."""
 
     name = "duckduckgo"
     category = "videos"
@@ -41,6 +43,7 @@ class DuckduckgoVideos(BaseSearchEngine[VideosResult]):
     def build_payload(
         self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
+        """Build a payload for the search request."""
         safesearch_base = {"on": "1", "moderate": "-1", "off": "-2"}
         timelimit = f"publishedAfter:{timelimit}" if timelimit else ""
         resolution = kwargs.get("resolution")
@@ -62,7 +65,7 @@ class DuckduckgoVideos(BaseSearchEngine[VideosResult]):
         return payload
 
     def extract_results(self, html_text: str) -> list[VideosResult]:
-        """Extract search results from lxml tree"""
+        """Extract search results from lxml tree."""
         json_data = json_loads(html_text)
         items = json_data.get("results", [])
         results = []

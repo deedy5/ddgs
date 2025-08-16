@@ -1,3 +1,8 @@
+"""DDGS | Dux Distributed Global Search.
+
+A metasearch library that aggregates results from diverse web search services.
+"""
+
 import logging
 
 from .ddgs import DDGS

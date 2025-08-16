@@ -1,3 +1,5 @@
+"""Duckduckgo images search engine implementation."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -8,7 +10,7 @@ from ..utils import _extract_vqd, json_loads
 
 
 class DuckduckgoImages(BaseSearchEngine[ImagesResult]):
-    """Duckduckgo images search engine"""
+    """Duckduckgo images search engine."""
 
     name = "duckduckgo"
     category = "images"
@@ -36,6 +38,7 @@ class DuckduckgoImages(BaseSearchEngine[ImagesResult]):
     def build_payload(
         self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
+        """Build a payload for the search request."""
         safesearch_base = {"on": "1", "moderate": "1", "off": "-1"}
         timelimit_base = {"d": "day", "w": "week", "m": "month", "y": "year"}
         timelimit = f"time:{timelimit_base[timelimit]}" if timelimit else ""
@@ -62,7 +65,7 @@ class DuckduckgoImages(BaseSearchEngine[ImagesResult]):
         return payload
 
     def extract_results(self, html_text: str) -> list[ImagesResult]:
-        """Extract search results from html text"""
+        """Extract search results from html text."""
         json_data = json_loads(html_text)
         items = json_data.get("results", [])
         results = []

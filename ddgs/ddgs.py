@@ -1,3 +1,5 @@
+"""DDGS class implementation."""
+
 from __future__ import annotations
 
 import logging
@@ -19,10 +21,33 @@ logger = logging.getLogger(__name__)
 
 
 class DDGS:
+    """DDGS | Dux Distributed Global Search.
+
+    A metasearch library that aggregates results from diverse web search services.
+
+    Args:
+        proxy: The proxy to use for the search. Defaults to None.
+        timeout: The timeout for the search. Defaults to 5.
+        verify: Whether to verify the SSL certificate. Defaults to True.
+
+    Attributes:
+        threads: The number of threads to use for the search. Defaults to None (automatic).
+        _executor: The ThreadPoolExecutor instance.
+
+    Raises:
+        DDGSException: If an error occurs during the search.
+
+    Example:
+        >>> from ddgs import DDGS
+        >>> results = DDGS().search("python")
+
+    """
+
     threads: int | None = None
     _executor: ThreadPoolExecutor | None = None
 
     def __init__(self, proxy: str | None = None, timeout: int | None = 5, verify: bool = True):
+        """Initialize the DDGS class."""
         self._proxy = _expand_proxy_tb_alias(proxy) or os.environ.get("DDGS_PROXY")
         self._timeout = timeout
         self._verify = verify
@@ -31,6 +56,7 @@ class DDGS:
         ] = {}  # dict[engine_class, engine_instance]
 
     def __enter__(self) -> DDGS:
+        """Enter the context manager and return the DDGS instance."""
         return self
 
     def __exit__(
@@ -39,6 +65,7 @@ class DDGS:
         exc_val: BaseException | None = None,
         exc_tb: TracebackType | None = None,
     ) -> None:
+        """Exit the context manager."""
         pass
 
     @classmethod
@@ -53,8 +80,7 @@ class DDGS:
         category: str,
         backend: str,
     ) -> list[BaseSearchEngine[Any]]:
-        """
-        Retrieve a list of search engine instances for a given category and backend.
+        """Retrieve a list of search engine instances for a given category and backend.
 
         Args:
             category: The category of search engines (e.g., 'text', 'images', etc.).
@@ -63,6 +89,7 @@ class DDGS:
         Returns:
             A list of initialized search engine instances corresponding to the specified
             category and backend. Instances are cached for reuse.
+
         """
         if isinstance(backend, list):  # deprecated
             backend = ",".join(backend)
@@ -115,8 +142,7 @@ class DDGS:
         keywords: str | None = None,
         **kwargs: Any,
     ) -> list[dict[str, Any]]:
-        """
-        Perform a search across engines in the given category.
+        """Perform a search across engines in the given category.
 
         Args:
             category: The category of search engines (e.g., 'text', 'images', etc.).
@@ -127,9 +153,12 @@ class DDGS:
             max_results: The maximum number of results to return. Defaults to 10.
             page: The page of results to return. Defaults to 1.
             backend: A single or comma-delimited backends. Defaults to "auto".
+            keywords: Deprecated alias for `query`.
+            **kwargs: Additional keyword arguments to pass to the search engines.
 
         Returns:
             A list of dictionaries containing the search results.
+
         """
         query = keywords or query
         assert query, "Query is mandatory."
@@ -187,16 +216,21 @@ class DDGS:
         raise DDGSException(err or "No results found.")
 
     def text(self, query: str, **kwargs: Any) -> list[dict[str, Any]]:
+        """Perform a text search."""
         return self._search("text", query, **kwargs)
 
     def images(self, query: str, **kwargs: Any) -> list[dict[str, Any]]:
+        """Perform an image search."""
         return self._search("images", query, **kwargs)
 
     def news(self, query: str, **kwargs: Any) -> list[dict[str, Any]]:
+        """Perform a news search."""
         return self._search("news", query, **kwargs)
 
     def videos(self, query: str, **kwargs: Any) -> list[dict[str, Any]]:
+        """Perform a video search."""
         return self._search("videos", query, **kwargs)
 
     def books(self, query: str, **kwargs: Any) -> list[dict[str, Any]]:
+        """Perform a book search."""
         return self._search("books", query, **kwargs)
