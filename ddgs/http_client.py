@@ -66,8 +66,10 @@ class HttpClient:
             return Response(status_code=resp.status_code, content=resp.content, text=resp.text)
         except Exception as ex:
             if "timed out" in f"{ex}":
-                raise TimeoutException(f"Request timed out: {ex!r}") from ex
-            raise DDGSException(f"{type(ex).__name__}: {ex!r}") from ex
+                msg = f"Request timed out: {ex!r}"
+                raise TimeoutException(msg) from ex
+            msg = f"{type(ex).__name__}: {ex!r}"
+            raise DDGSException(msg) from ex
 
     def get(self, *args: Any, **kwargs: Any) -> Response:
         """Make a GET request to the HTTP client."""

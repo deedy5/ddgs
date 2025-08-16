@@ -57,17 +57,24 @@ exclude = ["tests"]
 
 [tool.ruff.lint]
 select = [
-    "E", "W", # pycodestyle
-    "F",  # Pyflakes
-    "UP",  # pyupgrade
-    "B",  # flake8-bugbear
-    "SIM",  # flake8-simplify
+    # Core rules
+    "E", # pycodestyle errors
+    "W", # pycodestyle warnings
+    "F",  # pyflakes
     "I",  # isort
-    "D",  # pydocstyle
+
+    # Enhanced rules
     "S",  # flake8-bandit
-    "C4",  # flake8-comprehensions
+    "B",  # flake8-bugbear
     "A",  # flake8-builtins
-    "RUF",  # Ruff-specific rules
+    "C4",  # flake8-comprehensions
+    "EM",  # flake8-errmsg
+    "SIM",  # flake8-simplify
+    "UP",  # pyupgrade
+    "RUF",  # ruff-specific rules
+
+    # Documentation
+    "D",  # pydocstyle
 ]
 
 [tool.mypy]

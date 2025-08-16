@@ -161,7 +161,8 @@ class DDGS:
         """
         query = keywords or query
         if not query:
-            raise DDGSException("query is mandatory.")
+            msg = "query is mandatory."
+            raise DDGSException(msg)
 
         engines = self._get_engines(category, backend)
         len_unique_providers = len({engine.provider for engine in engines})
