@@ -90,8 +90,9 @@ for finder, modname, _ispkg in pkgutil.iter_modules(package.__path__, package_na
         name = getattr(cls, "name", None)
         category = getattr(cls, "category", None)
         if not isinstance(name, str) or not isinstance(category, str):
+            msg = f"{cls.__module__}.{cls.__qualname__} must define class attributes 'name: str' and 'category: str'."
             raise RuntimeError(
-                f"{cls.__module__}.{cls.__qualname__} must define class attributes 'name: str' and 'category: str'."
+                msg
             )
 
         ENGINES[category][name] = cls

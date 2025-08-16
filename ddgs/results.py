@@ -108,7 +108,8 @@ class ResultsAggregator(Generic[T], ABC):
     def __init__(self, cache_fields: set[str]) -> None:
         """Initialize the ResultsAggregator instance."""
         if not cache_fields:
-            raise ValueError("At least one cache_field must be provided")
+            msg = "At least one cache_field must be provided"
+            raise ValueError(msg)
         self.cache_fields = set(cache_fields)
         self._counter: Counter[str] = Counter()
         self._cache: dict[str, T] = {}
@@ -117,7 +118,8 @@ class ResultsAggregator(Generic[T], ABC):
         for key in item.__dict__:
             if key in self.cache_fields:
                 return str(item.__dict__[key])
-        raise AttributeError(f"Item {item!r} has none of the cache fields {self.cache_fields}")
+        msg = f"Item {item!r} has none of the cache fields {self.cache_fields}"
+        raise AttributeError(msg)
 
     def __len__(self) -> int:
         """Return the number of items in the cache."""
