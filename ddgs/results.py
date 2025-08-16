@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from abc import ABC
 from collections import Counter
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any, Callable, Generic, TypeVar
 
@@ -15,7 +16,7 @@ T = TypeVar("T")
 class BaseResult:
     """Base class for all results. Contains normalization functions."""
 
-    _normalizers: dict[str, Callable[[Any], Any]] = {
+    _normalizers: Mapping[str, Callable[[Any], str]] = {
         "title": _normalize_text,
         "body": _normalize_text,
         "href": _normalize_url,
@@ -25,7 +26,7 @@ class BaseResult:
         "date": _normalize_date,
     }
 
-    def __setattr__(self, name: str, value: Any) -> None:
+    def __setattr__(self, name: str, value: str) -> None:
         """Override setattr to apply normalization functions to certain attributes."""
         if value and (normalizer := self._normalizers.get(name)):
             value = normalizer(value)

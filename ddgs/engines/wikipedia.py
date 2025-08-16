@@ -55,12 +55,8 @@ class Wikipedia(BaseSearchEngine[TextResult]):
         )
         if resp_data:
             json_data = json_loads(resp_data)
-            try:
-                result.body = list(json_data["query"]["pages"].values())[0]["extract"]
-            except KeyError as ex:
-                logger.warning(f"Error getting body from Wikipedia for title={result.title}:  {ex}")
-
-        if "may refer to:" in result.body:
-            return []
+            result.body = next(iter(json_data["query"]["pages"].values())).get("extract", "")
+            if "may refer to:" in result.body:
+                return []
 
         return [result]

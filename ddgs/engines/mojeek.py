@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Any
 
 from ..base import BaseSearchEngine
@@ -19,7 +20,7 @@ class Mojeek(BaseSearchEngine[TextResult]):
     search_method = "GET"
 
     items_xpath = "//ul[contains(@class, 'results')]/li"
-    elements_xpath = {
+    elements_xpath: Mapping[str, str] = {
         "title": ".//h2//text()",
         "href": ".//h2/a/@href",
         "body": ".//p[@class='s']//text()",

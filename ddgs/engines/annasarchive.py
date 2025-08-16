@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Any
 
 from ..base import BaseSearchEngine
@@ -19,7 +20,7 @@ class AnnasArchive(BaseSearchEngine[BooksResult]):
     search_method = "GET"
 
     items_xpath = "//div[contains(@id, 'record-list')]//div[a or contains(@class, 'js-scroll-hidden')]"
-    elements_xpath = {
+    elements_xpath: Mapping[str, str] = {
         "title": ".//h3//text()",
         "author": ".//div[h3]/div[3]//text()",
         "publisher": ".//div[h3]/div[2]//text()",
