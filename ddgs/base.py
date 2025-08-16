@@ -119,5 +119,4 @@ class BaseSearchEngine(ABC, Generic[T]):
         if not html_text:
             return None
         results = self.extract_results(html_text)
-        results = self.post_extract_results(results)
-        return results
+        return self.post_extract_results(results)

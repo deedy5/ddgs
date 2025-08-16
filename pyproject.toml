@@ -69,6 +69,7 @@ select = [
     "A",  # flake8-builtins
     "C4",  # flake8-comprehensions
     "EM",  # flake8-errmsg
+    "RET",  # flake8-return
     "SIM",  # flake8-simplify
     "UP",  # pyupgrade
     "RUF",  # ruff-specific rules

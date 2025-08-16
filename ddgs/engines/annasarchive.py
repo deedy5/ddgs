@@ -33,8 +33,7 @@ class AnnasArchive(BaseSearchEngine[BooksResult]):
         self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
         """Build a payload for the search request."""
-        payload = {"q": query, "page": f"{page}"}
-        return payload
+        return {"q": query, "page": f"{page}"}
 
     def pre_process_html(self, html_text: str) -> str:
         """Pre-process the HTML text before parsing it."""
