@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class Response:
     """HTTP response."""
 
-    __slots__ = ("status_code", "content", "text")
+    __slots__ = ("content", "status_code", "text")
 
     def __init__(self, status_code: int, content: bytes, text: str):
         """Initialize the Response class."""

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Any
 
 from ..base import BaseSearchEngine
@@ -18,9 +19,9 @@ class DuckduckgoImages(BaseSearchEngine[ImagesResult]):
 
     search_url = "https://duckduckgo.com/i.js"
     search_method = "GET"
-    search_headers = {"Referer": "https://duckduckgo.com/", "Sec-Fetch-Mode": "cors"}
+    search_headers: Mapping[str, str] = {"Referer": "https://duckduckgo.com/", "Sec-Fetch-Mode": "cors"}
 
-    elements_replace = {
+    elements_replace: Mapping[str, str] = {
         "title": "title",
         "image": "image",
         "thumbnail": "thumbnail",

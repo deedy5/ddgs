@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from secrets import randbelow
 from typing import Any
 
@@ -20,7 +21,7 @@ class Yandex(BaseSearchEngine[TextResult]):
     search_method = "GET"
 
     items_xpath = "//li[contains(@class, 'serp-item')]"
-    elements_xpath = {
+    elements_xpath: Mapping[str, str] = {
         "title": ".//h3//text()",
         "href": ".//h3//a/@href",
         "body": ".//div[contains(@class, 'text')]//text()",

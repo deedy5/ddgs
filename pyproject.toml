@@ -66,6 +66,8 @@ select = [
     "D",  # pydocstyle
     "S",  # flake8-bandit
     "C4",  # flake8-comprehensions
+    "A",  # flake8-builtins
+    "RUF",  # Ruff-specific rules
 ]
 
 [tool.mypy]

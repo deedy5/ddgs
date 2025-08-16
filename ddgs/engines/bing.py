@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from collections.abc import Mapping
 from time import time
 from typing import Any
 from urllib.parse import parse_qs, urlparse
@@ -40,7 +41,7 @@ class Bing(BaseSearchEngine[TextResult]):
     search_method = "GET"
 
     items_xpath = "//li[contains(@class, 'b_algo')]"
-    elements_xpath = {
+    elements_xpath: Mapping[str, str] = {
         "title": ".//h2/a//text()",
         "href": ".//h2/a/@href",
         "body": ".//p//text()",

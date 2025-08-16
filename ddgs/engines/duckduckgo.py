@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Any
 
 from ..base import BaseSearchEngine
@@ -20,7 +21,7 @@ class Duckduckgo(BaseSearchEngine[TextResult]):
     search_method = "POST"
 
     items_xpath = "//div[contains(@class, 'body')]"
-    elements_xpath = {"title": ".//h2//text()", "href": "./a/@href", "body": "./a//text()"}
+    elements_xpath: Mapping[str, str] = {"title": ".//h2//text()", "href": "./a/@href", "body": "./a//text()"}
 
     def build_payload(
         self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any

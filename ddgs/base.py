@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
+from collections.abc import Mapping
 from functools import cached_property
 from typing import Any, Generic, Literal, TypeVar
 
@@ -28,10 +29,10 @@ class BaseSearchEngine(ABC, Generic[T]):
 
     search_url: str
     search_method: str  # GET or POST
-    search_headers: dict[str, str] = {}
+    search_headers: Mapping[str, str] = {}
     items_xpath: str
-    elements_xpath: dict[str, str]
-    elements_replace: dict[str, str]
+    elements_xpath: Mapping[str, str]
+    elements_replace: Mapping[str, str]
 
     def __init__(self, proxy: str | None = None, timeout: int | None = None, verify: bool = True):
         """Initialize the search engine."""

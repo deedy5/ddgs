@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import re
+from collections.abc import Mapping
 from datetime import datetime, timedelta, timezone
 from typing import Any, Callable
 from urllib.parse import unquote_plus
@@ -66,7 +67,7 @@ class YahooNews(BaseSearchEngine[NewsResult]):
     search_method = "GET"
 
     items_xpath = "//div[@id='web']//li[a]"
-    elements_xpath = {
+    elements_xpath: Mapping[str, str] = {
         "date": ".//span[contains(@class, 'time')]//text()",
         "title": ".//h4//text()",
         "body": ".//p//text()",
