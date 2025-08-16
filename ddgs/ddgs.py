@@ -168,7 +168,7 @@ class DDGS:
         seen_providers: set[str] = set()
 
         # Perform search
-        results_aggregator: ResultsAggregator[set[str]] = ResultsAggregator(set(["href", "image", "url", "embed_url"]))
+        results_aggregator: ResultsAggregator[set[str]] = ResultsAggregator({"href", "image", "url", "embed_url"})
         max_workers = min(len_unique_providers, ceil(max_results / 10) + 1) if max_results else len_unique_providers
         executor = self.get_executor()
         futures, err = {}, None

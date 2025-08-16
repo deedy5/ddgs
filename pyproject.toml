@@ -65,6 +65,7 @@ select = [
     "I",  # isort
     "D",  # pydocstyle
     "S",  # flake8-bandit
+    "C4",  # flake8-comprehensions
 ]
 
 [tool.mypy]
