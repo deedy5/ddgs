@@ -69,6 +69,8 @@ select = [
     "A",  # flake8-builtins
     "C4",  # flake8-comprehensions
     "EM",  # flake8-errmsg
+    "LOG",  # flake8-logging
+    "G",  # flake8-logging-format
     "RET",  # flake8-return
     "SIM",  # flake8-simplify
     "UP",  # pyupgrade

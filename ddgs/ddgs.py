@@ -123,7 +123,7 @@ class DDGS:
             return instances
         except KeyError as ex:
             logger.warning(
-                f"{ex!r} - backend is not exist or disabled. Available: {', '.join(sorted(engine_keys))}. Using 'auto'"
+                "%r - backend is not exist or disabled. Available: %s. Using 'auto'", ex, ", ".join(sorted(engine_keys))
             )
             return self._get_engines(category, "auto")
 
@@ -198,7 +198,7 @@ class DDGS:
                                 seen_providers.add(futures[future].provider)
                         except Exception as ex:
                             err = ex
-                            logger.info(f"engine:{futures[future].name}: {type(ex).__name__}: {ex!r}")
+                            logger.info("Error in engine %s: exc=%r", futures[future].name, ex)
                 futures = {f: futures[f] for f in not_done}
 
             if max_results and len(results_aggregator) >= max_results:
