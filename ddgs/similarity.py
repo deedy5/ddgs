@@ -18,7 +18,6 @@ class SimpleFilterRanker:
     _splitter = re.compile(r"\W+")
 
     def __init__(self, min_token_length: int = 3):
-        """Initialize the SimpleFilterRanker instance."""
         self.min_token_length = min_token_length
 
     def _extract_tokens(self, query: str) -> set[str]:

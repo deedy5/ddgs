@@ -16,13 +16,11 @@ logger = logging.getLogger(__name__)
 class Response:
     """HTTP response."""
 
-    __slots__ = ("content", "status_code", "text")
+    __slots__ = ("content", "status_code")
 
-    def __init__(self, status_code: int, content: bytes, text: str):
-        """Initialize the Response class."""
+    def __init__(self, status_code: int, content: bytes):
         self.status_code = status_code
         self.content = content
-        self.text = text
 
 
 class HttpClient:
@@ -63,7 +61,7 @@ class HttpClient:
         """Make a request to the HTTP client."""
         try:
             resp = self.client.request(*args, **kwargs)
-            return Response(status_code=resp.status_code, content=resp.content, text=resp.text)
+            return Response(status_code=resp.status_code, content=resp.content)
         except Exception as ex:
             if "timed out" in f"{ex}":
                 msg = f"Request timed out: {ex!r}"

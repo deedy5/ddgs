@@ -30,7 +30,7 @@ classifiers = [
 dependencies = [
     "click>=8.1.8",
     "primp>=0.15.0",
-    "lxml>=5.3.0",
+    "lxml>=6.0.0",
 ]
 dynamic = ["version"]
 
@@ -79,6 +79,9 @@ select = [
 
     # Documentation
     "D",  # pydocstyle
+]
+ignore = [
+    "D107",  # Missing docstring in `__init__`
 ]
 
 [tool.mypy]

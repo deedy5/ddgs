@@ -106,7 +106,6 @@ class ResultsAggregator(Generic[T], ABC):
     """
 
     def __init__(self, cache_fields: set[str]) -> None:
-        """Initialize the ResultsAggregator instance."""
         if not cache_fields:
             msg = "At least one cache_field must be provided"
             raise ValueError(msg)

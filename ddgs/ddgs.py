@@ -47,7 +47,6 @@ class DDGS:
     _executor: ThreadPoolExecutor | None = None
 
     def __init__(self, proxy: str | None = None, timeout: int | None = 5, verify: bool = True):
-        """Initialize the DDGS class."""
         self._proxy = _expand_proxy_tb_alias(proxy) or os.environ.get("DDGS_PROXY")
         self._timeout = timeout
         self._verify = verify
@@ -198,7 +197,7 @@ class DDGS:
                                 seen_providers.add(futures[future].provider)
                         except Exception as ex:
                             err = ex
-                            logger.info("Error in engine %s: exc=%r", futures[future].name, ex)
+                            logger.info("Error in engine %s: %r", futures[future].name, ex)
                 futures = {f: futures[f] for f in not_done}
 
             if max_results and len(results_aggregator) >= max_results:
