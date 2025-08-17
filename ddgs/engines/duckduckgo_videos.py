@@ -65,9 +65,9 @@ class DuckduckgoVideos(BaseSearchEngine[VideosResult]):
             payload["s"] = f"{(page - 1) * 60}"
         return payload
 
-    def extract_results(self, html_bytes: bytes) -> list[VideosResult]:
+    def extract_results(self, html_text: str) -> list[VideosResult]:
         """Extract search results from lxml tree."""
-        json_data = json_loads(html_bytes)
+        json_data = json_loads(html_text)
         items = json_data.get("results", [])
         results = []
         for item in items:
