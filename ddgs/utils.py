@@ -6,7 +6,7 @@ import re
 import unicodedata
 from datetime import datetime, timezone
 from html import unescape
-from typing import Any, Literal
+from typing import Any
 from urllib.parse import unquote
 
 from .exceptions import DDGSException
@@ -65,39 +65,31 @@ def _normalize_url(url: str) -> str:
     return unquote(url).replace(" ", "+") if url else ""
 
 
-def _normalize_text(
-    raw: str,
-    normalize_form: Literal["NFC", "NFD", "NFKC", "NFKD"] = "NFC",
-    collapse_spaces: bool = True,
-) -> str:
+def _normalize_text(raw: str) -> str:
     """Normalize text.
 
     Strip HTML tags, unescape HTML entities, normalize Unicode,
-    replace all separator-like characters with spaces, then
-    optionally collapse consecutive whitespace into a single space.
+    remove "c" category characters, and collapse whitespace.
     """
     if not raw:
         return ""
 
     # 1. Strip HTML tags
-    stripped = _REGEX_STRIP_TAGS.sub("", raw)
+    text = _REGEX_STRIP_TAGS.sub("", raw)
 
     # 2. Unescape HTML entities
-    unescaped = unescape(stripped)
+    text = unescape(text)
 
     # 3. Unicode normalization
-    normalized = unicodedata.normalize(normalize_form, unescaped)
+    text = unicodedata.normalize("NFC", text)
 
-    # 4. Map both Z* (separators) AND Cf (format) to a plain space
-    sep_to_space = {ord(ch): " " for ch in set(normalized) if unicodedata.category(ch).startswith(("Z", "C"))}
-    translated = normalized.translate(sep_to_space)
+    # 4. Remove "C" category characters
+    c_to_none = {ord(ch): None for ch in set(text) if unicodedata.category(ch)[0] == "C"}
+    if c_to_none:
+        text = text.translate(c_to_none)
 
-    # 5. Collapse whitespace if requested
-    if collapse_spaces:
-        # \s covers all whitespace including separators we translated
-        translated = re.sub(r"\s+", " ", translated).strip()
-
-    return translated
+    # 5. Collapse whitespace
+    return " ".join(text.split())
 
 
 def _normalize_date(date: int | str) -> str:
