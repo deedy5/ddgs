@@ -53,9 +53,9 @@ class DuckduckgoNews(BaseSearchEngine[NewsResult]):
             payload["s"] = f"{(page - 1) * 30}"
         return payload
 
-    def extract_results(self, html_text: str) -> list[NewsResult]:
+    def extract_results(self, html_bytes: bytes) -> list[NewsResult]:
         """Extract search results from lxml tree."""
-        json_data = json_loads(html_text)
+        json_data = json_loads(html_bytes)
         items = json_data.get("results", [])
         results = []
         for item in items:

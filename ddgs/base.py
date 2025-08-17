@@ -6,7 +6,7 @@ import logging
 from abc import ABC, abstractmethod
 from collections.abc import Mapping
 from functools import cached_property
-from typing import Any, Generic, Literal, TypeVar
+from typing import Any, Generic, Literal, TypeVar, cast
 
 from lxml import html
 from lxml.etree import HTMLParser as LHTMLParser
@@ -35,7 +35,6 @@ class BaseSearchEngine(ABC, Generic[T]):
     elements_replace: Mapping[str, str]
 
     def __init__(self, proxy: str | None = None, timeout: int | None = None, verify: bool = True):
-        """Initialize the search engine."""
         self.http_client = HttpClient(proxy=proxy, timeout=timeout, verify=verify)
         self.results: list[T] = []
 
@@ -58,12 +57,12 @@ class BaseSearchEngine(ABC, Generic[T]):
         """Build a payload for the search request."""
         raise NotImplementedError
 
-    def request(self, *args: Any, **kwargs: Any) -> str | None:
+    def request(self, *args: Any, **kwargs: Any) -> bytes | None:
         """Make a request to the search engine."""
         try:
             resp = self.http_client.request(*args, **kwargs)
             if resp.status_code == 200:
-                return resp.text
+                return resp.content
         except Exception as ex:
             raise ex
         return None
@@ -73,18 +72,18 @@ class BaseSearchEngine(ABC, Generic[T]):
         """Get HTML parser."""
         return LHTMLParser(remove_blank_text=True, remove_comments=True, remove_pis=True, collect_ids=False)
 
-    def extract_tree(self, html_text: str) -> html.Element:
-        """Extract html tree from html text."""
-        return html.fromstring(html_text, parser=self.parser)
+    def extract_tree(self, html_bytes: bytes) -> html.Element:
+        """Extract html tree from html bytes."""
+        return html.document_fromstring(cast(bytes, memoryview(html_bytes)), parser=self.parser)
 
-    def pre_process_html(self, html_text: str) -> str:
-        """Pre-process html_text before extracting results."""
-        return html_text
+    def pre_process_html(self, html_bytes: bytes) -> bytes:
+        """Pre-process html bytes before extracting results."""
+        return html_bytes
 
-    def extract_results(self, html_text: str) -> list[T]:
-        """Extract search results from html text."""
-        html_text = self.pre_process_html(html_text)
-        tree = self.extract_tree(html_text)
+    def extract_results(self, html_bytes: bytes) -> list[T]:
+        """Extract search results from html bytes."""
+        html_bytes = self.pre_process_html(html_bytes)
+        tree = self.extract_tree(html_bytes)
         items = tree.xpath(self.items_xpath)
         results = []
         for item in items:

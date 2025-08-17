@@ -41,9 +41,9 @@ class BaseMullvadLeta(BaseSearchEngine[TextResult], ABC):
             payload["page"] = f"{page}"
         return payload
 
-    def extract_results(self, html_text: str) -> list[TextResult]:
-        """Extract search results from html text."""
-        json_data = json_loads(html_text)
+    def extract_results(self, html_bytes: bytes) -> list[TextResult]:
+        """Extract search results from html bytes."""
+        json_data = json_loads(html_bytes)
         data = json_data["nodes"][2]["data"]
         # locate the real list of item-pointers
         items = data[data[0]["items"]]

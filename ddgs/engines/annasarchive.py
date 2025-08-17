@@ -35,9 +35,9 @@ class AnnasArchive(BaseSearchEngine[BooksResult]):
         """Build a payload for the search request."""
         return {"q": query, "page": f"{page}"}
 
-    def pre_process_html(self, html_text: str) -> str:
-        """Pre-process the HTML text before parsing it."""
-        return html_text.replace("<!--", "").replace("-->", "")
+    def pre_process_html(self, html_bytes: bytes) -> bytes:
+        """Pre-process the HTML before parsing it."""
+        return html_bytes.replace(b"<!--", b"").replace(b"-->", b"")
 
     def post_extract_results(self, results: list[BooksResult]) -> list[BooksResult]:
         """Post-process search results."""
