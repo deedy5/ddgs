@@ -65,9 +65,9 @@ class DuckduckgoImages(BaseSearchEngine[ImagesResult]):
             payload["s"] = f"{(page - 1) * 100}"
         return payload
 
-    def extract_results(self, html_bytes: bytes) -> list[ImagesResult]:
-        """Extract search results from html bytes."""
-        json_data = json_loads(html_bytes)
+    def extract_results(self, html_text: str) -> list[ImagesResult]:
+        """Extract search results from html text."""
+        json_data = json_loads(html_text)
         items = json_data.get("results", [])
         results = []
         for item in items:

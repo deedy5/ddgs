@@ -37,9 +37,9 @@ class Wikipedia(BaseSearchEngine[TextResult]):
         self.lang = lang  # used in extract_results
         return payload
 
-    def extract_results(self, html_bytes: bytes) -> list[TextResult]:
-        """Extract search results from html bytes."""
-        json_data = json_loads(html_bytes)
+    def extract_results(self, html_text: str) -> list[TextResult]:
+        """Extract search results from html text."""
+        json_data = json_loads(html_text)
         if not json_data[1]:
             return []
 
