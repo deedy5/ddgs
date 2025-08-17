@@ -56,7 +56,7 @@ class Wikipedia(BaseSearchEngine[TextResult]):
         if resp_data:
             json_data = json_loads(resp_data)
             result.body = next(iter(json_data["query"]["pages"].values())).get("extract", "")
-            if "may refer to:" in result.body:
-                return []
+        if "may refer to:" in result.body:
+            return []
 
         return [result]
