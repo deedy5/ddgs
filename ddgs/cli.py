@@ -18,6 +18,7 @@ from . import __version__
 from .ddgs import DDGS
 from .utils import _expand_proxy_tb_alias, json_dumps
 
+logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
 COLORS = {
