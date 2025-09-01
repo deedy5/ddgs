@@ -24,6 +24,9 @@ class BaseResult:
         "thumbnail": _normalize_url,
         "image": _normalize_url,
         "date": _normalize_date,
+        "author": _normalize_text,
+        "publisher": _normalize_text,
+        "info": _normalize_text,
     }
 
     def __setattr__(self, name: str, value: str) -> None:

@@ -19,12 +19,12 @@ class AnnasArchive(BaseSearchEngine[BooksResult]):
     search_url = "https://annas-archive.li/search"
     search_method = "GET"
 
-    items_xpath = "//div[contains(@id, 'record-list')]//div[a or contains(@class, 'js-scroll-hidden')]"
+    items_xpath = "//div[contains(@class, 'record-list-outer')]/div"
     elements_xpath: Mapping[str, str] = {
-        "title": ".//h3//text()",
-        "author": ".//div[h3]/div[3]//text()",
-        "publisher": ".//div[h3]/div[2]//text()",
-        "info": ".//div[h3]/div[1]//text()",
+        "title": ".//a[contains(@class, 'text-lg')]//text()",
+        "author": ".//a[span[contains(@class, 'user')]]//text()",
+        "publisher": ".//a[span[contains(@class, 'company')]]//text()",
+        "info": ".//div[contains(@class, 'text-gray-800')]/text()",
         "url": "./a/@href",
         "thumbnail": ".//img/@src",
     }
