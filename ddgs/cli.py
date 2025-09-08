@@ -420,7 +420,7 @@ def videos(
     "-b",
     "--backend",
     default=["auto"],
-    type=click.Choice(["auto", "all", "duckduckgo", "yahoo"]),
+    type=click.Choice(["auto", "all", "bing", "duckduckgo", "yahoo"]),
     multiple=True,
     callback=_convert_tuple_to_csv,
 )

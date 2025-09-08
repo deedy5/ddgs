@@ -159,7 +159,7 @@ ___
 | text()        | `bing`, `brave`, `duckduckgo`, `google`, `mojeek`, `mullvad_brave`, `mullvad_google`, `yandex`, `yahoo`, `wikipedia`|
 | images()      | `duckduckgo` |
 | videos()      | `duckduckgo` |
-| news()        | `duckduckgo`, `yahoo` |
+| news()        | `bing`, `duckduckgo`, `yahoo` |
 | books()       | `annasarchive` |
 
 [Go To TOP](#TOP)
