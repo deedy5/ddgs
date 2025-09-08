@@ -45,6 +45,6 @@ jobs:
       run: |
         pytest -v
     - name: Pytest re-run failures
-      if: steps.pytest.conclusion == 'failure'
+      if: steps.pytest.outcome == 'failure'
       run: |
         pytest -v --lf
