@@ -28,7 +28,7 @@ class Wikipedia(BaseSearchEngine[TextResult]):
         self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
     ) -> dict[str, Any]:
         """Build a payload for the search request."""
-        country, lang = region.lower().split("-")
+        _country, lang = region.lower().split("-")
         encoded_query = quote(query)
         self.search_url = (
             f"https://{lang}.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search={encoded_query}"
