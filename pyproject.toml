@@ -31,6 +31,7 @@ dependencies = [
     "click>=8.1.8",  # click 8.2.0 drops python 3.9
     "primp>=0.15.0",
     "lxml>=6.0.0",
+    "httpx[http2,socks,brotli]>=0.28.1",  # temporarily
 ]
 dynamic = ["version"]
 
