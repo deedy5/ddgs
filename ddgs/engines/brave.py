@@ -31,7 +31,7 @@ class Brave(BaseSearchEngine[TextResult]):
     ) -> dict[str, Any]:
         """Build a payload for the search request."""
         payload = {"q": query, "source": "web"}
-        country, lang = region.lower().split("-")
+        country, _lang = region.lower().split("-")
         cookies = {country: country, "useLocation": "0"}
         if safesearch != "moderate":
             cookies["safesearch"] = "strict" if safesearch == "on" else "off"
