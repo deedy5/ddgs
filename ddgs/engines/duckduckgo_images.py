@@ -41,7 +41,7 @@ class DuckduckgoImages(BaseSearchEngine[ImagesResult]):
     ) -> dict[str, Any]:
         """Build a payload for the search request."""
         safesearch_base = {"on": "1", "moderate": "1", "off": "-1"}
-        timelimit_base = {"d": "day", "w": "week", "m": "month", "y": "year"}
+        timelimit_base = {"d": "Day", "w": "Week", "m": "Month", "y": "Year"}
         timelimit = f"time:{timelimit_base[timelimit]}" if timelimit else ""
         size = kwargs.get("size")
         size = f"size:{size}" if size else ""
@@ -59,8 +59,9 @@ class DuckduckgoImages(BaseSearchEngine[ImagesResult]):
             "l": region,
             "vqd": self._get_vqd(query),
             "p": safesearch_base[safesearch.lower()],
-            "f": f"{timelimit},{size},{color},{type_image},{layout},{license_image}",
         }
+        if timelimit or size or color or type_image or layout or license_image:
+            payload["f"] = f"{timelimit},{size},{color},{type_image},{layout},{license_image}"
         if page > 1:
             payload["s"] = f"{(page - 1) * 100}"
         return payload
