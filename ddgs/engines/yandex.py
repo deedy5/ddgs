@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from secrets import randbelow
+from random import SystemRandom
 from typing import Any
 
 from ..base import BaseSearchEngine
 from ..results import TextResult
+
+random = SystemRandom()
 
 
 class Yandex(BaseSearchEngine[TextResult]):
@@ -34,7 +36,7 @@ class Yandex(BaseSearchEngine[TextResult]):
         payload = {
             "text": query,
             "web": "1",
-            "searchid": f"{randbelow(9999999 - 1000000 + 1) + 1000000}",  # == randint(1000000, 9999999),
+            "searchid": f"{random.randint(1000000, 9999999)}",
         }
         if page > 1:
             payload["p"] = f"{page - 1}"
