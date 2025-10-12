@@ -26,6 +26,8 @@ def ui_async(start: int) -> str:
 class Google(BaseSearchEngine[TextResult]):
     """Google search engine."""
 
+    disabled = True  # !!!
+
     name = "google"
     category = "text"
     provider = "google"
