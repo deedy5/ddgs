@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar
+from typing import Any, ClassVar, TypeVar
 
 from ..base import BaseSearchEngine
 from ..http_client2 import HttpClient2
@@ -23,7 +23,7 @@ class Duckduckgo(BaseSearchEngine[TextResult]):
     search_method = "POST"
 
     items_xpath = "//div[contains(@class, 'body')]"
-    elements_xpath: Mapping[str, str] = {"title": ".//h2//text()", "href": "./a/@href", "body": "./a//text()"}
+    elements_xpath: ClassVar[Mapping[str, str]] = {"title": ".//h2//text()", "href": "./a/@href", "body": "./a//text()"}
 
     def __init__(self, proxy: str | None = None, timeout: int | None = None, verify: bool = True):
         """Temporary, delete when HttpClient is fixed."""

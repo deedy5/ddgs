@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, ClassVar
 
 from ..base import BaseSearchEngine
 from ..results import VideosResult
@@ -20,7 +20,7 @@ class DuckduckgoVideos(BaseSearchEngine[VideosResult]):
     search_url = "https://duckduckgo.com/v.js"
     search_method = "GET"
 
-    elements_replace: Mapping[str, str] = {
+    elements_replace: ClassVar[Mapping[str, str]] = {
         "content": "content",
         "description": "description",
         "duration": "duration",

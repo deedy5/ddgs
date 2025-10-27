@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from collections.abc import Mapping
 from datetime import datetime, timedelta, timezone
-from typing import Any
+from typing import Any, ClassVar
 
 from ..base import BaseSearchEngine
 from ..results import NewsResult
@@ -44,7 +44,7 @@ class BingNews(BaseSearchEngine[NewsResult]):
     search_method = "GET"
 
     items_xpath = "//div[contains(@class, 'newsitem')]"
-    elements_xpath: Mapping[str, str] = {
+    elements_xpath: ClassVar[Mapping[str, str]] = {
         "date": ".//span[@aria-label]//@aria-label",
         "title": "@data-title",
         "body": ".//div[@class='snippet']//text()",

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC
-from typing import Any, Literal
+from typing import Any, ClassVar, Literal
 
 from ..base import BaseSearchEngine
 from ..results import TextResult
@@ -13,9 +13,9 @@ from ..utils import json_loads
 class BaseMullvadLeta(BaseSearchEngine[TextResult], ABC):
     """Generic Mullvad leta search engine."""
 
-    name: str = "base_mullvad_leta"
+    name = "base_mullvad_leta"
     category = "text"
-    provider: Literal["google", "brave"]
+    provider: ClassVar[Literal["google", "brave"]]
     priority = 0.5
 
     search_url = "https://leta.mullvad.net/search/__data.json"

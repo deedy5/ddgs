@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from secrets import token_urlsafe
 from time import time
-from typing import Any
+from typing import Any, ClassVar
 
 from ..base import BaseSearchEngine
 from ..results import TextResult
@@ -36,7 +36,7 @@ class Google(BaseSearchEngine[TextResult]):
     search_method = "GET"
 
     items_xpath = "//div[@data-snc]"
-    elements_xpath: Mapping[str, str] = {
+    elements_xpath: ClassVar[Mapping[str, str]] = {
         "title": ".//h3//text()",
         "href": ".//a[h3]/@href",
         "body": ".//div[starts-with(@data-sncf, '1')]//text()",

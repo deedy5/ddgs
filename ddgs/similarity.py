@@ -1,6 +1,7 @@
 """Simple filter ranker."""
 
 import re
+from typing import Final
 
 
 class SimpleFilterRanker:
@@ -15,7 +16,7 @@ class SimpleFilterRanker:
     3) Return wikipedia-top + both + title-only + body-only + neither.
     """
 
-    _splitter = re.compile(r"\W+")
+    _splitter: Final = re.compile(r"\W+")
 
     def __init__(self, min_token_length: int = 3):
         self.min_token_length = min_token_length

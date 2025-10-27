@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, ClassVar
 
 from ..base import BaseSearchEngine
 from ..results import TextResult
@@ -20,7 +20,7 @@ class Mojeek(BaseSearchEngine[TextResult]):
     search_method = "GET"
 
     items_xpath = "//ul[contains(@class, 'results')]/li"
-    elements_xpath: Mapping[str, str] = {
+    elements_xpath: ClassVar[Mapping[str, str]] = {
         "title": ".//h2//text()",
         "href": ".//h2/a/@href",
         "body": ".//p[@class='s']//text()",

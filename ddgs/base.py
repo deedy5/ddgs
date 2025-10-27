@@ -6,13 +6,16 @@ import logging
 from abc import ABC, abstractmethod
 from collections.abc import Mapping
 from functools import cached_property
-from typing import Any, Generic, Literal, TypeVar
+from typing import TYPE_CHECKING, Any, ClassVar, Generic, Literal, TypeVar
 
 from lxml import html
 from lxml.etree import HTMLParser as LHTMLParser
 
 from .http_client import HttpClient
 from .results import BooksResult, ImagesResult, NewsResult, TextResult, VideosResult
+
+if TYPE_CHECKING:
+    pass
 
 logger = logging.getLogger(__name__)
 T = TypeVar("T")
@@ -21,18 +24,18 @@ T = TypeVar("T")
 class BaseSearchEngine(ABC, Generic[T]):
     """Abstract base class for all search-engine backends."""
 
-    name: str  # unique key, e.g. "google"
-    category: Literal["text", "images", "videos", "news", "books"]
-    provider: str  # source of the search results (e.g. "google" for MullVadLetaGoogle)
-    disabled: bool = False  # if True, the engine is disabled
-    priority: float = 1
+    name: ClassVar[str]  # unique key, e.g. "google"
+    category: ClassVar[Literal["text", "images", "videos", "news", "books"]]
+    provider: ClassVar[str]  # source of the search results (e.g. "google" for MullVadLetaGoogle)
+    disabled: ClassVar[bool] = False  # if True, the engine is disabled
+    priority: ClassVar[float] = 1
 
     search_url: str
-    search_method: str  # GET or POST
-    search_headers: Mapping[str, str] = {}
-    items_xpath: str
-    elements_xpath: Mapping[str, str]
-    elements_replace: Mapping[str, str]
+    search_method: ClassVar[str]  # GET or POST
+    search_headers: ClassVar[Mapping[str, str]] = {}
+    items_xpath: ClassVar[str]
+    elements_xpath: ClassVar[Mapping[str, str]]
+    elements_replace: ClassVar[Mapping[str, str]]
 
     def __init__(self, proxy: str | None = None, timeout: int | None = None, verify: bool = True):
         self.http_client = HttpClient(proxy=proxy, timeout=timeout, verify=verify)
