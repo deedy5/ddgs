@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor, wait
 from math import ceil
 from random import random, shuffle
 from types import TracebackType
-from typing import Any
+from typing import Any, ClassVar
 
 from .base import BaseSearchEngine
 from .engines import ENGINES
@@ -43,8 +43,8 @@ class DDGS:
 
     """
 
-    threads: int | None = None
-    _executor: ThreadPoolExecutor | None = None
+    threads: ClassVar[int | None] = None
+    _executor: ClassVar[ThreadPoolExecutor | None] = None
 
     def __init__(self, proxy: str | None = None, timeout: int | None = 5, verify: bool = True):
         self._proxy = _expand_proxy_tb_alias(proxy) or os.environ.get("DDGS_PROXY")

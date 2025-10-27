@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from secrets import token_urlsafe
-from typing import Any
+from typing import Any, ClassVar
 from urllib.parse import unquote_plus
 
 from ..base import BaseSearchEngine
@@ -28,7 +28,7 @@ class Yahoo(BaseSearchEngine[TextResult]):
     search_method = "GET"
 
     items_xpath = "//div[contains(@class, 'relsrch')]"
-    elements_xpath: Mapping[str, str] = {
+    elements_xpath: ClassVar[Mapping[str, str]] = {
         "title": ".//div[contains(@class, 'Title')]//h3//text()",
         "href": ".//div[contains(@class, 'Title')]//a/@href",
         "body": ".//div[contains(@class, 'Text')]//text()",

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, ClassVar
 
 from ..base import BaseSearchEngine
 from ..results import BooksResult
@@ -20,7 +20,7 @@ class AnnasArchive(BaseSearchEngine[BooksResult]):
     search_method = "GET"
 
     items_xpath = "//div[contains(@class, 'record-list-outer')]/div"
-    elements_xpath: Mapping[str, str] = {
+    elements_xpath: ClassVar[Mapping[str, str]] = {
         "title": ".//a[contains(@class, 'text-lg')]//text()",
         "author": ".//a[span[contains(@class, 'user')]]//text()",
         "publisher": ".//a[span[contains(@class, 'company')]]//text()",

@@ -6,7 +6,7 @@ from abc import ABC
 from collections import Counter
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-from typing import Any, Callable, Generic, TypeVar
+from typing import Any, Callable, ClassVar, Generic, TypeVar
 
 from .utils import _normalize_date, _normalize_text, _normalize_url
 
@@ -16,7 +16,7 @@ T = TypeVar("T")
 class BaseResult:
     """Base class for all results. Contains normalization functions."""
 
-    _normalizers: Mapping[str, Callable[[Any], str]] = {
+    _normalizers: ClassVar[Mapping[str, Callable[[Any], str]]] = {
         "title": _normalize_text,
         "body": _normalize_text,
         "href": _normalize_url,

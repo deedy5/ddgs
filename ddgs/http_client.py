@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from secrets import choice
-from typing import Any, Literal, get_args
+from typing import Any, Final, Literal, get_args
 
 import primp
 
@@ -27,7 +27,7 @@ class Response:
 class HttpClient:
     """HTTP client."""
 
-    _impersonates = get_args(Literal[
+    _impersonates: Final = get_args(Literal[
         "chrome_100", "chrome_101", "chrome_104", "chrome_105", "chrome_106", "chrome_107",
         "chrome_108", "chrome_109", "chrome_114", "chrome_116", "chrome_117", "chrome_118",
         "chrome_119", "chrome_120", "chrome_123", "chrome_124", "chrome_126", "chrome_127",
@@ -38,7 +38,7 @@ class HttpClient:
         "edge_101", "edge_122", "edge_127", "edge_131",
         "firefox_109", "firefox_117", "firefox_128", "firefox_133", "firefox_135"
     ])  # fmt: skip
-    _impersonates_os = get_args(Literal["macos", "linux", "windows"])
+    _impersonates_os: Final = get_args(Literal["macos", "linux", "windows"])
 
     def __init__(self, proxy: str | None = None, timeout: int | None = 10, verify: bool = True) -> None:
         """Initialize the HttpClient object.
