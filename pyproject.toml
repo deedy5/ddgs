@@ -7,14 +7,13 @@ name = "ddgs"
 description = "Dux Distributed Global Search. A metasearch library that aggregates results from diverse web search services."
 readme = "README.md"
 requires-python = ">=3.9"
-license = {text = "MIT License"}
+license = "MIT"
 keywords = ["python", "search", "metasearch"]
 authors = [
   {name = "deedy5"}
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
