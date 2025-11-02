@@ -188,6 +188,10 @@ Note that some backends may be temporarily unavailable due to ratelimiting or IS
 
 ## DDGS class
 
+DDGS class is lazy-loaded.
+
+When you import DDGS nothing is executed — no implementation or dependencies are loaded. The actual DDGS class and its heavy imports are loaded lazily the first time you instantiate or otherwise access DDGS, keeping import-time overhead minimal for downstream code.
+
 ```python3
 class DDGS:
     """Dux Distributed Global Search. A metasearch library that aggregates results from diverse web search services.
