@@ -14,37 +14,38 @@ __version__ = "9.7.0"
 __all__ = ("DDGS",)
 
 if TYPE_CHECKING:
-    from .ddgs import DDGS as _DDGS
+    from .ddgs import DDGS
 
 # A do-nothing logging handler
 # https://docs.python.org/3/howto/logging.html#configuring-logging-for-a-library
 logging.getLogger("ddgs").addHandler(logging.NullHandler())
 
 
-class _DDGSLazyLoader:
-    def __init__(self) -> None:
-        self._obj: type[_DDGS] | None = None
-        self._lock: threading.Lock = threading.Lock()
+class _ProxyMeta(type):
+    _lock: threading.Lock = threading.Lock()
+    _real_cls: type[DDGS] | None = None
 
-    def _load(self) -> type[_DDGS]:
-        if self._obj is None:
-            with self._lock:
-                if self._obj is None:
-                    real = importlib.import_module(".ddgs", package=__name__).DDGS
-                    globals()["DDGS"] = real
-                    self._obj = real
-        return self._obj
+    @classmethod
+    def _load_real(mcls) -> type[DDGS]:
+        if mcls._real_cls is None:
+            with mcls._lock:
+                if mcls._real_cls is None:
+                    mcls._real_cls = importlib.import_module(".ddgs", package=__name__).DDGS
+                    globals()["DDGS"] = mcls._real_cls
+        return mcls._real_cls
 
-    def __call__(self, *args: Any, **kwargs: Any) -> _DDGS:
-        return self._load()(*args, **kwargs)
+    def __call__(cls, *args: Any, **kwargs: Any) -> DDGS:
+        real = type(cls)._load_real()
+        return real(*args, **kwargs)
 
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self._load(), name)
+    def __getattr__(cls, name: str) -> Any:
+        return getattr(type(cls)._load_real(), name)
 
-    def __dir__(self) -> list[str]:
+    def __dir__(cls) -> list[str]:
         base = set(super().__dir__())
-        loaded_names = set(dir(self._load()))
+        loaded_names = set(dir(type(cls)._load_real()))
         return sorted(base | (loaded_names - base))
 
 
-DDGS: type[_DDGS] | _DDGSLazyLoader = _DDGSLazyLoader()
+class DDGS(metaclass=_ProxyMeta):  # type: ignore
+    """Proxy class for lazy-loading the real DDGS implementation."""
