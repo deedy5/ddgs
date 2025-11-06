@@ -40,14 +40,14 @@ class HttpClient:
     ])  # fmt: skip
     _impersonates_os: Final = get_args(Literal["macos", "linux", "windows"])
 
-    def __init__(self, proxy: str | None = None, timeout: int | None = 10, verify: bool = True) -> None:
+    def __init__(self, proxy: str | None = None, timeout: int | None = 10, verify: bool | str = True) -> None:
         """Initialize the HttpClient object.
 
         Args:
             proxy (str, optional): proxy for the HTTP client, supports http/https/socks5 protocols.
                 example: "http://user:pass@example.com:3128". Defaults to None.
             timeout (int, optional): Timeout value for the HTTP client. Defaults to 10.
-            verify (bool, optional): Whether to verify the SSL certificate. Defaults to True.
+            verify: (bool | str):  True to verify, False to skip, or a str path to a PEM file. Defaults to True.
 
         """
         self.client = primp.Client(
@@ -55,7 +55,8 @@ class HttpClient:
             timeout=timeout,
             impersonate=choice(self._impersonates),
             impersonate_os=choice(self._impersonates_os),
-            verify=verify,
+            verify=verify if isinstance(verify, bool) else True,
+            ca_cert_file=verify if isinstance(verify, str) else None,
         )
 
     def request(self, *args: Any, **kwargs: Any) -> Response:

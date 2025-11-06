@@ -8,7 +8,6 @@ from random import SystemRandom
 from types import TracebackType
 from typing import Any, Callable
 
-import certifi
 import h2
 import httpcore
 import httpx
@@ -33,20 +32,20 @@ class Response:
 class HttpClient2:
     """Temporary HTTP client."""
 
-    def __init__(self, proxy: str | None = None, timeout: int | None = 10, verify: bool = True) -> None:
+    def __init__(self, proxy: str | None = None, timeout: int | None = 10, verify: bool | str = True) -> None:
         """Initialize the HttpClient object.
 
         Args:
             proxy (str, optional): proxy for the HTTP client, supports http/https/socks5 protocols.
                 example: "http://user:pass@example.com:3128". Defaults to None.
             timeout (int, optional): Timeout value for the HTTP client. Defaults to 10.
-            verify (bool, optional): Whether to verify the SSL certificate. Defaults to True.
+            verify: (bool | str):  True to verify, False to skip or str path to a PEM file. Defaults to True.
 
         """
         self.client = httpx.Client(
             proxy=proxy,
             timeout=timeout,
-            verify=_get_random_ssl_context() if verify else False,
+            verify=_get_random_ssl_context(verify) if verify else False,
             follow_redirects=False,
             http2=True,
         )
@@ -89,8 +88,8 @@ DEFAULT_CIPHERS = [  # https://developers.cloudflare.com/ssl/reference/cipher-su
 ]  # fmt: skip
 
 
-def _get_random_ssl_context() -> ssl.SSLContext:
-    ssl_context = ssl.create_default_context(cafile=certifi.where())
+def _get_random_ssl_context(verify: bool | str) -> ssl.SSLContext:
+    ssl_context = ssl.create_default_context(cafile=verify if isinstance(verify, str) else None)
     shuffled_ciphers = random.sample(DEFAULT_CIPHERS[9:], len(DEFAULT_CIPHERS) - 9)
     ssl_context.set_ciphers(":".join(DEFAULT_CIPHERS[:9] + shuffled_ciphers))
     commands: list[Callable[[ssl.SSLContext], None]] = [

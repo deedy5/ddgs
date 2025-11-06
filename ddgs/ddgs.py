@@ -28,7 +28,7 @@ class DDGS:
     Args:
         proxy: The proxy to use for the search. Defaults to None.
         timeout: The timeout for the search. Defaults to 5.
-        verify: Whether to verify the SSL certificate. Defaults to True.
+        verify: bool (True to verify, False to skip) or str path to a PEM file. Defaults to True.
 
     Attributes:
         threads: The number of threads to use for the search. Defaults to None (automatic).
@@ -46,7 +46,7 @@ class DDGS:
     threads: ClassVar[int | None] = None
     _executor: ClassVar[ThreadPoolExecutor | None] = None
 
-    def __init__(self, proxy: str | None = None, timeout: int | None = 5, verify: bool = True):
+    def __init__(self, proxy: str | None = None, timeout: int | None = 5, verify: bool | str = True):
         self._proxy = _expand_proxy_tb_alias(proxy) or os.environ.get("DDGS_PROXY")
         self._timeout = timeout
         self._verify = verify
