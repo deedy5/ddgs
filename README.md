@@ -200,7 +200,7 @@ class DDGS:
         proxy (str, optional): proxy for the HTTP client, supports http/https/socks5 protocols.
             example: "http://user:pass@example.com:3128". Defaults to None.
         timeout (int, optional): Timeout value for the HTTP client. Defaults to 5.
-        verify (bool): SSL verification when making the request. Defaults to True.
+        verify: (bool | str):  True to verify, False to skip, or a str path to a PEM file. Defaults to True.
     """
 ```
 

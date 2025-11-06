@@ -37,7 +37,7 @@ class BaseSearchEngine(ABC, Generic[T]):
     elements_xpath: ClassVar[Mapping[str, str]]
     elements_replace: ClassVar[Mapping[str, str]]
 
-    def __init__(self, proxy: str | None = None, timeout: int | None = None, verify: bool = True):
+    def __init__(self, proxy: str | None = None, timeout: int | None = None, verify: bool | str = True):
         self.http_client = HttpClient(proxy=proxy, timeout=timeout, verify=verify)
         self.results: list[T] = []
 
