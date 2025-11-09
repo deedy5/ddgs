@@ -156,7 +156,7 @@ ___
 
 | DDGS function | Available backends |
 | --------------|:-------------------|
-| text()        | `bing`, `brave`, `duckduckgo`, `google`, `mojeek`, `mullvad_brave`, `mullvad_google`, `yandex`, `yahoo`, `wikipedia`|
+| text()        | `bing`, `brave`, `duckduckgo`, `google`, `mojeek`, `yandex`, `yahoo`, `wikipedia`|
 | images()      | `duckduckgo` |
 | videos()      | `duckduckgo` |
 | news()        | `bing`, `duckduckgo`, `yahoo` |
@@ -170,7 +170,7 @@ ___
 
 The library considers:
 
-    - Duplicate providers (e.g., yahoo = bing, mullvad_google = google, etc.)
+    - Duplicate providers (e.g., yahoo = bing)
     - Result repeatability, prioritizing frequently repeated positions
     - Wikipedia summaries at the top of results, if available
 

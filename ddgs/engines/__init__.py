@@ -24,7 +24,6 @@ from .duckduckgo_news import DuckduckgoNews
 from .duckduckgo_videos import DuckduckgoVideos
 from .google import Google
 from .mojeek import Mojeek
-from .mullvad_leta import MullvadLetaBrave, MullvadLetaGoogle
 from .wikipedia import Wikipedia
 from .yahoo import Yahoo
 from .yandex import Yandex
@@ -36,8 +35,6 @@ ENGINES: dict[str, dict[str, type[BaseSearchEngine[Any]]]] = {
         "duckduckgo": Duckduckgo,  # bing
         "google": Google,
         "mojeek": Mojeek,
-        "mullvad_brave": MullvadLetaBrave,  # brave
-        "mullvad_google": MullvadLetaGoogle,  # google
         "yahoo": Yahoo,  # bing
         "yandex": Yandex,
         "wikipedia": Wikipedia,
