@@ -18,7 +18,7 @@ Thank you for your interest in contributing! Please discuss any major changes yo
    ```sh
    python -m venv .venv
    source .venv/bin/activate  # on Windows use `.venv\Scripts\activate`
-   pip install .[dev] orjson
+   pip install .[dev]
    
 4. Create your feature branch
    ```sh

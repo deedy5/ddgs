@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
+import json
 import logging
 from typing import Any
 from urllib.parse import quote
 
 from ..base import BaseSearchEngine
 from ..results import TextResult
-from ..utils import json_loads
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ class Wikipedia(BaseSearchEngine[TextResult]):
 
     def extract_results(self, html_text: str) -> list[TextResult]:
         """Extract search results from html text."""
-        json_data = json_loads(html_text)
+        json_data = json.loads(html_text)
         if not json_data[1]:
             return []
 
@@ -54,7 +54,7 @@ class Wikipedia(BaseSearchEngine[TextResult]):
             f"https://{self.lang}.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&titles={encoded_query}&explaintext=0&exintro=0&redirects=1",
         )
         if resp_data:
-            json_data = json_loads(resp_data)
+            json_data = json.loads(resp_data)
             result.body = next(iter(json_data["query"]["pages"].values())).get("extract", "")
         if "may refer to:" in result.body:
             return []
