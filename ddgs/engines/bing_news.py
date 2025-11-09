@@ -1,7 +1,5 @@
 """Bing news engine implementation."""
 
-from __future__ import annotations
-
 import re
 from collections.abc import Mapping
 from datetime import datetime, timedelta, timezone

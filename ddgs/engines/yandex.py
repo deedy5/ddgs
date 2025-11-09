@@ -1,7 +1,5 @@
 """Yandex search engine."""
 
-from __future__ import annotations
-
 from collections.abc import Mapping
 from random import SystemRandom
 from typing import Any, ClassVar

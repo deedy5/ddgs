@@ -1,12 +1,11 @@
 """Temporary HTTP client for 'backend=duckduckgo'. Delete when HttpClient is fixed."""
 
-from __future__ import annotations
-
 import logging
 import ssl
+from collections.abc import Callable
 from random import SystemRandom
 from types import TracebackType
-from typing import Any, Callable
+from typing import Any
 
 import h2
 import httpcore

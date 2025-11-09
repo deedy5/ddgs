@@ -1,7 +1,5 @@
 """CLI tool for DDGS."""
 
-from __future__ import annotations
-
 import csv
 import json
 import logging

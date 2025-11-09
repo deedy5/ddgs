@@ -51,8 +51,6 @@ ENGINES: dict[str, dict[str, type[BaseSearchEngine[Any]]]] = {
 }
 """
 
-from __future__ import annotations
-
 import importlib
 import inspect
 import pkgutil

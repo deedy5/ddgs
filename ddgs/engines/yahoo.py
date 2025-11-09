@@ -1,7 +1,5 @@
 """Yahoo search engine."""
 
-from __future__ import annotations
-
 from collections.abc import Mapping
 from secrets import token_urlsafe
 from typing import Any, ClassVar

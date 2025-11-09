@@ -1,12 +1,10 @@
 """Yahoo! News search engine."""
 
-from __future__ import annotations
-
 import logging
 import re
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from datetime import datetime, timedelta, timezone
-from typing import Any, Callable, ClassVar
+from typing import Any, ClassVar
 from urllib.parse import unquote_plus
 
 from ..base import BaseSearchEngine

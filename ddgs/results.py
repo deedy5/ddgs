@@ -1,12 +1,10 @@
 """Result classes."""
 
-from __future__ import annotations
-
 from abc import ABC
 from collections import Counter
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
-from typing import Any, Callable, ClassVar, Generic, TypeVar
+from typing import Any, ClassVar, Generic, TypeVar
 
 from .utils import _normalize_date, _normalize_text, _normalize_url
 
