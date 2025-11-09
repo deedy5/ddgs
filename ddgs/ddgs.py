@@ -63,7 +63,6 @@ class DDGS:
         exc_tb: TracebackType | None = None,
     ) -> None:
         """Exit the context manager."""
-        pass
 
     @classmethod
     def get_executor(cls) -> ThreadPoolExecutor:
@@ -187,12 +186,12 @@ class DDGS:
 
             if len(futures) >= max_workers or i >= max_workers:
                 done, not_done = wait(futures, timeout=self._timeout, return_when="FIRST_EXCEPTION")
-                for future in futures:
+                for future, engine in futures.items():
                     if future in done:
                         try:
                             if r := future.result():
                                 results_aggregator.extend(r)
-                                seen_providers.add(futures[future].provider)
+                                seen_providers.add(engine.provider)
                         except Exception as ex:
                             err = ex
                             logger.info("Error in engine %s: %r", futures[future].name, ex)

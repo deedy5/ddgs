@@ -142,7 +142,6 @@ def _download_results(
 @click.group(chain=True)
 def cli() -> None:
     """DDGS CLI tool."""
-    pass
 
 
 def safe_entry_point() -> None:

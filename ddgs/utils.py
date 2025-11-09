@@ -2,6 +2,7 @@
 
 import re
 import unicodedata
+from contextlib import suppress
 from datetime import datetime, timezone
 from html import unescape
 from urllib.parse import unquote
@@ -18,12 +19,11 @@ def _extract_vqd(html_bytes: bytes, query: str) -> str:
         (b"vqd=", 4, b"&"),
         (b"vqd='", 5, b"'"),
     ):
-        try:
+        with suppress(ValueError):
             start = html_bytes.index(c1) + c1_len
             end = html_bytes.index(c2, start)
             return html_bytes[start:end].decode()
-        except ValueError:
-            pass
+
     msg = f"_extract_vqd() {query=} Could not extract vqd."
     raise DDGSException(msg)
 
