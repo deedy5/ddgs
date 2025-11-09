@@ -19,7 +19,8 @@ Thank you for your interest in contributing! Please discuss any major changes yo
    python -m venv .venv
    source .venv/bin/activate  # on Windows use `.venv\Scripts\activate`
    pip install .[dev]
-   
+   ```
+   > (Or use `make setup` if you prefer the Makefile.)
 4. Create your feature branch
    ```sh
    git checkout -b feat/new-feature
@@ -29,12 +30,14 @@ Thank you for your interest in contributing! Please discuss any major changes yo
    ```sh
    pytest
    ```
+   > (Or use `make test`)
 7. Run type checking, formatting, and linting to ensure code quality
    ```sh
    mypy --install-types .
    ruff format
    ruff check
    ```
+   > (Or use `make format` and `make lint`)
 8. Commit your changes (please follow the [Conventional Commits](https://www.conventionalcommits.org) specification)
    ```sh
    git add .
