@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "ddgs"
 description = "Dux Distributed Global Search. A metasearch library that aggregates results from diverse web search services."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = "MIT"
 keywords = ["python", "search", "metasearch"]
 authors = [
@@ -17,17 +17,17 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "click>=8.1.8",  # click 8.2.0 drops python 3.9
+    "click>=8.1.8",
     "primp>=0.15.0",
     "lxml>=4.9.4",
     "httpx[http2,socks,brotli]>=0.28.1",  # temporarily
@@ -46,7 +46,7 @@ version = {attr = "ddgs.__version__"}
 [project.optional-dependencies]
 dev = [
     "mypy>=1.17.1",
-    "pytest>=8.4.1,<9",
+    "pytest>=8.4.1",
     "pytest-dependency>=0.6.0",
     "ruff>=0.13.0",
 ]
@@ -82,10 +82,12 @@ select = [
 ]
 ignore = [
     "D107",  # Missing docstring in `__init__`
+    "D203",    # incorrect-blank-line-before-class
+    "D213",    # multi-line-summary-second-line
 ]
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.10"
 strict = true
 exclude = ["build/"]
 

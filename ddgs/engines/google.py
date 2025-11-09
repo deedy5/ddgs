@@ -1,7 +1,5 @@
 """Google search engine implementation."""
 
-from __future__ import annotations
-
 from collections.abc import Mapping
 from secrets import token_urlsafe
 from time import time

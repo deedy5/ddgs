@@ -3,8 +3,6 @@
 A metasearch library that aggregates results from diverse web search services.
 """
 
-from __future__ import annotations
-
 import importlib
 import logging
 import threading
@@ -23,10 +21,10 @@ logging.getLogger("ddgs").addHandler(logging.NullHandler())
 
 class _ProxyMeta(type):
     _lock: threading.Lock = threading.Lock()
-    _real_cls: type[DDGS] | None = None
+    _real_cls: type["DDGS"] | None = None
 
     @classmethod
-    def _load_real(mcls) -> type[DDGS]:
+    def _load_real(mcls) -> type["DDGS"]:
         if mcls._real_cls is None:
             with mcls._lock:
                 if mcls._real_cls is None:
@@ -34,7 +32,7 @@ class _ProxyMeta(type):
                     globals()["DDGS"] = mcls._real_cls
         return mcls._real_cls
 
-    def __call__(cls, *args: Any, **kwargs: Any) -> DDGS:
+    def __call__(cls, *args: Any, **kwargs: Any) -> "DDGS":
         real = type(cls)._load_real()
         return real(*args, **kwargs)
 
