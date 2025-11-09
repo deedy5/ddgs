@@ -2,6 +2,7 @@
 
 import re
 from collections.abc import Mapping
+from contextlib import suppress
 from datetime import datetime, timedelta, timezone
 from typing import Any, ClassVar
 
@@ -16,10 +17,8 @@ def extract_date(pub_date_str: str) -> str:
     # Try parsing the date with predefined formats
     date_formats = ["%d.%m.%Y", "%m/%d/%Y", "%d/%m/%Y"]
     for date_format in date_formats:
-        try:
+        with suppress(ValueError):
             return datetime.strptime(pub_date_str, date_format).astimezone(timezone.utc).isoformat()
-        except ValueError:
-            pass
 
     # Search for relative date expressions
     match = DATE_RE.search(pub_date_str)
