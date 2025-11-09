@@ -6,41 +6,11 @@ import re
 import unicodedata
 from datetime import datetime, timezone
 from html import unescape
-from typing import Any
 from urllib.parse import unquote
 
 from .exceptions import DDGSException
 
-try:
-    HAS_ORJSON = True
-    import orjson
-except ImportError:
-    HAS_ORJSON = False
-    import json
-
 _REGEX_STRIP_TAGS = re.compile("<.*?>")
-
-
-def json_dumps(obj: Any) -> str:
-    """JSON encode an object."""
-    try:
-        return (
-            orjson.dumps(obj, option=orjson.OPT_INDENT_2).decode()
-            if HAS_ORJSON
-            else json.dumps(obj, ensure_ascii=False, indent=2)
-        )
-    except Exception as ex:
-        msg = f"{type(ex).__name__}: {ex}"
-        raise DDGSException(msg) from ex
-
-
-def json_loads(obj: str | bytes) -> Any:
-    """JSON decode an object."""
-    try:
-        return orjson.loads(obj) if HAS_ORJSON else json.loads(obj)
-    except Exception as ex:
-        msg = f"{type(ex).__name__}: {ex}"
-        raise DDGSException(msg) from ex
 
 
 def _extract_vqd(html_bytes: bytes, query: str) -> str:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import json
 import logging
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -16,7 +17,7 @@ import primp
 
 from . import __version__
 from .ddgs import DDGS
-from .utils import _expand_proxy_tb_alias, json_dumps
+from .utils import _expand_proxy_tb_alias
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +58,7 @@ def _save_data(query: str, data: list[dict[str, str]], function_name: str, filen
 
 def _save_json(jsonfile: str | Path, data: list[dict[str, str]]) -> None:
     with open(jsonfile, "w", encoding="utf-8") as file:
-        file.write(json_dumps(data))
+        file.write(json.dumps(data, ensure_ascii=False, indent=2))
 
 
 def _save_csv(csvfile: str | Path, data: list[dict[str, str]]) -> None:

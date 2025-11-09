@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import json
 from collections.abc import Mapping
 from typing import Any, ClassVar
 
 from ..base import BaseSearchEngine
 from ..results import VideosResult
-from ..utils import _extract_vqd, json_loads
+from ..utils import _extract_vqd
 
 
 class DuckduckgoVideos(BaseSearchEngine[VideosResult]):
@@ -67,7 +68,7 @@ class DuckduckgoVideos(BaseSearchEngine[VideosResult]):
 
     def extract_results(self, html_text: str) -> list[VideosResult]:
         """Extract search results from lxml tree."""
-        json_data = json_loads(html_text)
+        json_data = json.loads(html_text)
         items = json_data.get("results", [])
         results = []
         for item in items:

@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
+import json
 from abc import ABC
 from typing import Any, ClassVar, Literal
 
 from ..base import BaseSearchEngine
 from ..results import TextResult
-from ..utils import json_loads
 
 
 class BaseMullvadLeta(BaseSearchEngine[TextResult], ABC):
@@ -43,7 +43,7 @@ class BaseMullvadLeta(BaseSearchEngine[TextResult], ABC):
 
     def extract_results(self, html_text: str) -> list[TextResult]:
         """Extract search results from html text."""
-        json_data = json_loads(html_text)
+        json_data = json.loads(html_text)
         data = json_data["nodes"][2]["data"]
         # locate the real list of item-pointers
         items = data[data[0]["items"]]
