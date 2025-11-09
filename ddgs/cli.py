@@ -184,8 +184,6 @@ def version() -> str:
             "duckduckgo",
             "google",
             "mojeek",
-            "mullvad_brave",
-            "mullvad_google",
             "yandex",
             "yahoo",
             "wikipedia",

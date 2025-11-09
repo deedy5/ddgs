@@ -26,7 +26,7 @@ class BaseSearchEngine(ABC, Generic[T]):
 
     name: ClassVar[str]  # unique key, e.g. "google"
     category: ClassVar[Literal["text", "images", "videos", "news", "books"]]
-    provider: ClassVar[str]  # source of the search results (e.g. "google" for MullVadLetaGoogle)
+    provider: ClassVar[str]  # source of the search results (e.g. "bing" for DuckDuckgo)
     disabled: ClassVar[bool] = False  # if True, the engine is disabled
     priority: ClassVar[float] = 1
 
