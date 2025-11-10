@@ -5,8 +5,8 @@ import logging
 from typing import Any
 from urllib.parse import quote
 
-from ..base import BaseSearchEngine
-from ..results import TextResult
+from ddgs.base import BaseSearchEngine
+from ddgs.results import TextResult
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,13 @@ class Wikipedia(BaseSearchEngine[TextResult]):
     search_method = "GET"
 
     def build_payload(
-        self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
+        self,
+        query: str,
+        region: str,
+        safesearch: str,  # noqa: ARG002
+        timelimit: str | None,  # noqa: ARG002
+        page: int = 1,  # noqa: ARG002
+        **kwargs: str,  # noqa: ARG002
     ) -> dict[str, Any]:
         """Build a payload for the search request."""
         _country, lang = region.lower().split("-")

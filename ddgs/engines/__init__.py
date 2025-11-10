@@ -57,7 +57,7 @@ import pkgutil
 from collections import defaultdict
 from typing import Any
 
-from ..base import BaseSearchEngine
+from ddgs.base import BaseSearchEngine
 
 # ENGINES[category][name] = class
 ENGINES: dict[str, dict[str, type[BaseSearchEngine[Any]]]] = defaultdict(dict)
@@ -86,7 +86,7 @@ for finder, modname, _ispkg in pkgutil.iter_modules(package.__path__, package_na
         category = getattr(cls, "category", None)
         if not isinstance(name, str) or not isinstance(category, str):
             msg = f"{cls.__qualname__} must define class attributes 'name: str' and 'category: str'."
-            raise RuntimeError(msg)
+            raise TypeError(msg)
 
         ENGINES[category][name] = cls
 

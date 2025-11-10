@@ -5,20 +5,8 @@ from secrets import token_urlsafe
 from time import time
 from typing import Any, ClassVar
 
-from ..base import BaseSearchEngine
-from ..results import TextResult
-
-_arcid_random = None  # (random_token, timestamp)
-
-
-def ui_async(start: int) -> str:
-    """Generate 'async' payload param."""
-    global _arcid_random
-    now = int(time())
-    if not _arcid_random or now - _arcid_random[1] > 3600:
-        rnd_token = token_urlsafe(23 * 3 // 4)
-        _arcid_random = (rnd_token, now)
-    return f"arc_id:srp_{_arcid_random[0]}_1{start:02},use_ac:true,_fmt:prog"
+from ddgs.base import BaseSearchEngine
+from ddgs.results import TextResult
 
 
 class Google(BaseSearchEngine[TextResult]):
@@ -40,8 +28,24 @@ class Google(BaseSearchEngine[TextResult]):
         "body": ".//div[starts-with(@data-sncf, '1')]//text()",
     }
 
+    _arcid_random: tuple[str, int] | None = None  # (random_token, timestamp)
+
+    def ui_async(self, start: int) -> str:
+        """Generate 'async' payload param."""
+        now = int(time())
+        if not self._arcid_random or now - self._arcid_random[1] > 3600:
+            rnd_token = token_urlsafe(23 * 3 // 4)
+            self._arcid_random = (rnd_token, now)
+        return f"arc_id:srp_{self._arcid_random[0]}_1{start:02},use_ac:true,_fmt:prog"
+
     def build_payload(
-        self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
+        self,
+        query: str,
+        region: str,
+        safesearch: str,
+        timelimit: str | None,
+        page: int = 1,
+        **kwargs: str,  # noqa: ARG002
     ) -> dict[str, Any]:
         """Build a payload for the Google search request."""
         safesearch_base = {"on": "2", "moderate": "1", "off": "0"}
@@ -51,7 +55,7 @@ class Google(BaseSearchEngine[TextResult]):
             "filter": safesearch_base[safesearch.lower()],
             "start": str(start),
             "asearch": "arc",
-            "async": ui_async(start),
+            "async": self.ui_async(start),
             "ie": "UTF-8",
             "oe": "UTF-8",
         }

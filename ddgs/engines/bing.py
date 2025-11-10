@@ -6,8 +6,8 @@ from time import time
 from typing import Any, ClassVar
 from urllib.parse import parse_qs, urlparse
 
-from ..base import BaseSearchEngine
-from ..results import TextResult
+from ddgs.base import BaseSearchEngine
+from ddgs.results import TextResult
 
 
 def unwrap_bing_url(raw_url: str) -> str | None:
@@ -46,7 +46,13 @@ class Bing(BaseSearchEngine[TextResult]):
     }
 
     def build_payload(
-        self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
+        self,
+        query: str,
+        region: str,
+        safesearch: str,  # noqa: ARG002
+        timelimit: str | None,
+        page: int = 1,
+        **kwargs: str,  # noqa: ARG002
     ) -> dict[str, Any]:
         """Build a payload for the Bing search request."""
         country, lang = region.lower().split("-")

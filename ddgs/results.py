@@ -99,7 +99,7 @@ class BooksResult(BaseResult):
     thumbnail: str = ""
 
 
-class ResultsAggregator(Generic[T], ABC):
+class ResultsAggregator(ABC, Generic[T]):
     """Aggregates incoming results.
 
     Items are deduplicated by `cache_field`. Append just increments a counter;
@@ -132,12 +132,10 @@ class ResultsAggregator(Generic[T], ABC):
         we store the item; every time we bump the counter.
         """
         key = self._get_key(item)
-        if key not in self._cache:
+        if key not in self._cache or len(item.__dict__.get("body", "")) > len(
+            self._cache[key].__dict__.get("body", ""),
+        ):
             self._cache[key] = item
-        else:
-            # prefer longer body
-            if len(item.__dict__.get("body", "")) > len(self._cache[key].__dict__.get("body", "")):
-                self._cache[key] = item
         self._counter[key] += 1
 
     def extend(self, items: list[T]) -> None:

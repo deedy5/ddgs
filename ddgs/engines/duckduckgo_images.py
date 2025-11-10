@@ -4,9 +4,9 @@ import json
 from collections.abc import Mapping
 from typing import Any, ClassVar
 
-from ..base import BaseSearchEngine
-from ..results import ImagesResult
-from ..utils import _extract_vqd
+from ddgs.base import BaseSearchEngine
+from ddgs.results import ImagesResult
+from ddgs.utils import _extract_vqd
 
 
 class DuckduckgoImages(BaseSearchEngine[ImagesResult]):
@@ -36,7 +36,13 @@ class DuckduckgoImages(BaseSearchEngine[ImagesResult]):
         return _extract_vqd(resp_content, query)
 
     def build_payload(
-        self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
+        self,
+        query: str,
+        region: str,
+        safesearch: str,
+        timelimit: str | None,
+        page: int = 1,
+        **kwargs: str,
     ) -> dict[str, Any]:
         """Build a payload for the search request."""
         safesearch_base = {"on": "1", "moderate": "1", "off": "-1"}

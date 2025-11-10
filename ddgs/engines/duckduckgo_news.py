@@ -4,9 +4,9 @@ import json
 from collections.abc import Mapping
 from typing import Any, ClassVar
 
-from ..base import BaseSearchEngine
-from ..results import NewsResult
-from ..utils import _extract_vqd
+from ddgs.base import BaseSearchEngine
+from ddgs.results import NewsResult
+from ddgs.utils import _extract_vqd
 
 
 class DuckduckgoNews(BaseSearchEngine[NewsResult]):
@@ -34,7 +34,13 @@ class DuckduckgoNews(BaseSearchEngine[NewsResult]):
         return _extract_vqd(resp_content, query)
 
     def build_payload(
-        self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
+        self,
+        query: str,
+        region: str,
+        safesearch: str,
+        timelimit: str | None,
+        page: int = 1,
+        **kwargs: str,  # noqa: ARG002
     ) -> dict[str, Any]:
         """Build a payload for the search request."""
         safesearch_base = {"on": "1", "moderate": "-1", "off": "-2"}

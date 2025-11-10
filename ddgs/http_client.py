@@ -16,7 +16,7 @@ class Response:
 
     __slots__ = ("content", "status_code", "text")
 
-    def __init__(self, status_code: int, content: bytes, text: str):
+    def __init__(self, status_code: int, content: bytes, text: str) -> None:
         self.status_code = status_code
         self.content = content
         self.text = text
@@ -34,11 +34,11 @@ class HttpClient:
         "safari_17.0", "safari_17.2.1", "safari_17.4.1", "safari_17.5",
         "safari_18", "safari_18.2",
         "edge_101", "edge_122", "edge_127", "edge_131",
-        "firefox_109", "firefox_117", "firefox_128", "firefox_133", "firefox_135"
+        "firefox_109", "firefox_117", "firefox_128", "firefox_133", "firefox_135",
     ])  # fmt: skip
     _impersonates_os: Final = get_args(Literal["macos", "linux", "windows"])
 
-    def __init__(self, proxy: str | None = None, timeout: int | None = 10, verify: bool | str = True) -> None:
+    def __init__(self, proxy: str | None = None, timeout: int | None = 10, *, verify: bool | str = True) -> None:
         """Initialize the HttpClient object.
 
         Args:
@@ -57,7 +57,7 @@ class HttpClient:
             ca_cert_file=verify if isinstance(verify, str) else None,
         )
 
-    def request(self, *args: Any, **kwargs: Any) -> Response:
+    def request(self, *args: Any, **kwargs: Any) -> Response:  # noqa: ANN401
         """Make a request to the HTTP client."""
         try:
             resp = self.client.request(*args, **kwargs)
@@ -69,10 +69,10 @@ class HttpClient:
             msg = f"{type(ex).__name__}: {ex!r}"
             raise DDGSException(msg) from ex
 
-    def get(self, *args: Any, **kwargs: Any) -> Response:
+    def get(self, *args: Any, **kwargs: Any) -> Response:  # noqa: ANN401
         """Make a GET request to the HTTP client."""
         return self.request(*args, method="GET", **kwargs)
 
-    def post(self, *args: Any, **kwargs: Any) -> Response:
+    def post(self, *args: Any, **kwargs: Any) -> Response:  # noqa: ANN401
         """Make a POST request to the HTTP client."""
         return self.request(*args, method="POST", **kwargs)

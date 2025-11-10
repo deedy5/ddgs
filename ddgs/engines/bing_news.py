@@ -6,8 +6,8 @@ from contextlib import suppress
 from datetime import datetime, timedelta, timezone
 from typing import Any, ClassVar
 
-from ..base import BaseSearchEngine
-from ..results import NewsResult
+from ddgs.base import BaseSearchEngine
+from ddgs.results import NewsResult
 
 DATE_RE = re.compile(r"\b(\d+)\s*(days|tagen|jours|giorni|dias|días|дн\.|день)?\b", re.IGNORECASE)
 
@@ -51,7 +51,13 @@ class BingNews(BaseSearchEngine[NewsResult]):
     }
 
     def build_payload(
-        self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
+        self,
+        query: str,
+        region: str,
+        safesearch: str,  # noqa: ARG002
+        timelimit: str | None,
+        page: int = 1,
+        **kwargs: str,  # noqa: ARG002
     ) -> dict[str, Any]:
         """Build a payload for the Bing search request."""
         country, lang = region.lower().split("-")

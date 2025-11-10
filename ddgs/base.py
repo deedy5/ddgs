@@ -4,16 +4,13 @@ import logging
 from abc import ABC, abstractmethod
 from collections.abc import Mapping
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, ClassVar, Generic, Literal, TypeVar
+from typing import Any, ClassVar, Generic, Literal, TypeVar
 
 from lxml import html
 from lxml.etree import HTMLParser as LHTMLParser
 
 from .http_client import HttpClient
 from .results import BooksResult, ImagesResult, NewsResult, TextResult, VideosResult
-
-if TYPE_CHECKING:
-    pass
 
 logger = logging.getLogger(__name__)
 T = TypeVar("T")
@@ -35,7 +32,7 @@ class BaseSearchEngine(ABC, Generic[T]):
     elements_xpath: ClassVar[Mapping[str, str]]
     elements_replace: ClassVar[Mapping[str, str]]
 
-    def __init__(self, proxy: str | None = None, timeout: int | None = None, verify: bool | str = True):
+    def __init__(self, proxy: str | None = None, timeout: int | None = None, *, verify: bool | str = True) -> None:
         self.http_client = HttpClient(proxy=proxy, timeout=timeout, verify=verify)
         self.results: list[T] = []
 
@@ -53,19 +50,25 @@ class BaseSearchEngine(ABC, Generic[T]):
 
     @abstractmethod
     def build_payload(
-        self, query: str, region: str, safesearch: str, timelimit: str | None, page: int, **kwargs: Any
+        self,
+        query: str,
+        region: str,
+        safesearch: str,
+        timelimit: str | None,
+        page: int,
+        **kwargs: str,
     ) -> dict[str, Any]:
         """Build a payload for the search request."""
         raise NotImplementedError
 
-    def request(self, *args: Any, **kwargs: Any) -> str | None:
+    def request(self, *args: Any, **kwargs: Any) -> str | None:  # noqa: ANN401
         """Make a request to the search engine."""
         try:
             resp = self.http_client.request(*args, **kwargs)
             if resp.status_code == 200:
                 return resp.text
-        except Exception as ex:
-            raise ex
+        except Exception:  # noqa: BLE001
+            return None
         return None
 
     @cached_property
@@ -106,7 +109,7 @@ class BaseSearchEngine(ABC, Generic[T]):
         safesearch: str = "moderate",
         timelimit: str | None = None,
         page: int = 1,
-        **kwargs: Any,
+        **kwargs: str,
     ) -> list[T] | None:
         """Search the engine."""
         payload = self.build_payload(

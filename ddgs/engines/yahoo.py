@@ -5,8 +5,8 @@ from secrets import token_urlsafe
 from typing import Any, ClassVar
 from urllib.parse import unquote_plus
 
-from ..base import BaseSearchEngine
-from ..results import TextResult
+from ddgs.base import BaseSearchEngine
+from ddgs.results import TextResult
 
 
 def extract_url(u: str) -> str:
@@ -33,7 +33,13 @@ class Yahoo(BaseSearchEngine[TextResult]):
     }
 
     def build_payload(
-        self, query: str, region: str, safesearch: str, timelimit: str | None, page: int = 1, **kwargs: Any
+        self,
+        query: str,
+        region: str,  # noqa: ARG002
+        safesearch: str,  # noqa: ARG002
+        timelimit: str | None,
+        page: int = 1,
+        **kwargs: str,  # noqa: ARG002
     ) -> dict[str, Any]:
         """Build a payload for the search request."""
         self.search_url = (

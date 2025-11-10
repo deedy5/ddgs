@@ -2,16 +2,19 @@
 
 import logging
 import ssl
-from collections.abc import Callable
 from random import SystemRandom
 from types import TracebackType
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import h2
 import httpcore
 import httpx
 
 from .exceptions import DDGSException, TimeoutException
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
 
 logger = logging.getLogger(__name__)
 random = SystemRandom()
@@ -22,7 +25,7 @@ class Response:
 
     __slots__ = ("content", "status_code", "text")
 
-    def __init__(self, status_code: int, content: bytes, text: str):
+    def __init__(self, status_code: int, content: bytes, text: str) -> None:
         self.status_code = status_code
         self.content = content
         self.text = text
@@ -31,7 +34,7 @@ class Response:
 class HttpClient2:
     """Temporary HTTP client."""
 
-    def __init__(self, proxy: str | None = None, timeout: int | None = 10, verify: bool | str = True) -> None:
+    def __init__(self, proxy: str | None = None, timeout: int | None = 10, *, verify: bool | str = True) -> None:
         """Initialize the HttpClient object.
 
         Args:
@@ -44,12 +47,12 @@ class HttpClient2:
         self.client = httpx.Client(
             proxy=proxy,
             timeout=timeout,
-            verify=_get_random_ssl_context(verify) if verify else False,
+            verify=_get_random_ssl_context(verify=verify) if verify else False,
             follow_redirects=False,
             http2=True,
         )
 
-    def request(self, *args: Any, **kwargs: Any) -> Response:
+    def request(self, *args: Any, **kwargs: Any) -> Response:  # noqa: ANN401
         """Make a request to the HTTP client."""
         with Patch():
             try:
@@ -62,11 +65,11 @@ class HttpClient2:
                 msg = f"{type(ex).__name__}: {ex!r}"
                 raise DDGSException(msg) from ex
 
-    def get(self, *args: Any, **kwargs: Any) -> Response:
+    def get(self, *args: Any, **kwargs: Any) -> Response:  # noqa: ANN401
         """Make a GET request to the HTTP client."""
         return self.request(*args, method="GET", **kwargs)
 
-    def post(self, *args: Any, **kwargs: Any) -> Response:
+    def post(self, *args: Any, **kwargs: Any) -> Response:  # noqa: ANN401
         """Make a POST request to the HTTP client."""
         return self.request(*args, method="POST", **kwargs)
 
@@ -87,18 +90,19 @@ DEFAULT_CIPHERS = [  # https://developers.cloudflare.com/ssl/reference/cipher-su
 ]  # fmt: skip
 
 
-def _get_random_ssl_context(verify: bool | str) -> ssl.SSLContext:
+def _get_random_ssl_context(*, verify: bool | str) -> ssl.SSLContext:
     ssl_context = ssl.create_default_context(cafile=verify if isinstance(verify, str) else None)
     shuffled_ciphers = random.sample(DEFAULT_CIPHERS[9:], len(DEFAULT_CIPHERS) - 9)
     ssl_context.set_ciphers(":".join(DEFAULT_CIPHERS[:9] + shuffled_ciphers))
-    commands: list[Callable[[ssl.SSLContext], None]] = [
-        lambda context: None,
+    commands: list[None | Callable[[ssl.SSLContext], None]] = [
+        None,
         lambda context: setattr(context, "maximum_version", ssl.TLSVersion.TLSv1_2),
         lambda context: setattr(context, "minimum_version", ssl.TLSVersion.TLSv1_3),
         lambda context: setattr(context, "options", context.options | ssl.OP_NO_TICKET),
     ]
     random_command = random.choice(commands)
-    random_command(ssl_context)
+    if random_command:
+        random_command(ssl_context)
     return ssl_context
 
 
@@ -126,7 +130,7 @@ class Patch:
             self._write_outgoing_data(request)
 
         self.original_send_connection_init = httpcore._sync.http2.HTTP2Connection._send_connection_init
-        httpcore._sync.http2.HTTP2Connection._send_connection_init = _send_connection_init  # type: ignore
+        httpcore._sync.http2.HTTP2Connection._send_connection_init = _send_connection_init  # type: ignore[method-assign]
 
     def __exit__(
         self,
@@ -135,4 +139,4 @@ class Patch:
         exc_tb: TracebackType | None = None,
     ) -> None:
         """Exit the context manager."""
-        httpcore._sync.http2.HTTP2Connection._send_connection_init = self.original_send_connection_init  # type: ignore
+        httpcore._sync.http2.HTTP2Connection._send_connection_init = self.original_send_connection_init  # type: ignore[method-assign]
