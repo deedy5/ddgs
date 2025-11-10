@@ -24,19 +24,19 @@ class _ProxyMeta(type):
     _real_cls: type["DDGS"] | None = None
 
     @classmethod
-    def _load_real(mcls) -> type["DDGS"]:
-        if mcls._real_cls is None:
-            with mcls._lock:
-                if mcls._real_cls is None:
-                    mcls._real_cls = importlib.import_module(".ddgs", package=__name__).DDGS
-                    globals()["DDGS"] = mcls._real_cls
-        return mcls._real_cls
+    def _load_real(cls) -> type["DDGS"]:
+        if cls._real_cls is None:
+            with cls._lock:
+                if cls._real_cls is None:
+                    cls._real_cls = importlib.import_module(".ddgs", package=__name__).DDGS
+                    globals()["DDGS"] = cls._real_cls
+        return cls._real_cls
 
-    def __call__(cls, *args: Any, **kwargs: Any) -> "DDGS":
+    def __call__(cls, *args: Any, **kwargs: Any) -> "DDGS":  # noqa: ANN401
         real = type(cls)._load_real()
         return real(*args, **kwargs)
 
-    def __getattr__(cls, name: str) -> Any:
+    def __getattr__(cls, name: str) -> Any:  # noqa: ANN401
         return getattr(type(cls)._load_real(), name)
 
     def __dir__(cls) -> list[str]:
@@ -45,5 +45,5 @@ class _ProxyMeta(type):
         return sorted(base | (loaded_names - base))
 
 
-class DDGS(metaclass=_ProxyMeta):  # type: ignore
+class DDGS(metaclass=_ProxyMeta):  # type: ignore[no-redef]
     """Proxy class for lazy-loading the real DDGS implementation."""

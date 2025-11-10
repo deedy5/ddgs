@@ -3,11 +3,9 @@
 import csv
 import json
 import logging
-import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
 from urllib.parse import unquote
 
 import click
@@ -39,7 +37,7 @@ COLORS = {
 }
 
 
-def _convert_tuple_to_csv(ctx: click.Context, param: click.Parameter, value: Any) -> str:
+def _convert_tuple_to_csv(_ctx: click.Context, _param: click.Parameter, value: tuple[str] | None) -> str:
     if value is not None and isinstance(value, tuple):
         return ",".join(value)
     return ""
@@ -55,12 +53,12 @@ def _save_data(query: str, data: list[dict[str, str]], function_name: str, filen
 
 
 def _save_json(jsonfile: str | Path, data: list[dict[str, str]]) -> None:
-    with open(jsonfile, "w", encoding="utf-8") as file:
+    with Path(jsonfile).open("w", encoding="utf-8") as file:
         file.write(json.dumps(data, ensure_ascii=False, indent=2))
 
 
 def _save_csv(csvfile: str | Path, data: list[dict[str, str]]) -> None:
-    with open(csvfile, "w", newline="", encoding="utf-8") as file:
+    with Path(csvfile).open("w", newline="", encoding="utf-8") as file:
         if data:
             headers = data[0].keys()
             writer = csv.DictWriter(file, fieldnames=headers, quoting=csv.QUOTE_MINIMAL)
@@ -75,13 +73,18 @@ def _print_data(data: list[dict[str, str]]) -> None:
             for j, (k, v) in enumerate(e.items(), start=1):
                 if v:
                     width = 300 if k in ("content", "href", "image", "source", "thumbnail", "url") else 78
-                    k = "language" if k == "detected_language" else k
+                    title = "language" if k == "detected_language" else k
                     text = click.wrap_text(
-                        f"{v}", width=width, initial_indent="", subsequent_indent=" " * 12, preserve_paragraphs=True
+                        f"{v}",
+                        width=width,
+                        initial_indent="",
+                        subsequent_indent=" " * 12,
+                        preserve_paragraphs=True,
                     )
                 else:
+                    title = k
                     text = v
-                click.secho(f"{k:<12}{text}", bg="black", fg=COLORS[j], overline=True)
+                click.secho(f"{title:<12}{text}", bg="black", fg=COLORS[j], overline=True)
             input()
 
 
@@ -98,15 +101,16 @@ def _sanitize_query(query: str) -> str:
     )
 
 
-def _download_file(url: str, dir_path: str, filename: str, proxy: str | None, verify: bool) -> None:
+def _download_file(url: str, dir_path: str, filename: str, proxy: str | None, *, verify: bool) -> None:
     try:
         resp = primp.Client(proxy=proxy, impersonate="random", impersonate_os="random", timeout=10, verify=verify).get(
-            url
+            url,
         )
         if resp.status_code == 200:
-            with open(os.path.join(dir_path, filename[:200]), "wb") as file:
+            f = Path(dir_path) / filename[:200]
+            with f.open("wb") as file:
                 file.write(resp.content)
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         logger.debug("Error download_file url=%s: %r", url, ex)
 
 
@@ -116,11 +120,12 @@ def _download_results(
     function_name: str,
     proxy: str | None = None,
     threads: int | None = None,
-    verify: bool = True,
     pathname: str | None = None,
+    *,
+    verify: bool = True,
 ) -> None:
     path = pathname if pathname else f"{function_name}_{query}_{datetime.now(tz=timezone.utc):%Y%m%d_%H%M%S}"
-    os.makedirs(path, exist_ok=True)
+    Path(path).mkdir(parents=True, exist_ok=True)
 
     threads = 10 if threads is None else threads
     with ThreadPoolExecutor(max_workers=threads) as executor:
@@ -128,11 +133,15 @@ def _download_results(
         for i, res in enumerate(results, start=1):
             url = res["image"] if function_name == "images" else res["href"]
             filename = unquote(url.split("/")[-1].split("?")[0])
-            f = executor.submit(_download_file, url, path, f"{i}_{filename}", proxy, verify)
+            f = executor.submit(_download_file, url, path, f"{i}_{filename}", proxy, verify=verify)
             futures.append(f)
 
-        with click.progressbar(  # type: ignore
-            length=len(futures), label="Downloading", show_percent=True, show_pos=True, width=50
+        with click.progressbar(
+            length=len(futures),
+            label="Downloading",
+            show_percent=True,
+            show_pos=True,
+            width=50,
         ) as bar:
             for future in as_completed(futures):
                 future.result()
@@ -149,14 +158,14 @@ def safe_entry_point() -> None:
     logging.basicConfig(level=logging.WARNING)
     try:
         cli()
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001
         click.echo(f"{type(ex).__name__}: {ex!r}")
 
 
 @cli.command()
 def version() -> str:
     """Print and return version."""
-    print(__version__)
+    print(__version__)  # noqa: T201
     return __version__
 
 
@@ -184,7 +193,7 @@ def version() -> str:
             "yandex",
             "yahoo",
             "wikipedia",
-        ]
+        ],
     ),
     multiple=True,
     callback=_convert_tuple_to_csv,
@@ -205,10 +214,11 @@ def text(
     page: int,
     backend: str,
     output: str | None,
-    download: bool,
     download_directory: str | None,
     threads: int,
     proxy: str | None,
+    *,
+    download: bool,
     verify: bool,
 ) -> None:
     """CLI function to perform a DDGS text metasearch."""
@@ -275,7 +285,7 @@ def text(
             "Gray",
             "Teal",
             "White",
-        ]
+        ],
     ),
 )
 @click.option("-type", "--type_image", type=click.Choice(["photo", "clipart", "gif", "transparent", "line"]))
@@ -305,11 +315,12 @@ def images(
     type_image: str | None,
     layout: str | None,
     license_image: str | None,
-    download: bool,
     download_directory: str | None,
     threads: int,
     output: str | None,
     proxy: str | None,
+    *,
+    download: bool,
     verify: bool,
 ) -> None:
     """CLI function to perform a DDGS images metasearch."""
@@ -381,6 +392,7 @@ def videos(
     license_videos: str | None,
     output: str | None,
     proxy: str | None,
+    *,
     verify: bool,
 ) -> None:
     """CLI function to perform a DDGS videos metasearch."""
@@ -434,6 +446,7 @@ def news(
     backend: str,
     output: str | None,
     proxy: str | None,
+    *,
     verify: bool,
 ) -> None:
     """CLI function to perform a DDGS news metasearch."""
@@ -478,6 +491,7 @@ def books(
     backend: str,
     output: str | None,
     proxy: str | None,
+    *,
     verify: bool,
 ) -> None:
     """CLI function to perform a DDGS books metasearch."""
