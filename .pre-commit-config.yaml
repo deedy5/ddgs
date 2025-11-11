@@ -1,0 +1,53 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v6.0.0
+  hooks:
+    - id: check-added-large-files
+    - id: check-ast
+    - id: check-builtin-literals
+    - id: check-case-conflict
+    - id: check-docstring-first
+    - id: check-merge-conflict
+    - id: check-toml
+    - id: check-yaml
+    - id: debug-statements
+    - id: detect-private-key
+    - id: end-of-file-fixer
+    - id: mixed-line-ending
+    - id: name-tests-test
+    - id: no-commit-to-branch
+    - id: trailing-whitespace
+
+- repo: local
+  hooks:
+    - id: ruff-check
+      name: ruff check
+      entry: ruff check --fix
+      language: python
+      types: [python]
+      pass_filenames: false
+      always_run: true
+
+    - id: ruff-format
+      name: ruff format
+      entry: ruff format
+      language: python
+      types: [python]
+      pass_filenames: false
+      always_run: true
+
+    - id: mypy
+      name: mypy
+      entry: mypy --install-types --non-interactive .
+      language: python
+      types: [python]
+      pass_filenames: false
+      always_run: true
+
+    #- id: pytest
+    #  name: pytest
+    #  entry: pytest -v
+    #  language: python
+    #  types: [python]
+    #  pass_filenames: false
+    #  always_run: true
