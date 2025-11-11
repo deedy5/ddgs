@@ -46,6 +46,7 @@ version = {attr = "ddgs.__version__"}
 [project.optional-dependencies]
 dev = [
     "mypy>=1.17.1",
+    "pre-commit",
     "pytest>=8.4.1",
     "pytest-dependency>=0.6.0",
     "ruff>=0.13.0",
