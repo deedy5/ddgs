@@ -63,12 +63,9 @@ class BaseSearchEngine(ABC, Generic[T]):
 
     def request(self, *args: Any, **kwargs: Any) -> str | None:  # noqa: ANN401
         """Make a request to the search engine."""
-        try:
-            resp = self.http_client.request(*args, **kwargs)
-            if resp.status_code == 200:
-                return resp.text
-        except Exception:  # noqa: BLE001
-            return None
+        resp = self.http_client.request(*args, **kwargs)
+        if resp.status_code == 200:
+            return resp.text
         return None
 
     @cached_property
