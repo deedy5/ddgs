@@ -1,7 +1,7 @@
 PY := .venv/bin/python
 PIP := .venv/bin/pip
 
-.PHONY: help setup lint format test clean
+.PHONY: help setup lint format test all clean
 
 help:
 	@echo "Targets:"
@@ -17,12 +17,10 @@ setup:
 	$(PIP) install -e .[dev]
 
 lint:
-	$(PY) -m ruff check
-	$(PY) -m ruff format --check
+	$(PY) -m ruff check --fix
 	$(PY) -m mypy --install-types --non-interactive .
 
 format:
-	$(PY) -m ruff check --fix
 	$(PY) -m ruff format
 
 test:
