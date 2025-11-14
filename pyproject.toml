@@ -31,6 +31,7 @@ dependencies = [
     "primp>=0.15.0",
     "lxml>=4.9.4",
     "httpx[http2,socks,brotli]>=0.28.1",  # temporarily
+    "fake-useragent>=2.2.0",
 ]
 dynamic = ["version"]
 
