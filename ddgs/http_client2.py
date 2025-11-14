@@ -34,10 +34,18 @@ class Response:
 class HttpClient2:
     """Temporary HTTP client."""
 
-    def __init__(self, proxy: str | None = None, timeout: int | None = 10, *, verify: bool | str = True) -> None:
+    def __init__(
+        self,
+        headers: dict[str, str] | None = None,
+        proxy: str | None = None,
+        timeout: int | None = 10,
+        *,
+        verify: bool | str = True,
+    ) -> None:
         """Initialize the HttpClient object.
 
         Args:
+            headers (dict, optional): headers for the HTTP client.
             proxy (str, optional): proxy for the HTTP client, supports http/https/socks5 protocols.
                 example: "http://user:pass@example.com:3128". Defaults to None.
             timeout (int, optional): Timeout value for the HTTP client. Defaults to 10.
@@ -45,6 +53,7 @@ class HttpClient2:
 
         """
         self.client = httpx.Client(
+            headers=headers,
             proxy=proxy,
             timeout=timeout,
             verify=_get_random_ssl_context(verify=verify) if verify else False,
