@@ -8,7 +8,7 @@ import logging
 import threading
 from typing import TYPE_CHECKING, Any
 
-__version__ = "9.9.0"
+__version__ = "9.9.1"
 __all__ = ("DDGS",)
 
 if TYPE_CHECKING:
