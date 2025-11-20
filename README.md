@@ -5,23 +5,21 @@ A metasearch library that aggregates results from diverse web search services.
 
 
 ## Table of Contents
-- [DDGS | Dux Distributed Global Search](#ddgs--dux-distributed-global-search)
-  - [Table of Contents](#table-of-contents)
-  - [Install](#install)
-  - [CLI version](#cli-version)
-  - [DDGS search operators](#ddgs-search-operators)
-  - [Regions](#regions)
-  - [Engines](#engines)
-  - [Tips](#tips)
-  - [DDGS class](#ddgs-class)
-  - [Proxy](#proxy)
-  - [Exceptions](#exceptions)
-  - [1. text()](#1-text)
-  - [2. images()](#2-images)
-  - [3. videos()](#3-videos)
-  - [4. news()](#4-news)
-  - [5. books()](#5-books)
-  - [Disclaimer](#disclaimer)
+* [Install](#install)
+* [CLI version](#cli-version)
+* [DDGS search operators](#ddgs-search-operators)
+* [Regions](#regions)
+* [Engines](#engines)
+* [Tips](#tips)
+* [DDGS class](#ddgs-class)
+* [Proxy](#proxy)
+* [Exceptions](#exceptions)
+* [1. text()](#1-text)
+* [2. images()](#2-images)
+* [3. videos()](#3-videos)
+* [4. news()](#4-news)
+* [5. books()](#5-books)
+* [Disclaimer](#disclaimer)
 
 ## Install
 ```python
