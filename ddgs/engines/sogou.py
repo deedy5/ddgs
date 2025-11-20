@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import logging
 import re
-from collections.abc import Mapping
-from typing import Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
 from urllib.parse import urljoin
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 from ddgs.base import BaseSearchEngine
 from ddgs.results import TextResult
