@@ -11,7 +11,7 @@ from urllib.parse import unquote
 
 import click
 import primp
-from feedgenerator import Rss201rev2Feed
+from feedgenerator import Rss201rev2Feed  # type: ignore[import-not-found]
 
 from . import __version__
 from .ddgs import DDGS
