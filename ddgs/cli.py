@@ -1,5 +1,6 @@
 """CLI tool for DDGS."""
 
+import contextlib
 import csv
 import json
 import logging
@@ -10,6 +11,7 @@ from urllib.parse import unquote
 
 import click
 import primp
+from feedgenerator import Rss201rev2Feed
 
 from . import __version__
 from .ddgs import DDGS
@@ -44,12 +46,15 @@ def _convert_tuple_to_csv(_ctx: click.Context, _param: click.Parameter, value: t
 
 
 def _save_data(query: str, data: list[dict[str, str]], function_name: str, filename: str | None) -> None:
-    filename, ext = filename.rsplit(".", 1) if filename and filename.endswith((".csv", ".json")) else (None, filename)
+    valid_exts = (".csv", ".json", ".rss")
+    filename, ext = filename.rsplit(".", 1) if filename and filename.endswith(valid_exts) else (None, filename)
     filename = filename if filename else f"{function_name}_{query}_{datetime.now(tz=timezone.utc):%Y%m%d_%H%M%S}"
     if ext == "csv":
         _save_csv(f"{filename}.{ext}", data)
     elif ext == "json":
         _save_json(f"{filename}.{ext}", data)
+    elif ext == "rss":
+        _save_rss(f"{filename}.{ext}", data)
 
 
 def _save_json(jsonfile: str | Path, data: list[dict[str, str]]) -> None:
@@ -64,6 +69,45 @@ def _save_csv(csvfile: str | Path, data: list[dict[str, str]]) -> None:
             writer = csv.DictWriter(file, fieldnames=headers, quoting=csv.QUOTE_MINIMAL)
             writer.writeheader()
             writer.writerows(data)
+
+
+def _save_rss(rssfile: str | Path, data: list[dict[str, str]]) -> None:
+    """Save search results as an RSS 2.0 feed.
+
+    Args:
+        rssfile: Path to save the RSS file.
+        data: List of search result dictionaries.
+
+    """
+    feed = Rss201rev2Feed(
+        title="DDGS Search Results",
+        link="https://github.com/deedy5/ddgs",
+        description="Search results from DDGS metasearch",
+    )
+
+    for result in data:
+        # Extract common fields with fallbacks
+        title = result.get("title", "No Title")
+        link = result.get("href") or result.get("url") or result.get("image") or ""
+        description = result.get("body") or result.get("content") or result.get("description") or ""
+
+        # Get publication date if available (news uses "date", videos use "published")
+        pub_date = None
+        date_str = result.get("date") or result.get("published")
+        if date_str:
+            with contextlib.suppress(ValueError, AttributeError):
+                # Try to parse the date string
+                pub_date = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+
+        feed.add_item(
+            title=title,
+            link=link,
+            description=description,
+            pubdate=pub_date,
+        )
+
+    with Path(rssfile).open("w", encoding="utf-8") as file:
+        feed.write(file, "utf-8")
 
 
 def _print_data(data: list[dict[str, str]]) -> None:
@@ -198,7 +242,7 @@ def version() -> str:
     multiple=True,
     callback=_convert_tuple_to_csv,
 )
-@click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
+@click.option("-o", "--output", help="csv, json, rss or filename.csv|json|rss (save the results to a file)")
 @click.option("-d", "--download", is_flag=True, default=False, help="download results. -dd to set custom directory")
 @click.option("-dd", "--download-directory", help="Specify custom download directory")
 @click.option("-th", "--threads", default=10, help="download threads, default=10")
@@ -295,7 +339,7 @@ def text(
     "--license_image",
     type=click.Choice(["any", "Public", "Share", "ShareCommercially", "Modify", "ModifyCommercially"]),
 )
-@click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
+@click.option("-o", "--output", help="csv, json, rss or filename.csv|json|rss (save the results to a file)")
 @click.option("-d", "--download", is_flag=True, default=False, help="download results. -dd to set custom directory")
 @click.option("-dd", "--download-directory", help="Specify custom download directory")
 @click.option("-th", "--threads", default=10, help="download threads, default=10")
@@ -375,7 +419,7 @@ def images(
 @click.option("-res", "--resolution", type=click.Choice(["high", "standart"]))
 @click.option("-d", "--duration", type=click.Choice(["short", "medium", "long"]))
 @click.option("-lic", "--license_videos", type=click.Choice(["creativeCommon", "youtube"]))
-@click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
+@click.option("-o", "--output", help="csv, json, rss or filename.csv|json|rss (save the results to a file)")
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 def videos(
@@ -432,7 +476,7 @@ def videos(
     multiple=True,
     callback=_convert_tuple_to_csv,
 )
-@click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
+@click.option("-o", "--output", help="csv, json, rss or filename.csv|json|rss (save the results to a file)")
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 def news(
@@ -480,7 +524,7 @@ def news(
     multiple=True,
     callback=_convert_tuple_to_csv,
 )
-@click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
+@click.option("-o", "--output", help="csv, json, rss or filename.csv|json|rss (save the results to a file)")
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 def books(
