@@ -58,6 +58,7 @@ class DuckduckgoImages(BaseSearchEngine[ImagesResult]):
         layout = f"layout:{layout}" if layout else ""
         license_image = kwargs.get("license_image")
         license_image = f"license:{license_image}" if license_image else ""
+        hide_ai_images = "hide_ai_images:1" if kwargs.get("hide_ai_images") else ""
         payload = {
             "o": "json",
             "q": query,
@@ -66,7 +67,7 @@ class DuckduckgoImages(BaseSearchEngine[ImagesResult]):
             "p": safesearch_base[safesearch.lower()],
         }
         if timelimit or size or color or type_image or layout or license_image:
-            payload["f"] = f"{timelimit},{size},{color},{type_image},{layout},{license_image}"
+            payload["f"] = f"{timelimit},{size},{color},{type_image},{layout},{license_image},{hide_ai_images}"
         if page > 1:
             payload["s"] = f"{(page - 1) * 100}"
         return payload
