@@ -50,3 +50,7 @@ class Duckduckgo(BaseSearchEngine[TextResult]):
         if timelimit:
             payload["df"] = timelimit
         return payload
+
+    def post_extract_results(self, results: list[TextResult]) -> list[TextResult]:
+        """Post-process search results."""
+        return [r for r in results if not r.href.startswith("https://duckduckgo.com/y.js?")]
