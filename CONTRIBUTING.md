@@ -2,6 +2,10 @@
 
 Thanks for your interest in contributing! Please open a Discussion, Issue, or email the maintainers to talk over any major changes before submitting a pull request.
 
+## IDE configuration
+
+If you use **VSCode**, install recommended extensions (press `F1` → *Show Recommended Extensions*).
+
 ## Development
 
 1. Fork the repository and clone your fork:
