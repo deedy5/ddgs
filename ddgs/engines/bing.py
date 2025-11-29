@@ -31,6 +31,8 @@ def unwrap_bing_url(raw_url: str) -> str | None:
 class Bing(BaseSearchEngine[TextResult]):
     """Bing search engine."""
 
+    disabled = True  # !!!
+
     name = "bing"
     category = "text"
     provider = "bing"
