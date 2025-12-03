@@ -7,7 +7,7 @@ import pytest
 from click.testing import CliRunner
 
 from ddgs import DDGS, __version__
-from ddgs.cli import _download_results, _save_csv, _save_json, cli
+from ddgs.cli import _download_results, _save_csv, _save_json, _save_rss, cli
 
 runner = CliRunner()
 TEXT_RESULTS = []
@@ -75,6 +75,19 @@ def test_save_json(tmp_path: Path) -> None:
     temp_file = tmp_path / "test_json.json"
     _save_json(temp_file, TEXT_RESULTS)
     assert temp_file.exists()
+
+
+@pytest.mark.dependency(depends=["test_get_text"])
+def test_save_rss(tmp_path: Path) -> None:
+    temp_file = tmp_path / "test_rss.rss"
+    _save_rss(temp_file, TEXT_RESULTS)
+    assert temp_file.exists()
+    # Verify it's valid XML by reading it
+    content = temp_file.read_text(encoding="utf-8")
+    assert "<?xml" in content
+    assert "<rss" in content
+    assert "<channel>" in content
+    assert "</rss>" in content
 
 
 @pytest.mark.dependency(depends=["test_get_text"])
