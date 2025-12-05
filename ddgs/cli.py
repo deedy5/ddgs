@@ -297,6 +297,7 @@ def text(
     "--license_image",
     type=click.Choice(["any", "Public", "Share", "ShareCommercially", "Modify", "ModifyCommercially"]),
 )
+@click.option("-hai", "--hide-ai-images", is_flag=True, default=False, help="exclude AI generated images from results")
 @click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
 @click.option("-d", "--download", is_flag=True, default=False, help="download results. -dd to set custom directory")
 @click.option("-dd", "--download-directory", help="Specify custom download directory")
@@ -318,6 +319,7 @@ def images(
     type_image: str | None,
     layout: str | None,
     license_image: str | None,
+    hide_ai_images: bool | None,
     download_directory: str | None,
     threads: int,
     output: str | None,
@@ -342,6 +344,7 @@ def images(
         type_image=type_image,
         layout=layout,
         license_image=license_image,
+        hide_ai_images=hide_ai_images,
     )
     query = _sanitize_query(query)
     if output:
