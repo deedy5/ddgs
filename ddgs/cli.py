@@ -66,7 +66,7 @@ def _save_csv(csvfile: str | Path, data: list[dict[str, str]]) -> None:
             writer.writerows(data)
 
 
-def _print_data(data: list[dict[str, str]]) -> None:
+def _print_data(data: list[dict[str, str]], *, no_color: bool = False) -> None:
     if data:
         for i, e in enumerate(data, start=1):
             click.secho(f"{i}.\t    {'=' * 78}", bg="black", fg="white")
@@ -84,7 +84,7 @@ def _print_data(data: list[dict[str, str]]) -> None:
                 else:
                     title = k
                     text = v
-                click.secho(f"{title:<12}{text}", bg="black", fg=COLORS[j], overline=True)
+                click.secho(f"{title:<12}{text}", bg="black", fg=COLORS[j] if not no_color else "white", overline=True)
             input()
 
 
@@ -204,6 +204,7 @@ def version() -> str:
 @click.option("-th", "--threads", default=10, help="download threads, default=10")
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
+@click.option("-nc", "--no-color", is_flag=True, default=False, help="disable color output")
 def text(
     query: str,
     keywords: str | None,  # deprecated
@@ -220,6 +221,7 @@ def text(
     *,
     download: bool,
     verify: bool,
+    no_color: bool,
 ) -> None:
     """CLI function to perform a DDGS text metasearch."""
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).text(
@@ -246,7 +248,7 @@ def text(
             pathname=download_directory,
         )
     if not output and not download:
-        _print_data(data)
+        _print_data(data, no_color=no_color)
 
 
 @cli.command()
@@ -301,6 +303,7 @@ def text(
 @click.option("-th", "--threads", default=10, help="download threads, default=10")
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
+@click.option("-nc", "--no-color", is_flag=True, default=False, help="disable color output")
 def images(
     query: str,
     keywords: str | None,  # deprecated
@@ -322,6 +325,7 @@ def images(
     *,
     download: bool,
     verify: bool,
+    no_color: bool,
 ) -> None:
     """CLI function to perform a DDGS images metasearch."""
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).images(
@@ -353,7 +357,7 @@ def images(
             pathname=download_directory,
         )
     if not output and not download:
-        _print_data(data)
+        _print_data(data, no_color=no_color)
 
 
 @cli.command()
@@ -378,6 +382,7 @@ def images(
 @click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
+@click.option("-nc", "--no-color", is_flag=True, default=False, help="disable color output")
 def videos(
     query: str,
     keywords: str | None,  # deprecated
@@ -394,6 +399,7 @@ def videos(
     proxy: str | None,
     *,
     verify: bool,
+    no_color: bool,
 ) -> None:
     """CLI function to perform a DDGS videos metasearch."""
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).videos(
@@ -413,7 +419,7 @@ def videos(
     if output:
         _save_data(query, data, function_name="videos", filename=output)
     else:
-        _print_data(data)
+        _print_data(data, no_color=no_color)
 
 
 @cli.command()
@@ -435,6 +441,7 @@ def videos(
 @click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
+@click.option("-nc", "--no-color", is_flag=True, default=False, help="disable color output")
 def news(
     query: str,
     keywords: str | None,  # deprecated
@@ -448,6 +455,7 @@ def news(
     proxy: str | None,
     *,
     verify: bool,
+    no_color: bool,
 ) -> None:
     """CLI function to perform a DDGS news metasearch."""
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).news(
@@ -464,7 +472,7 @@ def news(
     if output:
         _save_data(query, data, function_name="news", filename=output)
     else:
-        _print_data(data)
+        _print_data(data, no_color=no_color)
 
 
 @cli.command()
@@ -483,6 +491,7 @@ def news(
 @click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
+@click.option("-nc", "--no-color", is_flag=True, default=False, help="disable color output")
 def books(
     query: str,
     keywords: str | None,  # deprecated
@@ -493,6 +502,7 @@ def books(
     proxy: str | None,
     *,
     verify: bool,
+    no_color: bool,
 ) -> None:
     """CLI function to perform a DDGS books metasearch."""
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).books(
@@ -505,7 +515,7 @@ def books(
     if output:
         _save_data(query, data, function_name="books", filename=output)
     else:
-        _print_data(data)
+        _print_data(data, no_color=no_color)
 
 
 if __name__ == "__main__":
