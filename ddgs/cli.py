@@ -190,6 +190,7 @@ def version() -> str:
             "duckduckgo",
             "google",
             "mojeek",
+            "sogou",
             "yandex",
             "yahoo",
             "wikipedia",
