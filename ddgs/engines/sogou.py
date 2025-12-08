@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import logging
-import re
 from typing import TYPE_CHECKING, Any, ClassVar
 from urllib.parse import urljoin
 
@@ -12,8 +10,6 @@ if TYPE_CHECKING:
 
 from ddgs.base import BaseSearchEngine
 from ddgs.results import TextResult
-
-logger = logging.getLogger(__name__)
 
 
 class Sogou(BaseSearchEngine[TextResult]):
@@ -32,13 +28,6 @@ class Sogou(BaseSearchEngine[TextResult]):
         "href": ".//h3//a/@href",
         "body": ".//div[contains(@class, 'space-txt')]//text()",
     }
-
-    _redirect_pattern = re.compile(r"window\.location\.replace\([\"'](?P<url>[^\"']+)[\"']\)")
-    _meta_refresh_pattern = re.compile(r"URL='?(?P<url>[^'\"]+)", re.IGNORECASE)
-
-    def __init__(self, proxy: str | None = None, timeout: int | None = None, *, verify: bool | str = True) -> None:
-        super().__init__(proxy=proxy, timeout=timeout, verify=verify)
-        self._href_cache: dict[str, str] = {}
 
     def build_payload(
         self,
@@ -59,31 +48,12 @@ class Sogou(BaseSearchEngine[TextResult]):
 
     def post_extract_results(self, results: list[TextResult]) -> list[TextResult]:
         """Post-process search results."""
-        post_results = []
-        for result in results:
-            if result.href and result.title:
-                result.href = self._normalize_href(result.href)
-                post_results.append(result)
-        return post_results
-
-    def _normalize_href(self, href: str) -> str:
-        """Normalize Sogou link to an absolute URL and resolve redirects when possible."""
-        href = urljoin(self.search_url, href)
-        if "sogou.com/link?url=" not in href:
-            return href
-
-        if href in self._href_cache:
-            return self._href_cache[href]
-
-        resolved = href
-        try:
-            resp = self.http_client.request("GET", href)
-        except Exception as exc:  # noqa: BLE001
-            logger.debug("Error resolving Sogou link %s: %r", href, exc)
-        else:
-            if resp.status_code == 200 and resp.text:
-                match = self._redirect_pattern.search(resp.text) or self._meta_refresh_pattern.search(resp.text)
-                if match:
-                    resolved = match.group("url")
-        self._href_cache[href] = resolved
-        return resolved
+        return [
+            TextResult(
+                title=r.title,
+                href=urljoin(self.search_url, r.href),
+                body=r.body,
+            )
+            for r in results
+            if r.href and r.title
+        ]
