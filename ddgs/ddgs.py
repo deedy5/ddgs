@@ -95,8 +95,7 @@ class DDGS:
         if "auto" in backend_list or "all" in backend_list:
             keys = engine_keys
             if category == "text":
-                # ensure Wikipedia is always included and in the first position
-                keys = ["wikipedia"] + [key for key in keys if key != "wikipedia"]
+                keys = ["wikipedia", "grokipedia"] + [k for k in keys if k not in ("wikipedia", "grokipedia")]
         else:
             keys = backend_list
 

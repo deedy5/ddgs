@@ -189,6 +189,7 @@ def version() -> str:
             "brave",
             "duckduckgo",
             "google",
+            "grokipedia",
             "mojeek",
             "yandex",
             "yahoo",
