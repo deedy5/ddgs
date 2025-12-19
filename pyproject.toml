@@ -44,6 +44,10 @@ ddgs = "ddgs.cli:safe_entry_point"
 [tool.setuptools.dynamic]
 version = {attr = "ddgs.__version__"}
 
+[tool.setuptools.packages.find]
+include = ["ddgs*"]
+exclude = ["api*"]
+
 [project.optional-dependencies]
 dev = [
     "mypy>=1.17.1",
@@ -56,6 +60,12 @@ dev = [
     "lxml-stubs",
     "types-Pygments",
     "types-pexpect",
+    "types-PyYAML",
+    "types-ujson"
+]
+api = [
+    "fastapi[standard]>=0.104.0",
+    "fastapi-mcp>=0.4.0",
 ]
 
 [tool.ruff]

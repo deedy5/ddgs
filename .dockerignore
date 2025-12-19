@@ -1,0 +1,73 @@
+# Git files
+.git
+.gitignore
+
+# Python cache and build files
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git
+.mypy_cache
+.pytest_cache
+.hypothesis
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Documentation
+README.md
+CONTRIBUTING.md
+LICENSE.md
+docs/
+
+# Test files
+tests/
+*.test.py
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Docker files
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Requirements file (using pyproject.toml instead)
+requirements.txt
+
+# API files - keeping for Docker build context

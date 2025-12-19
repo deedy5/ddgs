@@ -5,6 +5,7 @@ A metasearch library that aggregates results from diverse web search services.
 
 
 ## Table of Contents
+* [API Server (with MCP Integration)](#api-server-with-mcp-integration)
 * [Install](#install)
 * [CLI version](#cli-version)
 * [Engines](#engines)
@@ -15,6 +16,37 @@ A metasearch library that aggregates results from diverse web search services.
 * [4. news()](#4-news)
 * [5. books()](#5-books)
 * [Disclaimer](#disclaimer)
+
+___
+## API Server (with MCP Integration)
+-  **Docker compose**
+```bash
+git clone https://github.com/deedy5/ddgs && cd ddgs
+docker-compose up --build
+```
+-  **Bash**
+```bash
+git clone https://github.com/deedy5/ddgs && cd ddgs
+chmod +x start_api.sh
+./start_api.sh
+```
+
+#### Available Endpoints
+- MCP Endpoints (for AI assistance):
+    - `http://localhost:8000/mcp` - HTTP transport
+    - `http://localhost:8000/sse` - SSE transport
+- API Docs: `http://localhost:8000/docs`
+- Health Check: `http://localhost:8000/health`
+
+#### Available MCP Tools
+- `search_text` - Web text searches
+- `search_images` - Image searches
+- `search_news` - News searches
+- `search_videos` - Video searches
+- `search_books` - Book searches
+
+[Go To TOP](#TOP)
+___
 
 ## Install
 ```python

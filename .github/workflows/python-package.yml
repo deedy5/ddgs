@@ -30,7 +30,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install -U pip
-        python -m pip install .[dev]
+        python -m pip install .[dev,api]
     - name: Ruff
       run: |
         ruff check .
