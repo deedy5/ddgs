@@ -5,12 +5,17 @@ from collections.abc import Mapping
 from typing import Any, ClassVar
 
 from ddgs.base import BaseSearchEngine
+from ddgs.requests_http_client import RequestsHttpClient
 from ddgs.results import ImagesResult
 from ddgs.utils import _extract_vqd
 
 
 class DuckduckgoImages(BaseSearchEngine[ImagesResult]):
-    """Duckduckgo images search engine."""
+    """Duckduckgo images search engine.
+
+    This engine uses RequestsHttpClient instead of the default HttpClient
+    to work around DuckDuckGo's detection of the primp library.
+    """
 
     name = "duckduckgo"
     category = "images"
@@ -18,7 +23,14 @@ class DuckduckgoImages(BaseSearchEngine[ImagesResult]):
 
     search_url = "https://duckduckgo.com/i.js"
     search_method = "GET"
-    search_headers: ClassVar[Mapping[str, str]] = {"Referer": "https://duckduckgo.com/", "Sec-Fetch-Mode": "cors"}
+    search_headers: ClassVar[Mapping[str, str]] = {
+        "Referer": "https://duckduckgo.com/",
+        "Origin": "https://duckduckgo.com",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-origin",
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "Accept-Language": "en-US,en;q=0.9",
+    }
 
     elements_replace: ClassVar[Mapping[str, str]] = {
         "title": "title",
@@ -29,6 +41,23 @@ class DuckduckgoImages(BaseSearchEngine[ImagesResult]):
         "width": "width",
         "source": "source",
     }
+
+    def __init__(self, proxy: str | None = None, timeout: int | None = None, *, verify: bool | str = True) -> None:
+        """Initialize the DuckduckgoImages engine with RequestsHttpClient.
+
+        Override the base class initialization to use RequestsHttpClient
+        instead of the default HttpClient (which uses primp).
+
+        Args:
+            proxy: Proxy configuration (same as base class).
+            timeout: Request timeout (same as base class).
+            verify: SSL verification (same as base class).
+
+        """
+        # Use RequestsHttpClient instead of default HttpClient to avoid DuckDuckGo detection
+        # RequestsHttpClient has the same interface as HttpClient, so this is type-safe
+        self.http_client = RequestsHttpClient(proxy=proxy, timeout=timeout, verify=verify)  # type: ignore[assignment]
+        self.results: list[ImagesResult] = []
 
     def _get_vqd(self, query: str) -> str:
         """Get vqd value for a search query using DuckDuckGo."""
