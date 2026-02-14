@@ -17,35 +17,30 @@ def test_context_manager() -> None:
 
 
 def test_text_search() -> None:
-    query = "wolf"
-    results = DDGS().text(query)
+    results = DDGS().text("wolf")
     assert isinstance(results, list)
     assert len(results) > 0
 
 
 def test_images_search() -> None:
-    query = "tiger"
-    results = DDGS().images(query)
+    results = DDGS().images("tiger")
     assert isinstance(results, list)
     assert len(results) > 0
 
 
 def test_news_search() -> None:
-    query = "rabbit"
-    results = DDGS().news(query)
+    results = DDGS().news("rabbit")
     assert isinstance(results, list)
     assert len(results) > 0
 
 
 def test_videos_search() -> None:
-    query = "monkey"
-    results = DDGS().videos(query)
+    results = DDGS().videos("monkey")
     assert isinstance(results, list)
     assert len(results) > 0
 
 
 def test_books_search() -> None:
-    query = "mouse"
-    results = DDGS().books(query)
+    results = DDGS().books("mouse")
     assert isinstance(results, list)
     assert len(results) > 0

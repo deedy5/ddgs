@@ -1,5 +1,3 @@
-import pathlib
-import shutil
 import time
 from pathlib import Path
 
@@ -10,8 +8,6 @@ from ddgs import DDGS, __version__
 from ddgs.cli import _download_results, _save_csv, _save_json, cli
 
 runner = CliRunner()
-TEXT_RESULTS = []
-IMAGES_RESULTS = []
 
 
 @pytest.fixture(autouse=True)
@@ -49,49 +45,39 @@ def test_books_command() -> None:
     assert "title" in result.output
 
 
-@pytest.mark.dependency()
-def test_get_text() -> None:
-    global TEXT_RESULTS
-    TEXT_RESULTS = DDGS().text("cow", max_results=5)
-    assert TEXT_RESULTS
+def test_text_workflow(tmp_path: Path) -> None:
+    """Combined test for text search, save, and download functionality."""
+    # Step 1: Get text results
+    text_results = DDGS().text("cow", max_results=5)
+    assert text_results
 
+    # Step 2: Save to CSV
+    csv_file = tmp_path / "test_csv.csv"
+    _save_csv(csv_file, text_results)
+    assert csv_file.exists()
 
-@pytest.mark.dependency()
-def test_get_images() -> None:
-    global IMAGES_RESULTS
-    IMAGES_RESULTS = DDGS().images("horse", max_results=5)
-    assert IMAGES_RESULTS
+    # Step 3: Save to JSON
+    json_file = tmp_path / "test_json.json"
+    _save_json(json_file, text_results)
+    assert json_file.exists()
 
-
-@pytest.mark.dependency(depends=["test_get_text"])
-def test_save_csv(tmp_path: Path) -> None:
-    temp_file = tmp_path / "test_csv.csv"
-    _save_csv(temp_file, TEXT_RESULTS)
-    assert temp_file.exists()
-
-
-@pytest.mark.dependency(depends=["test_get_text"])
-def test_save_json(tmp_path: Path) -> None:
-    temp_file = tmp_path / "test_json.json"
-    _save_json(temp_file, TEXT_RESULTS)
-    assert temp_file.exists()
-
-
-@pytest.mark.dependency(depends=["test_get_text"])
-def test_text_download() -> None:
-    pathname = pathlib.Path("text_downloads")
-    _download_results(f"{test_text_download}", TEXT_RESULTS, function_name="text", pathname=str(pathname))
+    # Step 4: Download results
+    pathname = tmp_path / "text_downloads"
+    _download_results("test_text_download", text_results, function_name="text", pathname=str(pathname))
     assert pathname.is_dir() and pathname.iterdir()
     for file in pathname.iterdir():
         assert file.is_file()
-    shutil.rmtree(str(pathname))
 
 
-@pytest.mark.dependency(depends=["test_get_images"])
-def test_images_download() -> None:
-    pathname = pathlib.Path("images_downloads")
-    _download_results(f"{test_images_download}", IMAGES_RESULTS, function_name="images", pathname=str(pathname))
+def test_images_workflow(tmp_path: Path) -> None:
+    """Combined test for images search and download functionality."""
+    # Step 1: Get images results
+    images_results = DDGS().images("horse", max_results=5)
+    assert images_results
+
+    # Step 2: Download results
+    pathname = tmp_path / "images_downloads"
+    _download_results("test_images_download", images_results, function_name="images", pathname=str(pathname))
     assert pathname.is_dir() and pathname.iterdir()
     for file in pathname.iterdir():
         assert file.is_file()
-    shutil.rmtree(str(pathname))
