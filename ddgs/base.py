@@ -27,13 +27,14 @@ class BaseSearchEngine(ABC, Generic[T]):
 
     search_url: str
     search_method: ClassVar[str]  # GET or POST
-    search_headers: ClassVar[Mapping[str, str]] = {}
+    headers_update: ClassVar[Mapping[str, str]] = {}
     items_xpath: ClassVar[str]
     elements_xpath: ClassVar[Mapping[str, str]]
     elements_replace: ClassVar[Mapping[str, str]]
 
     def __init__(self, proxy: str | None = None, timeout: int | None = None, *, verify: bool | str = True) -> None:
         self.http_client = HttpClient(proxy=proxy, timeout=timeout, verify=verify)
+        self.http_client.client.headers_update(self.headers_update)  # type: ignore[arg-type]
         self.results: list[T] = []
 
     @property
@@ -113,9 +114,9 @@ class BaseSearchEngine(ABC, Generic[T]):
             query=query, region=region, safesearch=safesearch, timelimit=timelimit, page=page, **kwargs
         )
         if self.search_method == "GET":
-            html_text = self.request(self.search_method, self.search_url, params=payload, headers=self.search_headers)
+            html_text = self.request(self.search_method, self.search_url, params=payload)
         else:
-            html_text = self.request(self.search_method, self.search_url, data=payload, headers=self.search_headers)
+            html_text = self.request(self.search_method, self.search_url, data=payload)
         if not html_text:
             return None
         results = self.extract_results(html_text)

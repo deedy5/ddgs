@@ -18,8 +18,17 @@ class DuckduckgoImages(BaseSearchEngine[ImagesResult]):
 
     search_url = "https://duckduckgo.com/i.js"
     search_method = "GET"
-    search_headers: ClassVar[Mapping[str, str]] = {"Referer": "https://duckduckgo.com/", "Sec-Fetch-Mode": "cors"}
-
+    headers_update: ClassVar[Mapping[str, str]] = {
+        "Accept": "*/*",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Referer": "https://duckduckgo.com/",
+        "Sec-GPC": "1",
+        "Connection": "keep-alive",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-origin",
+        "Priority": "u=4",
+    }
     elements_replace: ClassVar[Mapping[str, str]] = {
         "title": "title",
         "image": "image",
@@ -64,6 +73,7 @@ class DuckduckgoImages(BaseSearchEngine[ImagesResult]):
             "l": region,
             "vqd": self._get_vqd(query),
             "p": safesearch_base[safesearch.lower()],
+            "ct": "AT",
         }
         if timelimit or size or color or type_image or layout or license_image:
             payload["f"] = f"{timelimit},{size},{color},{type_image},{layout},{license_image}"
