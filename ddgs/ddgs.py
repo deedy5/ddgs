@@ -8,6 +8,8 @@ from random import random, shuffle
 from types import TracebackType
 from typing import Any, ClassVar
 
+from typing_extensions import Self
+
 from .base import BaseSearchEngine
 from .engines import ENGINES
 from .exceptions import DDGSException, TimeoutException
@@ -52,7 +54,7 @@ class DDGS:
             type[BaseSearchEngine[Any]], BaseSearchEngine[Any]
         ] = {}  # dict[engine_class, engine_instance]
 
-    def __enter__(self) -> "DDGS":
+    def __enter__(self) -> Self:
         """Enter the context manager and return the DDGS instance."""
         return self
 

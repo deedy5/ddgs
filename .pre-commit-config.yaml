@@ -22,7 +22,7 @@ repos:
   hooks:
     - id: ruff-check
       name: ruff check
-      entry: ruff check --fix
+      entry: .venv/bin/ruff check --fix
       language: python
       types: [python]
       pass_filenames: false
@@ -30,7 +30,7 @@ repos:
 
     - id: ruff-format
       name: ruff format
-      entry: ruff format
+      entry: .venv/bin/ruff format
       language: python
       types: [python]
       pass_filenames: false
@@ -38,7 +38,7 @@ repos:
 
     - id: mypy
       name: mypy
-      entry: mypy --install-types --non-interactive .
+      entry: .venv/bin/mypy --install-types --non-interactive .
       language: python
       types: [python]
       pass_filenames: false
