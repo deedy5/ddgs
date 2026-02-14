@@ -51,7 +51,7 @@ class Google(BaseSearchEngine[TextResult]):
 
     search_url = "https://www.google.com/search"
     search_method = "GET"
-    search_headers: ClassVar[dict[str, str]] = {"User-Agent": get_ua()}
+    headers_update: ClassVar[dict[str, str]] = {"User-Agent": get_ua()}
 
     items_xpath = "//div[div[@data-hveid]//div[h3]]"
     elements_xpath: ClassVar[Mapping[str, str]] = {
