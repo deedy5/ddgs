@@ -28,10 +28,8 @@ classifiers = [
 ]
 dependencies = [
     "click>=8.1.8",
-    "primp>=0.15.0",
+    "primp==1.0.0",
     "lxml>=4.9.4",
-    "httpx[http2,socks,brotli]>=0.28.1",  # temporarily
-    "fake-useragent>=2.2.0",
 ]
 dynamic = ["version"]
 
@@ -55,6 +53,7 @@ dev = [
     "pytest>=8.4.1",
     "pytest-dependency>=0.6.0",
     "ruff>=0.13.0",
+    "typing-extensions>=4.15.0",
 
     # for mypy
     "lxml-stubs",

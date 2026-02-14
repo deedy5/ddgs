@@ -1,8 +1,7 @@
 """HTTP client."""
 
 import logging
-from secrets import choice
-from typing import Any, Final, Literal, get_args
+from typing import Any
 
 import primp
 
@@ -25,19 +24,6 @@ class Response:
 class HttpClient:
     """HTTP client."""
 
-    _impersonates: Final = get_args(Literal[
-        "chrome_100", "chrome_101", "chrome_104", "chrome_105", "chrome_106", "chrome_107",
-        "chrome_108", "chrome_109", "chrome_114", "chrome_116", "chrome_117", "chrome_118",
-        "chrome_119", "chrome_120", "chrome_123", "chrome_124", "chrome_126", "chrome_127",
-        "chrome_128", "chrome_129", "chrome_130", "chrome_131", "chrome_133",
-        "safari_15.3", "safari_15.5", "safari_15.6.1", "safari_16", "safari_16.5",
-        "safari_17.0", "safari_17.2.1", "safari_17.4.1", "safari_17.5",
-        "safari_18", "safari_18.2",
-        "edge_101", "edge_122", "edge_127", "edge_131",
-        "firefox_109", "firefox_117", "firefox_128", "firefox_133", "firefox_135",
-    ])  # fmt: skip
-    _impersonates_os: Final = get_args(Literal["macos", "linux", "windows"])
-
     def __init__(self, proxy: str | None = None, timeout: int | None = 10, *, verify: bool | str = True) -> None:
         """Initialize the HttpClient object.
 
@@ -51,8 +37,8 @@ class HttpClient:
         self.client = primp.Client(
             proxy=proxy,
             timeout=timeout,
-            impersonate=choice(self._impersonates),
-            impersonate_os=choice(self._impersonates_os),
+            impersonate="random",
+            impersonate_os="random",
             verify=verify if isinstance(verify, bool) else True,
             ca_cert_file=verify if isinstance(verify, str) else None,
         )

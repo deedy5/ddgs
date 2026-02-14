@@ -45,7 +45,7 @@ def _convert_tuple_to_csv(_ctx: click.Context, _param: click.Parameter, value: t
 
 def _save_data(query: str, data: list[dict[str, str]], function_name: str, filename: str | None) -> None:
     filename, ext = filename.rsplit(".", 1) if filename and filename.endswith((".csv", ".json")) else (None, filename)
-    filename = filename if filename else f"{function_name}_{query}_{datetime.now(tz=timezone.utc):%Y%m%d_%H%M%S}"
+    filename = filename or f"{function_name}_{query}_{datetime.now(tz=timezone.utc):%Y%m%d_%H%M%S}"
     if ext == "csv":
         _save_csv(f"{filename}.{ext}", data)
     elif ext == "json":
@@ -124,7 +124,7 @@ def _download_results(
     *,
     verify: bool = True,
 ) -> None:
-    path = pathname if pathname else f"{function_name}_{query}_{datetime.now(tz=timezone.utc):%Y%m%d_%H%M%S}"
+    path = pathname or f"{function_name}_{query}_{datetime.now(tz=timezone.utc):%Y%m%d_%H%M%S}"
     Path(path).mkdir(parents=True, exist_ok=True)
 
     threads = 10 if threads is None else threads

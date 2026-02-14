@@ -51,7 +51,7 @@ def extract_image(u: str) -> str:
 
 def extract_source(s: str) -> str:
     """Remove ' via Yahoo' from string."""
-    return s.split(" ·  via Yahoo")[0]
+    return s.split(" ·  via Yahoo", maxsplit=1)[0]
 
 
 class YahooNews(BaseSearchEngine[NewsResult]):
