@@ -30,5 +30,5 @@ RUN useradd --create-home --shell /bin/bash app \
     && chown -R app:app /app
 USER app
 
-# Run the application
-CMD ["python", "start_api.py"]
+# Run the application using uvicorn
+CMD ["python", "-m", "uvicorn", "ddgs.api_server:fastapi_app", "--host", "0.0.0.0", "--port", "8000"]
