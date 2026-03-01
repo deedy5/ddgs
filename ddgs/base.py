@@ -91,7 +91,9 @@ class BaseSearchEngine(ABC, Generic[T]):
         for item in items:
             result = self.result_type()
             for key, value in self.elements_xpath.items():
-                data = " ".join(x.strip() for x in item.xpath(value))
+                # Join text fragments without adding spaces, then normalize whitespace
+                raw_text = "".join(x.strip() for x in item.xpath(value))
+                data = " ".join(raw_text.split())
                 result.__setattr__(key, data)
             results.append(result)
         return results
