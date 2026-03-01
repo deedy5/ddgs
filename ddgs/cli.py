@@ -3,6 +3,8 @@
 import csv
 import json
 import logging
+import os
+import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
@@ -14,6 +16,9 @@ import primp
 from . import __version__
 from .ddgs import DDGS
 from .utils import _expand_proxy_tb_alias
+
+# Use a consistent PID file location in user's home directory
+_PID_FILE = Path.home() / ".cache" / "ddgs" / "api.pid"
 
 logger = logging.getLogger(__name__)
 
@@ -517,6 +522,93 @@ def books(
         _save_data(query, data, function_name="books", filename=output)
     else:
         _print_data(data, no_color=no_color)
+
+
+@cli.command()
+@click.option("-d", "--detach", is_flag=True, help="Run the server in detached mode (background)")
+@click.option("-s", "--stop", is_flag=True, help="Stop the detached server")
+@click.option("--host", default="0.0.0.0", help="Host to bind the server to")  # noqa: S104
+@click.option("-p", "--port", default=8000, type=int, help="Port to bind the server to")
+@click.option("--reload", is_flag=True, help="Enable auto-reload on code changes")
+def api(detach: bool, stop: bool, host: str, port: int, reload: bool) -> None:  # noqa: FBT001
+    """Start/stop the DDGS MCP API server.
+
+    Starts a FastAPI server with MCP (Model Context Protocol) support for search tools.
+    The server exposes SSE endpoint at /sse and supports text, image, news, video, and book search.
+
+    Examples:
+        ddgs api              # Start server in foreground
+        ddgs api -d           # Start server in detached mode
+        ddgs api -s           # Stop the detached server
+        ddgs api -h 127.0.0.1 -p 9000  # Bind to specific host/port
+
+    """
+    # Ensure PID file directory exists
+    _PID_FILE.parent.mkdir(parents=True, exist_ok=True)
+
+    if stop:
+        if not _PID_FILE.exists():
+            click.echo("No detached server is running (PID file not found)", err=True)
+            return
+        pid = int(_PID_FILE.read_text().strip())
+        try:
+            os.kill(pid, 15)  # SIGTERM
+            click.echo(f"DDGS API server stopped (PID: {pid})")
+        except ProcessLookupError:
+            click.echo(f"Server process (PID: {pid}) was not running, cleaning up PID file")
+        except OSError as e:
+            click.echo(f"Failed to stop server: {e}", err=True)
+        finally:
+            _PID_FILE.unlink(missing_ok=True)
+        return
+
+    try:
+        import subprocess  # noqa: PLC0415
+
+        import uvicorn  # noqa: PLC0415
+    except ImportError:
+        click.echo("Error: API dependencies not installed. Run: pip install 'ddgs[api]'", err=True)
+        return
+
+    if detach:
+        import time  # noqa: PLC0415
+
+        cmd = [
+            sys.executable,
+            "-m",
+            "uvicorn",
+            "ddgs.api_server:fastapi_app",
+            "--host",
+            host,
+            "--port",
+            str(port),
+        ]
+        process = subprocess.Popen(  # noqa: S603
+            cmd,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+
+        # Wait briefly and verify process started successfully
+        time.sleep(0.5)
+        if process.poll() is not None:
+            click.echo(f"Failed to start server: process exited with code {process.returncode}", err=True)
+            return
+
+        _PID_FILE.write_text(str(process.pid))
+        click.echo(f"DDGS API server started in detached mode on http://{host}:{port} (PID: {process.pid})")
+        click.echo("MCP server enabled at /sse")
+    else:
+        click.echo(f"Starting DDGS API server on http://{host}:{port}")
+        click.echo("MCP server enabled at /sse")
+        click.echo("Press Ctrl+C to stop")
+        uvicorn.run(
+            "ddgs.api_server:fastapi_app",
+            host=host,
+            port=port,
+            log_level="info",
+            reload=reload,
+        )
 
 
 if __name__ == "__main__":

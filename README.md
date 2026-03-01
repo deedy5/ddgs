@@ -19,12 +19,29 @@ A metasearch library that aggregates results from diverse web search services.
 
 ___
 ## API Server (with MCP Integration)
--  **Docker compose**
+
+- **CLI (after pip install)**
+```bash
+# Start server in foreground
+ddgs api
+
+# Start server in detached mode (background)
+ddgs api -d
+
+# Stop detached server
+ddgs api -s
+
+# Custom host/port
+ddgs api --host 127.0.0.1 --port 9000
+```
+
+- **Docker compose**
 ```bash
 git clone https://github.com/deedy5/ddgs && cd ddgs
 docker-compose up --build
 ```
--  **Bash**
+
+- **Bash script**
 ```bash
 git clone https://github.com/deedy5/ddgs && cd ddgs
 chmod +x start_api.sh
@@ -33,7 +50,6 @@ chmod +x start_api.sh
 
 #### Available Endpoints
 - MCP Endpoints (for AI assistance):
-    - `http://localhost:8000/mcp` - HTTP transport
     - `http://localhost:8000/sse` - SSE transport
 - API Docs: `http://localhost:8000/docs`
 - Health Check: `http://localhost:8000/health`

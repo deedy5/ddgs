@@ -62,8 +62,8 @@ dev = [
     "types-ujson"
 ]
 api = [
-    "fastapi[standard]>=0.104.0",
-    "fastapi-mcp>=0.4.0",
+    "fastapi>=0.135.1",
+    "mcp>=1.26.0",
 ]
 
 [tool.ruff]
