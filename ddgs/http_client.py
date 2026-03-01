@@ -48,10 +48,9 @@ class HttpClient:
         try:
             resp = self.client.request(*args, **kwargs)
             return Response(status_code=resp.status_code, content=resp.content, text=resp.text)
+        except primp.TimeoutError as ex:
+            raise TimeoutException(ex) from ex
         except Exception as ex:
-            if "timed out" in f"{ex}":
-                msg = f"Request timed out: {ex!r}"
-                raise TimeoutException(msg) from ex
             msg = f"{type(ex).__name__}: {ex!r}"
             raise DDGSException(msg) from ex
 

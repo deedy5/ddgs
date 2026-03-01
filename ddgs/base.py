@@ -34,7 +34,7 @@ class BaseSearchEngine(ABC, Generic[T]):
 
     def __init__(self, proxy: str | None = None, timeout: int | None = None, *, verify: bool | str = True) -> None:
         self.http_client = HttpClient(proxy=proxy, timeout=timeout, verify=verify)
-        self.http_client.client.headers_update(self.headers_update)  # type: ignore[arg-type]
+        self.http_client.client.headers_update(self.headers_update)
         self.results: list[T] = []
 
     @property
