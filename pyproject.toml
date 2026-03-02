@@ -49,7 +49,7 @@ exclude = ["api*"]
 [project.optional-dependencies]
 dev = [
     "mypy>=1.17.1",
-    "pre-commit",
+    "prek",
     "pytest>=8.4.1",
     "ruff>=0.13.0",
     "typing-extensions>=4.15.0",
