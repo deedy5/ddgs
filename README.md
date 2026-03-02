@@ -20,11 +20,8 @@ A metasearch library that aggregates results from diverse web search services.
 ___
 ## Install
 ```python
-# Base install
-pip install -U ddgs
-
-# With API server support (includes fastapi, mcp, uvicorn[standard])
-pip install -U ddgs[api]
+pip install -U ddgs      # Base install
+pip install -U ddgs[api] # With API server
 ```
 
 ## CLI version
@@ -38,19 +35,12 @@ ___
 
 ## API Server (with MCP Integration)
 
-- **CLI (after pip install)**
+- **CLI**
 ```bash
-# Start server in foreground
-ddgs api
-
-# Start server in detached mode (background)
-ddgs api -d
-
-# Stop detached server
-ddgs api -s
-
-# Custom host/port
-ddgs api --host 127.0.0.1 --port 9000
+ddgs api    # Start in foreground
+ddgs api -d # Start in detached mode
+ddgs api -s # Stop detached server
+ddgs api --host 127.0.0.1 --port 9000 --proxy socks5h://127.0.0.1:9150  # Custom host / post / proxy
 ```
 
 - **Docker compose**

@@ -1,11 +1,13 @@
 """MCP server for DDGS."""
 
 import logging
+import os
 from typing import Any
 
 from mcp.server.fastmcp import FastMCP
 
 from ddgs import DDGS
+from ddgs.utils import _expand_proxy_tb_alias
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +40,7 @@ def search_text(
         List of search results with title, href, and body
 
     """
-    results = DDGS().text(
+    results = DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).text(
         query=query,
         region=region,
         safesearch=safesearch,
@@ -85,7 +87,7 @@ def search_images(
         List of image search results with title, image URL, and source
 
     """
-    results = DDGS().images(
+    results = DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).images(
         query=query,
         region=region,
         safesearch=safesearch,
@@ -127,7 +129,7 @@ def search_news(
         List of news results with title, URL, source, and date
 
     """
-    results = DDGS().news(
+    results = DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).news(
         query=query,
         region=region,
         safesearch=safesearch,
@@ -170,7 +172,7 @@ def search_videos(
         List of video search results with title, URL, and metadata
 
     """
-    results = DDGS().videos(
+    results = DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).videos(
         query=query,
         region=region,
         safesearch=safesearch,
@@ -204,7 +206,7 @@ def search_books(
         List of book search results with title, author, and metadata
 
     """
-    results = DDGS().books(
+    results = DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).books(
         query=query,
         max_results=max_results,
         page=page,
