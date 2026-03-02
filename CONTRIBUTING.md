@@ -28,10 +28,10 @@ If you use **VSCode**, install recommended extensions (press `F1` → *Show Reco
    ```
 3. Install pre-commit hooks (automates formatting, linting, typing):
    ```sh
-   pre-commit install
+   prek install
    ```
    - Hooks run `ruff` and `mypy` automatically on each commit.
-   - To run them manually: `pre-commit run --all-files`.
+   - To run them manually: `prek`.
 
 3. Create a feature branch:
    ```sh
@@ -62,7 +62,7 @@ If you use **VSCode**, install recommended extensions (press `F1` → *Show Reco
 ## PR checklist
 
    - Tests pass: `pytest`
-   - pre-commit checks pass: `pre-commit run --all-files`
+   - prek checks pass: `prek`
    - Commit messages follow Conventional Commits
    - PR references related Issue/Discussion and describes changes
    - Add tests for new behavior where applicable
