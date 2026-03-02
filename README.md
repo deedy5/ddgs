@@ -5,9 +5,9 @@ A metasearch library that aggregates results from diverse web search services.
 
 
 ## Table of Contents
-* [API Server (with MCP Integration)](#api-server-with-mcp-integration)
 * [Install](#install)
 * [CLI version](#cli-version)
+* [API Server (with MCP Integration)](#api-server-with-mcp-integration)
 * [Engines](#engines)
 * [DDGS class](#ddgs-class)
 * [1. text()](#1-text)
@@ -18,6 +18,24 @@ A metasearch library that aggregates results from diverse web search services.
 * [Disclaimer](#disclaimer)
 
 ___
+## Install
+```python
+# Base install
+pip install -U ddgs
+
+# With API server support (includes fastapi, mcp, uvicorn[standard])
+pip install -U ddgs[api]
+```
+
+## CLI version
+
+```python3
+ddgs --help
+```
+
+[Go To TOP](#TOP)
+___
+
 ## API Server (with MCP Integration)
 
 - **CLI (after pip install)**
@@ -76,19 +94,6 @@ chmod +x start_api.sh
 
 [Go To TOP](#TOP)
 ___
-
-## Install
-```python
-pip install -U ddgs
-```
-
-## CLI version
-
-```python3
-ddgs --help
-```
-
-[Go To TOP](#TOP)
 
 ## Engines
 
