@@ -90,7 +90,8 @@ def _print_data(data: list[dict[str, str]], *, no_color: bool = False) -> None:
                     title = k
                     text = v
                 click.secho(f"{title:<12}{text}", bg="black", fg=COLORS[j] if not no_color else "white", overline=True)
-            input()
+            if sys.stdin.isatty():  # Only block for input in interactive mode
+                input()
 
 
 def _sanitize_query(query: str) -> str:
