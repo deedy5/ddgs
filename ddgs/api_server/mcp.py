@@ -1,5 +1,6 @@
 """MCP server for DDGS."""
 
+import asyncio
 import logging
 import os
 from typing import Any
@@ -16,7 +17,7 @@ mcp = FastMCP("ddgs-search")
 
 
 @mcp.tool()
-def search_text(
+async def search_text(
     query: str,
     region: str = "us-en",
     safesearch: str = "moderate",
@@ -40,20 +41,22 @@ def search_text(
         List of search results with title, href, and body
 
     """
-    results = DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).text(
-        query=query,
-        region=region,
-        safesearch=safesearch,
-        timelimit=timelimit,
-        max_results=max_results,
-        page=page,
-        backend=backend,
+    results = await asyncio.to_thread(
+        lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).text(
+            query=query,
+            region=region,
+            safesearch=safesearch,
+            timelimit=timelimit,
+            max_results=max_results,
+            page=page,
+            backend=backend,
+        )
     )
     return list(results)
 
 
 @mcp.tool()
-def search_images(
+async def search_images(
     query: str,
     region: str = "us-en",
     safesearch: str = "moderate",
@@ -87,25 +90,27 @@ def search_images(
         List of image search results with title, image URL, and source
 
     """
-    results = DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).images(
-        query=query,
-        region=region,
-        safesearch=safesearch,
-        timelimit=timelimit,
-        max_results=max_results,
-        page=page,
-        backend=backend,
-        size=size,
-        color=color,
-        type_image=type_image,
-        layout=layout,
-        license_image=license_image,
+    results = await asyncio.to_thread(
+        lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).images(
+            query=query,
+            region=region,
+            safesearch=safesearch,
+            timelimit=timelimit,
+            max_results=max_results,
+            page=page,
+            backend=backend,
+            size=size,
+            color=color,
+            type_image=type_image,
+            layout=layout,
+            license_image=license_image,
+        )
     )
     return list(results)
 
 
 @mcp.tool()
-def search_news(
+async def search_news(
     query: str,
     region: str = "us-en",
     safesearch: str = "moderate",
@@ -129,20 +134,22 @@ def search_news(
         List of news results with title, URL, source, and date
 
     """
-    results = DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).news(
-        query=query,
-        region=region,
-        safesearch=safesearch,
-        timelimit=timelimit,
-        max_results=max_results,
-        page=page,
-        backend=backend,
+    results = await asyncio.to_thread(
+        lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).news(
+            query=query,
+            region=region,
+            safesearch=safesearch,
+            timelimit=timelimit,
+            max_results=max_results,
+            page=page,
+            backend=backend,
+        )
     )
     return list(results)
 
 
 @mcp.tool()
-def search_videos(
+async def search_videos(
     query: str,
     region: str = "us-en",
     safesearch: str = "moderate",
@@ -172,23 +179,25 @@ def search_videos(
         List of video search results with title, URL, and metadata
 
     """
-    results = DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).videos(
-        query=query,
-        region=region,
-        safesearch=safesearch,
-        timelimit=timelimit,
-        max_results=max_results,
-        page=page,
-        backend=backend,
-        resolution=resolution,
-        duration=duration,
-        license_videos=license_videos,
+    results = await asyncio.to_thread(
+        lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).videos(
+            query=query,
+            region=region,
+            safesearch=safesearch,
+            timelimit=timelimit,
+            max_results=max_results,
+            page=page,
+            backend=backend,
+            resolution=resolution,
+            duration=duration,
+            license_videos=license_videos,
+        )
     )
     return list(results)
 
 
 @mcp.tool()
-def search_books(
+async def search_books(
     query: str,
     max_results: int = 10,
     page: int = 1,
@@ -206,10 +215,12 @@ def search_books(
         List of book search results with title, author, and metadata
 
     """
-    results = DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).books(
-        query=query,
-        max_results=max_results,
-        page=page,
-        backend=backend,
+    results = await asyncio.to_thread(
+        lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).books(
+            query=query,
+            max_results=max_results,
+            page=page,
+            backend=backend,
+        )
     )
     return list(results)
