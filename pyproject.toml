@@ -52,7 +52,6 @@ dev = [
     "prek",
     "pytest>=8.4.1",
     "ruff>=0.13.0",
-    "typing-extensions>=4.15.0",
 
     # for mypy
     "lxml-stubs",
