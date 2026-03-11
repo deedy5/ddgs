@@ -1,10 +1,13 @@
 """Anna's Archive search engine implementation."""
 
 from collections.abc import Mapping
+from random import SystemRandom
 from typing import Any, ClassVar
 
 from ddgs.base import BaseSearchEngine
 from ddgs.results import BooksResult
+
+random = SystemRandom()
 
 
 class AnnasArchive(BaseSearchEngine[BooksResult]):
@@ -14,7 +17,7 @@ class AnnasArchive(BaseSearchEngine[BooksResult]):
     category = "books"
     provider = "annasarchive"
 
-    search_url = "https://annas-archive.li/search"
+    search_url = f"https://annas-archive.{random.choice(['gd', 'gl', 'pk'])}/search"
     search_method = "GET"
 
     items_xpath = "//div[contains(@class, 'record-list-outer')]/div"
