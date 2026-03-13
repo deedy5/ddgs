@@ -9,37 +9,29 @@ from ddgs.results import TextResult
 
 random = SystemRandom()
 
+# iPhone GSA (Google Search App) user agents — Google serves server-rendered
+_GSA_TEMPLATE = (
+    "Mozilla/5.0 (iPhone; CPU iPhone OS {ios} like Mac OS X)"
+    " AppleWebKit/605.1.15 (KHTML, like Gecko)"
+    " GSA/{gsa} Mobile/15E148 Safari/604.1"
+)
+_GSA_VARIANTS = [
+    ("17_7_1", "406.0.862495628"),
+    ("18_0_1", "406.0.862495628"),
+    ("18_1_1", "399.2.845414227"),
+    ("18_5_0", "406.0.862495628"),
+    ("18_6_0", "406.0.862495628"),
+    ("18_6_2", "406.0.862495628"),
+    ("18_7_2", "404.0.856692123"),
+    ("18_7_3", "406.0.862495628"),
+    ("18_7_4", "406.0.862495628"),
+]
+
 
 def get_ua() -> str:
-    """Return one random User-Agent string."""
-    patterns = [
-        "Opera/9.80 (J2ME/MIDP; Opera Mini/{v}/{b}; U; {l}) Presto/{p} Version/{f}",
-        "Opera/9.80 (Android; Linux; Opera Mobi/{b}; U; {l}) Presto/{p} Version/{f}",
-        "Opera/9.80 (iPhone; Opera Mini/{v}/{b}; U; {l}) Presto/{p} Version/{f}",
-        "Opera/9.80 (iPad; Opera Mini/{v}/{b}; U; {l}) Presto/{p} Version/{f}",
-    ]
-    mini_versions = ["4.0", "5.0.17381", "7.1.32444", "9.80"]
-    mobi_builds = ["27", "447", "ADR-1011151731"]
-    builds = ["18.678", "24.743", "503"]
-    prestos = ["2.6.35", "2.7.60", "2.8.119"]
-    finals = ["10.00", "11.10", "12.16"]
-    langs = ["en-US", "en-GB", "de-DE", "fr-FR", "es-ES", "ru-RU", "zh-CN"]
-    fallback = "Opera/9.80 (iPad; Opera Mini/5.0.17381/503; U; eu) Presto/2.6.35 Version/11.10"
-
-    try:
-        p = random.choice(patterns)
-        vals = {
-            "l": random.choice(langs),
-            "p": random.choice(prestos),
-            "f": random.choice(finals),
-        }
-        if "{v}" in p:
-            vals["v"] = random.choice(mini_versions)
-        if "{b}" in p:
-            vals["b"] = random.choice(mobi_builds) if "Opera Mobi" in p else random.choice(builds)
-        return p.format(**vals)
-    except Exception:  # noqa: BLE001
-        return fallback
+    """Return a random GSA (Google Search App) iPhone user agent."""
+    ios, gsa = random.choice(_GSA_VARIANTS)
+    return _GSA_TEMPLATE.format(ios=ios, gsa=gsa)
 
 
 class Google(BaseSearchEngine[TextResult]):
@@ -53,11 +45,12 @@ class Google(BaseSearchEngine[TextResult]):
     search_method = "GET"
     headers_update: ClassVar[dict[str, str]] = {"User-Agent": get_ua()}
 
-    items_xpath = "//div[div[@data-hveid]//div[h3]]"
+    # XPaths for GSA user agent response format.
+    items_xpath = "//div[contains(@class, 'MjjYud')]"
     elements_xpath: ClassVar[Mapping[str, str]] = {
-        "title": ".//h3//text()",
+        "title": ".//div[contains(@role, 'link')]//text()",
         "href": ".//a/@href",
-        "body": "./div/div/div[2]//text()",
+        "body": ".//div[contains(@data-sncf, '1')]//text()",
     }
 
     def build_payload(
@@ -91,5 +84,6 @@ class Google(BaseSearchEngine[TextResult]):
         for result in results:
             if result.href.startswith("/url?q="):
                 result.href = result.href.split("?q=")[1].split("&")[0]
-            post_results.append(result)
+            if result.title and result.href.startswith("http"):
+                post_results.append(result)
         return post_results
