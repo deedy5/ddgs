@@ -9,29 +9,29 @@ from ddgs.results import TextResult
 
 random = SystemRandom()
 
-# iPhone GSA (Google Search App) user agents — Google serves server-rendered
-_GSA_TEMPLATE = (
-    "Mozilla/5.0 (iPhone; CPU iPhone OS {ios} like Mac OS X)"
-    " AppleWebKit/605.1.15 (KHTML, like Gecko)"
-    " GSA/{gsa} Mobile/15E148 Safari/604.1"
-)
-_GSA_VARIANTS = [
-    ("17_7_1", "406.0.862495628"),
-    ("18_0_1", "406.0.862495628"),
-    ("18_1_1", "399.2.845414227"),
-    ("18_5_0", "406.0.862495628"),
-    ("18_6_0", "406.0.862495628"),
-    ("18_6_2", "406.0.862495628"),
-    ("18_7_2", "404.0.856692123"),
-    ("18_7_3", "406.0.862495628"),
-    ("18_7_4", "406.0.862495628"),
-]
-
 
 def get_ua() -> str:
-    """Return a random GSA (Google Search App) iPhone user agent."""
-    ios, gsa = random.choice(_GSA_VARIANTS)
-    return _GSA_TEMPLATE.format(ios=ios, gsa=gsa)
+    """Return one random User-Agent string."""
+    # iOS version to GSA version mapping based on the provided user agents
+    os_gsa_map = {
+        "17_4": ["315.0.630091404", "317.0.634488990"],
+        "17_6_1": ["411.0.879111500"],
+        "18_1_1": ["411.0.879111500"],
+        "18_2": ["173.0.391310503"],
+        "18_6_2": ["397.0.836500703", "399.2.845414227", "410.0.875971614", "411.0.879111500"],
+        "18_7_2": ["411.0.879111500"],
+        "18_7_5": ["411.0.879111500"],
+        "18_7_6": ["411.0.879111500"],
+        "26_1_0": ["411.0.879111500"],
+        "26_2_0": ["396.0.833910942", "409.0.872648028", "411.0.879111500"],
+        "26_2_1": ["409.0.872648028", "411.0.879111500"],
+        "26_3_0": ["406.0.862495628", "410.0.875971614", "411.0.879111500"],
+        "26_3_1": ["370.0.762543316", "404.0.856692123", "408.0.868297084", "410.0.875971614", "411.0.879111500"],
+        "26_4_0": ["411.0.879111500"],
+    }
+    os_version = random.choice(list(os_gsa_map.keys()))
+    gsa_version = random.choice(os_gsa_map[os_version])
+    return f"Mozilla/5.0 (iPhone; CPU iPhone OS {os_version} like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/{gsa_version} Mobile/15E148 Safari/604.1"  # noqa: E501
 
 
 class Google(BaseSearchEngine[TextResult]):
@@ -45,12 +45,11 @@ class Google(BaseSearchEngine[TextResult]):
     search_method = "GET"
     headers_update: ClassVar[dict[str, str]] = {"User-Agent": get_ua()}
 
-    # XPaths for GSA user agent response format.
-    items_xpath = "//div[contains(@class, 'MjjYud')]"
+    items_xpath = "//div[@data-snc]"
     elements_xpath: ClassVar[Mapping[str, str]] = {
-        "title": ".//div[contains(@role, 'link')]//text()",
+        "title": ".//div[@role='link']//text()",
         "href": ".//a/@href",
-        "body": ".//div[contains(@data-sncf, '1')]//text()",
+        "body": "./div[@data-sncf]//text()",
     }
 
     def build_payload(
