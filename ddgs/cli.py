@@ -8,6 +8,7 @@ import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import TYPE_CHECKING
 from urllib.parse import unquote
 
 import click
@@ -15,7 +16,17 @@ import primp
 
 from . import __version__
 from .ddgs import DDGS
+from .mcp_transport import (
+    DEFAULT_MCP_TRANSPORT,
+    MCP_TRANSPORT_CHOICES,
+    get_mcp_transport_endpoint,
+    normalize_mcp_endpoint,
+    normalize_mcp_transport,
+)
 from .utils import _expand_proxy_tb_alias
+
+if TYPE_CHECKING:
+    from fastapi import FastAPI
 
 # Use a consistent PID file location in user's home directory
 _PID_FILE = Path.home() / ".cache" / "ddgs" / "api.pid"
@@ -40,6 +51,39 @@ COLORS = {
     14: "white",
     15: "bright_white",
 }
+
+
+def _create_api_server_app(transport: str, endpoint: str) -> "FastAPI":
+    """Create a configured FastAPI app for the DDGS API server."""
+    from .api_server import create_fastapi_app  # noqa: PLC0415
+
+    return create_fastapi_app(transport=transport, endpoint=endpoint)
+
+
+def _uses_default_api_server_config(transport: str, endpoint: str) -> bool:
+    """Return whether the requested API server config matches the default import path."""
+    return transport == DEFAULT_MCP_TRANSPORT and endpoint == get_mcp_transport_endpoint(transport)
+
+
+def _get_detached_api_command(host: str, port: int, transport: str, endpoint: str, proxy: str | None) -> list[str]:
+    """Build the detached child process command for the API server."""
+    cmd = [
+        sys.executable,
+        "-m",
+        "ddgs.cli",
+        "api",
+        "--host",
+        host,
+        "--port",
+        str(port),
+        "--transport",
+        transport,
+    ]
+    if endpoint != get_mcp_transport_endpoint(transport):
+        cmd.extend(["--endpoint", endpoint])
+    if proxy:
+        cmd.extend(["--proxy", proxy])
+    return cmd
 
 
 def _convert_tuple_to_csv(_ctx: click.Context, _param: click.Parameter, value: tuple[str] | None) -> str:
@@ -531,17 +575,37 @@ def books(
 @click.option("--host", default="0.0.0.0", help="Host to bind the server to")  # noqa: S104
 @click.option("--port", default=8000, type=int, help="Port to bind the server to")
 @click.option("--reload", is_flag=True, help="Enable auto-reload on code changes")
+@click.option(
+    "--transport",
+    default=DEFAULT_MCP_TRANSPORT,
+    type=click.Choice(MCP_TRANSPORT_CHOICES, case_sensitive=False),
+    show_default=True,
+    help="MCP transport to expose",
+)
+@click.option("--endpoint", help="Override the MCP endpoint path")
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
-def api(detach: bool, stop: bool, host: str, port: int, reload: bool, proxy: str | None) -> None:  # noqa: FBT001, PLR0912, C901
+def api(  # noqa: C901, PLR0912, PLR0915
+    *,
+    detach: bool,
+    stop: bool,
+    host: str,
+    port: int,
+    reload: bool,
+    transport: str,
+    endpoint: str | None,
+    proxy: str | None,
+) -> None:
     """Start/stop the DDGS MCP API server.
 
     Starts a FastAPI server with MCP (Model Context Protocol) support for search tools.
-    The server exposes SSE endpoint at /sse and supports text, image, news, video, and book search.
+    The server exposes the selected MCP endpoint and supports text, image, news, video, and book search.
 
     Examples:
         ddgs api              # Start server in foreground
         ddgs api -d           # Start server in detached mode
         ddgs api -s           # Stop the detached server
+        ddgs api --transport http  # Expose HTTP transport at /mcp
+        ddgs api --transport http --endpoint /search  # Expose HTTP transport at /search
         ddgs api --host 127.0.0.1 --port 9000  # Bind to specific host/port
         ddgs api -pr socks5h://127.0.0.1:9150  # Use proxy
 
@@ -566,36 +630,34 @@ def api(detach: bool, stop: bool, host: str, port: int, reload: bool, proxy: str
         return
 
     try:
-        import subprocess  # noqa: PLC0415
-
         import uvicorn  # noqa: PLC0415
     except ImportError:
         click.echo("Error: API dependencies not installed. Run: pip install 'ddgs[api]'", err=True)
         return
 
-    # Prepare proxy environment variable
-    proxy_env = os.environ.copy()
-    if proxy:
-        proxy_env["DDGS_PROXY"] = _expand_proxy_tb_alias(proxy) or proxy
+    normalized_transport = normalize_mcp_transport(transport)
+    normalized_endpoint = normalize_mcp_endpoint(endpoint, normalized_transport)
+    uses_default_api_server_config = _uses_default_api_server_config(normalized_transport, normalized_endpoint)
+    expanded_proxy = (_expand_proxy_tb_alias(proxy) or proxy) if proxy else None
+
+    if reload and not uses_default_api_server_config:
+        click.echo("Error: --reload is only supported with the default SSE endpoint /sse", err=True)
+        return
 
     if detach:
+        try:
+            import subprocess  # noqa: PLC0415
+        except ImportError:
+            click.echo("Error: API dependencies not installed. Run: pip install 'ddgs[api]'", err=True)
+            return
+
         import time  # noqa: PLC0415
 
-        cmd = [
-            sys.executable,
-            "-m",
-            "uvicorn",
-            "ddgs.api_server:fastapi_app",
-            "--host",
-            host,
-            "--port",
-            str(port),
-        ]
+        cmd = _get_detached_api_command(host, port, normalized_transport, normalized_endpoint, proxy)
         process = subprocess.Popen(  # noqa: S603
             cmd,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
-            env=proxy_env,
         )
 
         # Wait briefly and verify process started successfully
@@ -606,25 +668,32 @@ def api(detach: bool, stop: bool, host: str, port: int, reload: bool, proxy: str
 
         _PID_FILE.write_text(str(process.pid))
         click.echo(f"DDGS API server started in detached mode on http://{host}:{port} (PID: {process.pid})")
-        if proxy:
-            click.echo(f"Using proxy: {proxy_env['DDGS_PROXY']}")
-        click.echo("MCP server enabled at /sse")
+        if expanded_proxy:
+            click.echo(f"Using proxy: {expanded_proxy}")
+        click.echo(f"MCP server enabled with {normalized_transport} transport at {normalized_endpoint}")
     else:
         click.echo(f"Starting DDGS API server on http://{host}:{port}")
-        if proxy:
-            click.echo(f"Using proxy: {proxy_env['DDGS_PROXY']}")
-        click.echo("MCP server enabled at /sse")
+        if expanded_proxy:
+            os.environ["DDGS_PROXY"] = expanded_proxy
+            click.echo(f"Using proxy: {expanded_proxy}")
+        click.echo(f"MCP server enabled with {normalized_transport} transport at {normalized_endpoint}")
         click.echo("Press Ctrl+C to stop")
-        # Set environment variable for the current process
-        if proxy:
-            os.environ["DDGS_PROXY"] = proxy_env["DDGS_PROXY"]
-        uvicorn.run(
-            "ddgs.api_server:fastapi_app",
-            host=host,
-            port=port,
-            log_level="info",
-            reload=reload,
-        )
+        if uses_default_api_server_config:
+            uvicorn.run(
+                "ddgs.api_server:fastapi_app",
+                host=host,
+                port=port,
+                log_level="info",
+                reload=reload,
+            )
+        else:
+            uvicorn.run(
+                _create_api_server_app(normalized_transport, normalized_endpoint),
+                host=host,
+                port=port,
+                log_level="info",
+                reload=False,
+            )
 
 
 if __name__ == "__main__":
