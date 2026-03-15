@@ -1,11 +1,18 @@
+import sys
 import time
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 from click.testing import CliRunner
 
 from ddgs import DDGS, __version__
 from ddgs.cli import _download_results, _save_csv, _save_json, cli
+from ddgs.mcp_transport import (
+    DEFAULT_MCP_TRANSPORT,
+    normalize_mcp_endpoint,
+    normalize_mcp_transport,
+)
 
 runner = CliRunner()
 
@@ -43,6 +50,52 @@ def test_videos_command() -> None:
 def test_books_command() -> None:
     result = runner.invoke(cli, ["books", "-q", "bee"])
     assert "title" in result.output
+
+
+def test_normalize_mcp_transport() -> None:
+    assert normalize_mcp_transport(None) == DEFAULT_MCP_TRANSPORT
+    assert normalize_mcp_transport("sse") == "sse"
+    assert normalize_mcp_transport("http") == "http"
+
+
+def test_normalize_mcp_endpoint() -> None:
+    assert normalize_mcp_endpoint(None, "sse") == "/sse"
+    assert normalize_mcp_endpoint("mcp", "http") == "/mcp"
+    assert normalize_mcp_endpoint("/custom/", "http") == "/custom"
+    assert normalize_mcp_endpoint("//custom//", "http") == "/custom"
+    assert normalize_mcp_endpoint("//", "http") == "/"
+
+
+def test_api_command_uses_transport_and_endpoint(monkeypatch: pytest.MonkeyPatch) -> None:
+    captured: dict[str, object] = {}
+    sentinel_app = object()
+
+    def fake_create_api_server_app(transport: str, endpoint: str) -> object:
+        captured["transport"] = transport
+        captured["endpoint"] = endpoint
+        return sentinel_app
+
+    def fake_run(app: object, host: str, port: int, log_level: str, reload: bool) -> None:
+        captured["app"] = app
+        captured["host"] = host
+        captured["port"] = port
+        captured["log_level"] = log_level
+        captured["reload"] = reload
+
+    monkeypatch.setattr("ddgs.cli._create_api_server_app", fake_create_api_server_app)
+    monkeypatch.setitem(sys.modules, "uvicorn", SimpleNamespace(run=fake_run))
+
+    result = runner.invoke(cli, ["api", "--transport", "http", "--endpoint", "search"])
+
+    assert result.exit_code == 0
+    assert captured["app"] is sentinel_app
+    assert captured["host"] == "0.0.0.0"
+    assert captured["port"] == 8000
+    assert captured["log_level"] == "info"
+    assert captured["reload"] is False
+    assert captured["transport"] == "http"
+    assert captured["endpoint"] == "/search"
+    assert "MCP server enabled with http transport at /search" in result.output
 
 
 def test_text_workflow(tmp_path: Path) -> None:

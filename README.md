@@ -40,7 +40,8 @@ ___
 ddgs api    # Start in foreground
 ddgs api -d # Start in detached mode
 ddgs api -s # Stop detached server
-ddgs api --host 127.0.0.1 --port 9000 --proxy socks5h://127.0.0.1:9150  # Custom host / post / proxy
+ddgs api --transport http  # Start with Streamable HTTP transport at /mcp
+ddgs api --host 127.0.0.1 --port 9000 --proxy socks5h://127.0.0.1:9150  # Custom host / port / proxy
 ```
 
 - **Docker compose**
@@ -58,9 +59,14 @@ chmod +x start_api.sh
 
 #### Available Endpoints
 - MCP Endpoints (for AI assistance):
-    - `http://localhost:8000/sse` - SSE transport
+    - `http://localhost:8000/mcp` - [Streamable HTTP transport](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports#streamable-http) (`ddgs api --transport http`)
+    - `http://localhost:8000/sse` - [SSE transport](https://modelcontextprotocol.io/specification/2024-11-05/basic/transports#http-with-sse) (`ddgs api --transport sse`, default)
 - API Docs: `http://localhost:8000/docs`
 - Health Check: `http://localhost:8000/health`
+
+Use `--endpoint` to replace either default path with your own, for example `ddgs api --transport http --endpoint /search`.
+
+SSE remains the default transport for backward compatibility, but Streamable HTTP is recommended for new MCP clients.
 
 #### Available MCP Tools
 - `search_text` - Web text searches
