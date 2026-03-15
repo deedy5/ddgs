@@ -183,6 +183,7 @@ def images(
     type_image: str | None = None,
     layout: str | None = None,
     license_image: str | None = None,
+    hide_ai_images: bool | None = None,
 ) -> list[dict[str, str]]:
     """DDGS images metasearch.
 
@@ -204,6 +205,7 @@ def images(
             Share (Free to Share and Use), ShareCommercially (Free to Share and Use Commercially),
             Modify (Free to Modify, Share, and Use), ModifyCommercially (Free to Modify, Share, and
             Use Commercially). Defaults to None.
+        hide_ai_images: exclude AI generated images from results.
 
     Returns:
         List of dictionaries with images search results.
