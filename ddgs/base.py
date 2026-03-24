@@ -67,7 +67,10 @@ class BaseSearchEngine(ABC, Generic[T]):
         resp = self.http_client.request(*args, **kwargs)
         if resp.status_code == 200:
             return resp.text
-        return None
+        elif resp.status_code in (403, 429, 202):
+            raise ValueError(f"Request blocked with status code {resp.status_code} by rate limiting or anti-bot measures")
+        else:
+            raise ValueError(f"Request failed with status code {resp.status_code}")
 
     @cached_property
     def parser(self) -> LHTMLParser:
