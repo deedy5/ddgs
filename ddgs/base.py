@@ -119,6 +119,6 @@ class BaseSearchEngine(ABC, Generic[T]):
         else:
             html_text = self.request(self.search_method, self.search_url, data=payload)
         if not html_text:
-            return None
+            raise ValueError("Empty response")
         results = self.extract_results(html_text)
         return self.post_extract_results(results)
