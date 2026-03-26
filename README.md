@@ -224,7 +224,7 @@ results = DDGS().images(
     layout=None,
     license_image=None,
 )
-print(images)
+print(results)
 [
     {
         "title": "File:The Sun by the Atmospheric Imaging Assembly of NASA's Solar ...",
