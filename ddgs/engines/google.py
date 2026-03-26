@@ -11,27 +11,23 @@ random = SystemRandom()
 
 
 def get_ua() -> str:
-    """Return one random User-Agent string."""
-    # iOS version to GSA version mapping based on the provided user agents
-    os_gsa_map = {
-        "17_4": ["315.0.630091404", "317.0.634488990"],
-        "17_6_1": ["411.0.879111500"],
-        "18_1_1": ["411.0.879111500"],
-        "18_2": ["173.0.391310503"],
-        "18_6_2": ["397.0.836500703", "399.2.845414227", "410.0.875971614", "411.0.879111500"],
-        "18_7_2": ["411.0.879111500"],
-        "18_7_5": ["411.0.879111500"],
-        "18_7_6": ["411.0.879111500"],
-        "26_1_0": ["411.0.879111500"],
-        "26_2_0": ["396.0.833910942", "409.0.872648028", "411.0.879111500"],
-        "26_2_1": ["409.0.872648028", "411.0.879111500"],
-        "26_3_0": ["406.0.862495628", "410.0.875971614", "411.0.879111500"],
-        "26_3_1": ["370.0.762543316", "404.0.856692123", "408.0.868297084", "410.0.875971614", "411.0.879111500"],
-        "26_4_0": ["411.0.879111500"],
-    }
-    os_version = random.choice(list(os_gsa_map.keys()))
-    gsa_version = random.choice(os_gsa_map[os_version])
-    return f"Mozilla/5.0 (iPhone; CPU iPhone OS {os_version} like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) GSA/{gsa_version} Mobile/15E148 Safari/604.1"  # noqa: E501
+    """Return one random Android Google App User-Agent string."""
+    # Device templates: (Android version, device string, Chrome major version range)
+    devices = (
+        ("5.0", "SM-G900P Build/LRX21T", 39, 60),
+        ("6.0", "Nexus 5 Build/MRA58N", 39, 60),
+        ("8.0", "Pixel 2 Build/OPD3.170816.012", 39, 60),
+    )
+    android_ver, device, chrome_min, chrome_max = random.choice(devices)
+    chrome_major = random.randint(chrome_min, chrome_max)
+    chrome_build = random.randint(1000, 9999)
+    chrome_patch = random.randint(1000, 1999)
+    ua = (
+        f"Mozilla/5.0 (Linux; Android {android_ver}; {device}) "
+        f"AppleWebKit/537.36 (KHTML, like Gecko) "
+        f"Chrome/{chrome_major}.0.{chrome_build}.{chrome_patch} Mobile Safari/537.36"
+    )
+    return f"{ua} GoogleApp/{random.randint(0, 9)}"
 
 
 class Google(BaseSearchEngine[TextResult]):
@@ -45,11 +41,11 @@ class Google(BaseSearchEngine[TextResult]):
     search_method = "GET"
     headers_update: ClassVar[dict[str, str]] = {"User-Agent": get_ua()}
 
-    items_xpath = "//div[@data-snc]"
+    items_xpath = "//div[@data-hveid][.//h3]"
     elements_xpath: ClassVar[Mapping[str, str]] = {
-        "title": ".//div[@role='link']//text()",
-        "href": ".//a/@href",
-        "body": "./div[@data-sncf]//text()",
+        "title": ".//h3//text()",
+        "href": ".//a[.//h3]/@href",
+        "body": "./div/div[last()]//text()",
     }
 
     def build_payload(
@@ -62,6 +58,7 @@ class Google(BaseSearchEngine[TextResult]):
         **kwargs: str,  # noqa: ARG002
     ) -> dict[str, Any]:
         """Build a payload for the Google search request."""
+        self.http_client.client.set_cookies("google.com", {"CONSENT": "YES+"})
         safesearch_base = {"on": "2", "moderate": "1", "off": "0"}
         start = (page - 1) * 10
         payload = {
