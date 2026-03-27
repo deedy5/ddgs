@@ -72,9 +72,13 @@ def _save_csv(csvfile: str | Path, data: list[dict[str, str]]) -> None:
 
 
 def _print_data(data: list[dict[str, str]], *, no_color: bool = False) -> None:
+    is_tty = sys.stdout.isatty()
+    if not is_tty:
+        no_color = True
     if data:
         for i, e in enumerate(data, start=1):
-            click.secho(f"{i}.\t    {'=' * 78}", bg="black", fg="white")
+            sep = f"{i}.\t    {'=' * 78}" if is_tty else f"{i}."
+            click.secho(sep, bg="black", fg="white")
             for j, (k, v) in enumerate(e.items(), start=1):
                 if v:
                     width = 300 if k in ("content", "href", "image", "source", "thumbnail", "url") else 78
@@ -90,7 +94,7 @@ def _print_data(data: list[dict[str, str]], *, no_color: bool = False) -> None:
                     title = k
                     text = v
                 click.secho(f"{title:<12}{text}", bg="black", fg=COLORS[j] if not no_color else "white", overline=True)
-            if sys.stdin.isatty():  # Only block for input in interactive mode
+            if is_tty:  # Only block for input in interactive mode
                 input()
 
 
@@ -555,6 +559,40 @@ def extract(
         click.echo(f"URL: {url}\n")
         content = data["content"]
         click.echo(content.decode() if isinstance(content, bytes) else content)
+
+
+@cli.command()
+@click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
+def mcp(proxy: str | None) -> None:
+    """Start DDGS MCP server over stdio for local MCP clients.
+
+    Examples:
+        ddgs mcp                            # Start MCP server using stdio transport
+        ddgs mcp -pr socks5h://127.0.0.1:9150  # With proxy
+
+    MCP client configuration:
+        {
+          "mcpServers": {
+            "ddgs": {
+              "command": "ddgs",
+              "args": ["mcp"]
+            }
+          }
+        }
+
+    """
+    try:
+        from ddgs.api_server.mcp import mcp as mcp_server  # noqa: PLC0415
+    except ImportError:
+        click.echo("Error: MCP dependencies not installed. Run: pip install 'ddgs[mcp]'", err=True)
+        return
+
+    if proxy:
+        os.environ["DDGS_PROXY"] = _expand_proxy_tb_alias(proxy) or proxy
+
+    import asyncio  # noqa: PLC0415
+
+    asyncio.run(mcp_server.run_stdio_async())
 
 
 @cli.command()
