@@ -21,8 +21,9 @@ A metasearch library that aggregates results from diverse web search services.
 ___
 ## Install
 ```python
-pip install -U ddgs      # Base install
-pip install -U ddgs[api] # With API server
+pip install -U ddgs       # Base install
+pip install -U ddgs[mcp]  # With MCP server (stdio)
+pip install -U ddgs[api]  # With MCP + API server (SSE + FastAPI)
 ```
 
 ## CLI version
@@ -36,12 +37,20 @@ ___
 
 ## API Server (with MCP Integration)
 
+- **Install**
+```bash
+pip install -U ddgs[mcp]  # MCP server (stdio)
+pip install -U ddgs[api]  # MCP + API server (SSE + FastAPI)
+```
+
 - **CLI**
 ```bash
-ddgs api    # Start in foreground
+ddgs mcp    # Start MCP server (stdio transport, for local MCP clients)
+ddgs mcp -pr socks5h://127.0.0.1:9150  # with proxy
+ddgs api    # Start MCP + API server (SSE transport + FastAPI)
 ddgs api -d # Start in detached mode
 ddgs api -s # Stop detached server
-ddgs api --host 127.0.0.1 --port 9000 --proxy socks5h://127.0.0.1:9150  # Custom host / post / proxy
+ddgs api --host 127.0.0.1 --port 9000 -pr socks5h://127.0.0.1:9150  # Custom host / port / proxy
 ```
 
 - **Docker compose**
@@ -58,8 +67,9 @@ chmod +x start_api.sh
 ```
 
 #### Available Endpoints
-- MCP Endpoints (for AI assistance):
-    - `http://localhost:8000/sse` - SSE transport
+- MCP Endpoints (for AI assistants):
+    - **stdio** — `ddgs mcp`
+    - **sse** — `ddgs api`(`http://localhost:8000/sse`)
 - API Docs: `http://localhost:8000/docs`
 - Health Check: `http://localhost:8000/health`
 
@@ -72,13 +82,25 @@ chmod +x start_api.sh
 - `extract_content` - Extract content from a URL
 
 #### Typical configuration
-```python
+
+- **stdio** (for local MCP clients):
+```json
 {
   "mcpServers": {
-    "ddgs-search": {
-      "url": "http://localhost:8000/sse",
-      "disabled": false,
-      "alwaysAllow": []
+    "ddgs": {
+      "command": "ddgs",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+- **SSE** (for HTTP-based MCP clients):
+```json
+{
+  "mcpServers": {
+    "ddgs": {
+      "url": "http://localhost:8000/sse"
     }
   }
 }
