@@ -11,6 +11,7 @@ from typing import Any, ClassVar
 from .base import BaseSearchEngine
 from .engines import ENGINES
 from .exceptions import DDGSException, TimeoutException
+from .http_client import HttpClient
 from .results import ResultsAggregator
 from .similarity import SimpleFilterRanker
 from .utils import _expand_proxy_tb_alias
@@ -232,3 +233,29 @@ class DDGS:
     def books(self, query: str, **kwargs: Any) -> list[dict[str, Any]]:  # noqa: ANN401
         """Perform a book search."""
         return self._search("books", query, **kwargs)
+
+    def extract(self, url: str, fmt: str = "text_markdown") -> dict[str, str | bytes]:
+        """Fetch a URL and extract its content.
+
+        Args:
+            url: The URL to fetch and extract content from.
+            fmt: Output format: "text_markdown", "text_plain", "text_rich", "text" (raw HTML), "content" (raw bytes).
+
+        Returns:
+            A dictionary with 'url' and 'content' keys.
+
+        """
+        client = HttpClient(proxy=self._proxy, timeout=self._timeout, verify=self._verify)
+        resp = client.get(url)
+        if resp.status_code != 200:
+            msg = f"Failed to fetch {url}: HTTP {resp.status_code}"
+            raise DDGSException(msg)
+
+        content_map: dict[str, str | bytes] = {
+            "text_markdown": resp.text_markdown,
+            "text_plain": resp.text_plain,
+            "text_rich": resp.text_rich,
+            "text": resp.text,
+            "content": resp.content,
+        }
+        return {"url": url, "content": content_map.get(fmt, resp.text_markdown)}

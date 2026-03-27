@@ -224,3 +224,23 @@ async def search_books(
         )
     )
     return list(results)
+
+
+@mcp.tool()
+async def extract_content(url: str, fmt: str = "text_markdown") -> dict[str, str | bytes]:
+    """Extract content from a URL.
+
+    Args:
+        url: The URL to fetch and extract content from.
+        fmt: Output format: "text_markdown", "text_plain", "text_rich", "text" (raw HTML), "content" (raw bytes).
+
+    Returns:
+        Dictionary with url and content keys.
+
+    """
+    return await asyncio.to_thread(
+        lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).extract(
+            url=url,
+            fmt=fmt,
+        )
+    )

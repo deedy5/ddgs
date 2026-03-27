@@ -106,6 +106,13 @@ class BooksSearchRequest(BaseModel):
     backend: str = Field("auto", description="Search backend (auto, or specific engine)")
 
 
+class ExtractRequest(BaseModel):
+    """Request model for URL content extraction."""
+
+    url: str = Field(..., description="URL to extract content from")
+    format: str = Field("text_markdown", description="Format: text_markdown, text_plain, text_rich, text, content")
+
+
 class SearchResponse(BaseModel):
     """Response model for search operations."""
 
@@ -405,6 +412,36 @@ async def search_books_get(
     except Exception as e:
         logger.warning("Error in book search (GET): %s", e)
         raise HTTPException(status_code=500, detail=f"Book search failed: {e!s}") from e
+
+
+@app.post("/extract")
+async def extract_content(request: ExtractRequest) -> dict[str, str | bytes]:
+    """Extract text content from a URL."""
+    try:
+        return await asyncio.to_thread(
+            lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).extract(
+                url=request.url,
+                fmt=request.format,
+            )
+        )
+    except Exception as e:
+        logger.warning("Error extracting content: %s", e)
+        raise HTTPException(status_code=500, detail=f"Extraction failed: {e!s}") from e
+
+
+@app.get("/extract")
+async def extract_content_get(url: str, fmt: str = "text_markdown") -> dict[str, str | bytes]:
+    """Extract text content from a URL via GET request."""
+    try:
+        return await asyncio.to_thread(
+            lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).extract(
+                url=url,
+                fmt=fmt,
+            )
+        )
+    except Exception as e:
+        logger.warning("Error extracting content (GET): %s", e)
+        raise HTTPException(status_code=500, detail=f"Extraction failed: {e!s}") from e
 
 
 if __name__ == "__main__":

@@ -526,6 +526,38 @@ def books(
 
 
 @cli.command()
+@click.option("-u", "--url", required=True, help="URL to extract content from")
+@click.option(
+    "-f",
+    "--format",
+    "fmt",
+    default="text_markdown",
+    type=click.Choice(["text_markdown", "text_plain", "text_rich", "text", "content"]),
+    help="Output format",
+)
+@click.option("-o", "--output", help="json or filename.json (save the results to a file)")
+@click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
+@click.option("-v", "--verify", default=True, help="verify SSL when making the request")
+def extract(
+    url: str,
+    fmt: str,
+    output: str | None,
+    proxy: str | None,
+    *,
+    verify: bool,
+) -> None:
+    """CLI function to extract content from a URL."""
+    data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).extract(url=url, fmt=fmt)
+    if output:
+        str_data: dict[str, str] = {k: v.decode() if isinstance(v, bytes) else v for k, v in data.items()}
+        _save_data(_sanitize_query(url), [str_data], "extract", filename=output)
+    else:
+        click.echo(f"URL: {url}\n")
+        content = data["content"]
+        click.echo(content.decode() if isinstance(content, bytes) else content)
+
+
+@cli.command()
 @click.option("-d", "--detach", is_flag=True, help="Run the server in detached mode (background)")
 @click.option("-s", "--stop", is_flag=True, help="Stop the detached server")
 @click.option("--host", default="0.0.0.0", help="Host to bind the server to")  # noqa: S104

@@ -13,12 +13,28 @@ logger = logging.getLogger(__name__)
 class Response:
     """HTTP response."""
 
-    __slots__ = ("content", "status_code", "text")
+    __slots__ = ("_resp", "content", "status_code", "text")
 
-    def __init__(self, status_code: int, content: bytes, text: str) -> None:
-        self.status_code = status_code
-        self.content = content
-        self.text = text
+    def __init__(self, resp: Any) -> None:  # noqa: ANN401
+        self._resp = resp
+        self.status_code = resp.status_code
+        self.content = resp.content
+        self.text = resp.text
+
+    @property
+    def text_markdown(self) -> str:
+        """Get response body as Markdown text."""
+        return self._resp.text_markdown  # type: ignore[no-any-return]
+
+    @property
+    def text_plain(self) -> str:
+        """Get response body as plain text."""
+        return self._resp.text_plain  # type: ignore[no-any-return]
+
+    @property
+    def text_rich(self) -> str:
+        """Get response body as rich text."""
+        return self._resp.text_rich  # type: ignore[no-any-return]
 
 
 class HttpClient:
@@ -47,17 +63,17 @@ class HttpClient:
         """Make a request to the HTTP client."""
         try:
             resp = self.client.request(*args, **kwargs)
-            return Response(status_code=resp.status_code, content=resp.content, text=resp.text)
+            return Response(resp)
         except primp.TimeoutError as ex:
             raise TimeoutException(ex) from ex
         except Exception as ex:
             msg = f"{type(ex).__name__}: {ex!r}"
             raise DDGSException(msg) from ex
 
-    def get(self, *args: Any, **kwargs: Any) -> Response:  # noqa: ANN401
+    def get(self, url: str, *args: Any, **kwargs: Any) -> Response:  # noqa: ANN401
         """Make a GET request to the HTTP client."""
-        return self.request(*args, method="GET", **kwargs)
+        return self.request("GET", url, *args, **kwargs)
 
-    def post(self, *args: Any, **kwargs: Any) -> Response:  # noqa: ANN401
+    def post(self, url: str, *args: Any, **kwargs: Any) -> Response:  # noqa: ANN401
         """Make a POST request to the HTTP client."""
-        return self.request(*args, method="POST", **kwargs)
+        return self.request("POST", url, *args, **kwargs)
