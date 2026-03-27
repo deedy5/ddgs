@@ -15,6 +15,7 @@ A metasearch library that aggregates results from diverse web search services.
 * [3. videos()](#3-videos)
 * [4. news()](#4-news)
 * [5. books()](#5-books)
+* [6. extract()](#6-extract)
 * [Disclaimer](#disclaimer)
 
 ___
@@ -68,6 +69,7 @@ chmod +x start_api.sh
 - `search_news` - News searches
 - `search_videos` - Video searches
 - `search_books` - Book searches
+- `extract_content` - Extract content from a URL
 
 #### Typical configuration
 ```python
@@ -392,6 +394,59 @@ print(results)
         'thumbnail': 'https://s3proxy.cdn-zlib.sk//covers299/collections/userbooks/da4954486be7c2b2b9f70b2aa5bcf01292de3ea510b5656f892821950ded9ada.jpg',
     }, ...
 ]
+```
+
+[Go To TOP](#TOP)
+
+## 6. extract()
+
+Fetch a URL and extract its content in various formats.
+
+```python
+def extract(
+    url: str,
+    fmt: str = "text_markdown",
+) -> dict[str, str | bytes]:
+    """Fetch a URL and extract its content.
+
+    Args:
+        url: The URL to fetch and extract content from.
+        fmt: Output format:
+            "text_markdown" (HTML→Markdown, preserves links/headers/lists),
+            "text_plain" (HTML→plain text),
+            "text_rich" (HTML→rich text with headers/lists),
+            "text" (raw HTML),
+            "content" (raw bytes).
+
+    Returns:
+        Dictionary with 'url' and 'content' keys.
+    """
+```
+***Examples***
+```python
+# Markdown (default) - preserves links, headers, lists
+result = DDGS().extract("https://example.com")
+print(result)
+{"url": "https://example.com", "content": "# Example Domain\n\nThis domain is for use in..."}
+
+# Plain text
+result = DDGS().extract("https://example.com", fmt="text_plain")
+
+# Rich text (headers/lists, no link URLs)
+result = DDGS().extract("https://example.com", fmt="text_rich")
+
+# Raw HTML
+result = DDGS().extract("https://example.com", fmt="text")
+
+# Raw bytes
+result = DDGS().extract("https://example.com", fmt="content")
+```
+
+***CLI***
+```bash
+ddgs extract -u https://example.com
+ddgs extract -u https://example.com -f text_plain
+ddgs extract -u https://example.com -f content -o output.json
 ```
 
 [Go To TOP](#TOP)
