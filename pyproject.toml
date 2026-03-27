@@ -65,6 +65,9 @@ api = [
     "mcp>=1.26.0",
     "uvicorn[standard]>=0.41.0",
 ]
+mcp = [
+    "mcp>=1.26.0",
+]
 
 [tool.ruff]
 line-length = 120
