@@ -94,8 +94,6 @@ def _print_data(data: list[dict[str, str]], *, no_color: bool = False) -> None:
                     title = k
                     text = v
                 click.secho(f"{title:<12}{text}", bg="black", fg=COLORS[j] if not no_color else "white", overline=True)
-            if is_tty:  # Only block for input in interactive mode
-                input()
 
 
 def _sanitize_query(query: str) -> str:
@@ -216,6 +214,7 @@ def version() -> str:
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 @click.option("-nc", "--no-color", is_flag=True, default=False, help="disable color output")
+@click.option("--json", "output_json", is_flag=True, default=False, help="output results as JSON to stdout")
 def text(
     query: str,
     keywords: str | None,  # deprecated
@@ -233,6 +232,7 @@ def text(
     download: bool,
     verify: bool,
     no_color: bool,
+    output_json: bool,
 ) -> None:
     """CLI function to perform a DDGS text metasearch."""
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).text(
@@ -245,6 +245,9 @@ def text(
         page=page,
         backend=backend,
     )
+    if output_json:
+        click.echo(json.dumps(data, ensure_ascii=False, indent=2))
+        return
     query = _sanitize_query(query)
     if output:
         _save_data(query, data, "text", filename=output)
@@ -315,6 +318,7 @@ def text(
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 @click.option("-nc", "--no-color", is_flag=True, default=False, help="disable color output")
+@click.option("--json", "output_json", is_flag=True, default=False, help="output results as JSON to stdout")
 def images(
     query: str,
     keywords: str | None,  # deprecated
@@ -337,6 +341,7 @@ def images(
     download: bool,
     verify: bool,
     no_color: bool,
+    output_json: bool,
 ) -> None:
     """CLI function to perform a DDGS images metasearch."""
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).images(
@@ -354,6 +359,9 @@ def images(
         layout=layout,
         license_image=license_image,
     )
+    if output_json:
+        click.echo(json.dumps(data, ensure_ascii=False, indent=2))
+        return
     query = _sanitize_query(query)
     if output:
         _save_data(query, data, function_name="images", filename=output)
@@ -394,6 +402,7 @@ def images(
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 @click.option("-nc", "--no-color", is_flag=True, default=False, help="disable color output")
+@click.option("--json", "output_json", is_flag=True, default=False, help="output results as JSON to stdout")
 def videos(
     query: str,
     keywords: str | None,  # deprecated
@@ -411,6 +420,7 @@ def videos(
     *,
     verify: bool,
     no_color: bool,
+    output_json: bool,
 ) -> None:
     """CLI function to perform a DDGS videos metasearch."""
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).videos(
@@ -426,6 +436,9 @@ def videos(
         duration=duration,
         license_videos=license_videos,
     )
+    if output_json:
+        click.echo(json.dumps(data, ensure_ascii=False, indent=2))
+        return
     query = _sanitize_query(query)
     if output:
         _save_data(query, data, function_name="videos", filename=output)
@@ -453,6 +466,7 @@ def videos(
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 @click.option("-nc", "--no-color", is_flag=True, default=False, help="disable color output")
+@click.option("--json", "output_json", is_flag=True, default=False, help="output results as JSON to stdout")
 def news(
     query: str,
     keywords: str | None,  # deprecated
@@ -467,6 +481,7 @@ def news(
     *,
     verify: bool,
     no_color: bool,
+    output_json: bool,
 ) -> None:
     """CLI function to perform a DDGS news metasearch."""
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).news(
@@ -479,6 +494,9 @@ def news(
         page=page,
         backend=backend,
     )
+    if output_json:
+        click.echo(json.dumps(data, ensure_ascii=False, indent=2))
+        return
     query = _sanitize_query(query)
     if output:
         _save_data(query, data, function_name="news", filename=output)
@@ -503,6 +521,7 @@ def news(
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 @click.option("-nc", "--no-color", is_flag=True, default=False, help="disable color output")
+@click.option("--json", "output_json", is_flag=True, default=False, help="output results as JSON to stdout")
 def books(
     query: str,
     keywords: str | None,  # deprecated
@@ -514,6 +533,7 @@ def books(
     *,
     verify: bool,
     no_color: bool,
+    output_json: bool,
 ) -> None:
     """CLI function to perform a DDGS books metasearch."""
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).books(
@@ -523,6 +543,9 @@ def books(
         page=page,
         backend=backend,
     )
+    if output_json:
+        click.echo(json.dumps(data, ensure_ascii=False, indent=2))
+        return
     if output:
         _save_data(query, data, function_name="books", filename=output)
     else:
