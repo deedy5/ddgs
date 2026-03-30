@@ -62,7 +62,7 @@ class BaseSearchEngine(ABC, Generic[T]):
         """Build a payload for the search request."""
         raise NotImplementedError
 
-    def request(self, *args: Any, **kwargs: Any) -> str | None:  # noqa: ANN401
+    def request(self, *args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
         """Make a request to the search engine."""
         resp = self.http_client.request(*args, **kwargs)
         if resp.status_code == 200:

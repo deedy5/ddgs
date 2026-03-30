@@ -44,3 +44,24 @@ def test_books_search() -> None:
     results = DDGS().books("mouse")
     assert isinstance(results, list)
     assert len(results) > 0
+
+
+def test_extract() -> None:
+    result = DDGS().extract("https://httpbin.org/html")
+    assert isinstance(result, dict)
+    assert "url" in result
+    assert "content" in result
+    assert isinstance(result["content"], str)
+    assert len(result["content"]) > 0
+
+
+def test_extract_text_plain() -> None:
+    result = DDGS().extract("https://httpbin.org/html", fmt="text_plain")
+    assert isinstance(result["content"], str)
+    assert len(result["content"]) > 0
+
+
+def test_extract_content() -> None:
+    result = DDGS().extract("https://httpbin.org/html", fmt="content")
+    assert isinstance(result["content"], bytes)
+    assert len(result["content"]) > 0
