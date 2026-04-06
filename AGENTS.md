@@ -6,7 +6,7 @@
 
 - **Python**: >=3.10 (tested up to 3.14)
 - **Dependencies**: `click`, `primp`, `lxml`
-- **Package layout**: `ddgs/` (source), `tests/` (tests), optional `api` extras (FastAPI + MCP)
+- **Package layout**: `ddgs/` (source), `tests/` (tests), optional extras: `api` (FastAPI), `mcp` (stdio)
 
 ## Build / Lint / Test Commands
 
