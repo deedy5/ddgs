@@ -30,8 +30,7 @@ class DDGS:
         verify: bool (True to verify, False to skip) or str path to a PEM file. Defaults to True.
 
     Attributes:
-        threads: The number of threads to use for the search. Defaults to None (automatic).
-        _executor: The ThreadPoolExecutor instance.
+        threads: The maximum number of threads per search. Defaults to None (automatic, based on max_results).
 
     Raises:
         DDGSException: If an error occurs during the search.
@@ -43,7 +42,6 @@ class DDGS:
     """
 
     threads: ClassVar[int | None] = None
-    _executor: ClassVar[ThreadPoolExecutor | None] = None
 
     def __init__(self, proxy: str | None = None, timeout: int | None = 5, *, verify: bool | str = True) -> None:
         self._proxy = _expand_proxy_tb_alias(proxy) or os.environ.get("DDGS_PROXY")
@@ -64,13 +62,6 @@ class DDGS:
         exc_tb: TracebackType | None = None,
     ) -> None:
         """Exit the context manager."""
-
-    @classmethod
-    def get_executor(cls) -> ThreadPoolExecutor:
-        """Get a ThreadPoolExecutor instance and cache it."""
-        if cls._executor is None:
-            cls._executor = ThreadPoolExecutor(max_workers=cls.threads, thread_name_prefix="DDGS")
-        return cls._executor
 
     def _get_engines(
         self,
@@ -170,37 +161,39 @@ class DDGS:
         # Perform search
         results_aggregator: ResultsAggregator[set[str]] = ResultsAggregator({"href", "image", "url", "embed_url"})
         max_workers = min(len_unique_providers, ceil(max_results / 10) + 1) if max_results else len_unique_providers
-        executor = self.get_executor()
+        if DDGS.threads:
+            max_workers = min(max_workers, DDGS.threads)
         futures, err = {}, None
-        for i, engine in enumerate(engines, start=1):
-            if engine.provider in seen_providers:
-                continue
-            future = executor.submit(
-                engine.search,
-                query,
-                region=region,
-                safesearch=safesearch,
-                timelimit=timelimit,
-                page=page,
-                **kwargs,
-            )
-            futures[future] = engine
+        with ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="DDGS") as executor:
+            for i, engine in enumerate(engines, start=1):
+                if engine.provider in seen_providers:
+                    continue
+                future = executor.submit(
+                    engine.search,
+                    query,
+                    region=region,
+                    safesearch=safesearch,
+                    timelimit=timelimit,
+                    page=page,
+                    **kwargs,
+                )
+                futures[future] = engine
 
-            if len(futures) >= max_workers or i >= max_workers:
-                done, not_done = wait(futures, timeout=self._timeout, return_when="FIRST_EXCEPTION")
-                for f, f_engine in futures.items():
-                    if f in done:
-                        try:
-                            if r := f.result():
-                                results_aggregator.extend(r)
-                                seen_providers.add(f_engine.provider)
-                        except Exception as ex:  # noqa: BLE001
-                            err = ex
-                            logger.info("Error in engine %s: %r", engine.name, ex)
-                futures = {f: futures[f] for f in not_done}
+                if len(futures) >= max_workers or i >= max_workers:
+                    done, not_done = wait(futures, timeout=self._timeout, return_when="FIRST_EXCEPTION")
+                    for f, f_engine in futures.items():
+                        if f in done:
+                            try:
+                                if r := f.result():
+                                    results_aggregator.extend(r)
+                                    seen_providers.add(f_engine.provider)
+                            except Exception as ex:  # noqa: BLE001
+                                err = ex
+                                logger.info("Error in engine %s: %r", f_engine.name, ex)
+                    futures = {f: futures[f] for f in not_done}
 
-            if max_results and len(results_aggregator) >= max_results:
-                break
+                if max_results and len(results_aggregator) >= max_results:
+                    break
 
         results = results_aggregator.extract_dicts()
         # Rank results
