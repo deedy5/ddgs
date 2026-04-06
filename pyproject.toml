@@ -62,7 +62,6 @@ dev = [
 ]
 api = [
     "fastapi>=0.135.1",
-    "mcp>=1.26.0",
     "uvicorn[standard]>=0.41.0",
 ]
 mcp = [
