@@ -114,7 +114,7 @@ ___
 | DDGS function | Available backends |
 | --------------|:-------------------|
 | text()        | `bing`, `brave`, `duckduckgo`, `google`, `grokipedia`, `mojeek`, `yandex`, `yahoo`, `wikipedia`|
-| images()      | `duckduckgo` |
+| images()      | `bing`, `duckduckgo` |
 | videos()      | `duckduckgo` |
 | news()        | `bing`, `duckduckgo`, `yahoo` |
 | books()       | `annasarchive` |
