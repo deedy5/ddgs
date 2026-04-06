@@ -97,27 +97,6 @@ Client configuration:
 }
 ```
 
-### SSE (for HTTP-based MCP clients)
-
-```bash
-pip install ddgs[api]
-ddgs api                           # foreground
-ddgs api -d                        # detached (background)
-ddgs api --host 127.0.0.1 --port 9000  # custom host/port
-ddgs api -pr socks5h://127.0.0.1:9150  # with proxy
-```
-
-Client configuration:
-```json
-{
-  "mcpServers": {
-    "ddgs": {
-      "url": "http://localhost:8000/sse"
-    }
-  }
-}
-```
-
 ### Available MCP Tools
 
 | Tool | Description |
