@@ -603,10 +603,10 @@ def mcp(proxy: str | None) -> None:
 @click.option("--reload", is_flag=True, help="Enable auto-reload on code changes")
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 def api(detach: bool, stop: bool, host: str, port: int, reload: bool, proxy: str | None) -> None:  # noqa: FBT001, PLR0912, C901
-    """Start/stop the DDGS MCP API server.
+    """Start/stop the DDGS API server.
 
-    Starts a FastAPI server with MCP (Model Context Protocol) support for search tools.
-    The server exposes SSE endpoint at /sse and supports text, image, news, video, and book search.
+    Starts a FastAPI server with REST endpoints for search tools.
+    Supports text, image, news, video, and book search.
 
     Examples:
         ddgs api              # Start server in foreground
@@ -678,12 +678,10 @@ def api(detach: bool, stop: bool, host: str, port: int, reload: bool, proxy: str
         click.echo(f"DDGS API server started in detached mode on http://{host}:{port} (PID: {process.pid})")
         if proxy:
             click.echo(f"Using proxy: {proxy_env['DDGS_PROXY']}")
-        click.echo("MCP server enabled at /sse")
     else:
         click.echo(f"Starting DDGS API server on http://{host}:{port}")
         if proxy:
             click.echo(f"Using proxy: {proxy_env['DDGS_PROXY']}")
-        click.echo("MCP server enabled at /sse")
         click.echo("Press Ctrl+C to stop")
         # Set environment variable for the current process
         if proxy:

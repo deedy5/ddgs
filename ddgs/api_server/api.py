@@ -35,6 +35,11 @@ app.add_middleware(
 )
 
 
+def _get_ddgs() -> DDGS:
+    """Create a DDGS instance with proxy configuration from environment."""
+    return DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY")))
+
+
 # Pydantic models for request/response
 class TextSearchRequest(BaseModel):
     """Request model for search operations."""
@@ -144,7 +149,7 @@ async def search_text(request: TextSearchRequest) -> SearchResponse:
     """Perform a text search."""
     try:
         results = await asyncio.to_thread(
-            lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).text(
+            lambda: _get_ddgs().text(
                 query=request.query,
                 region=request.region,
                 safesearch=request.safesearch,
@@ -174,7 +179,7 @@ async def search_text_get(
     """Perform a text search via GET request."""
     try:
         results = await asyncio.to_thread(
-            lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).text(
+            lambda: _get_ddgs().text(
                 query=query,
                 region=region,
                 safesearch=safesearch,
@@ -196,7 +201,7 @@ async def search_images(request: ImagesSearchRequest) -> SearchResponse:
     """Perform an image search."""
     try:
         results = await asyncio.to_thread(
-            lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).images(
+            lambda: _get_ddgs().images(
                 query=request.query,
                 region=request.region,
                 safesearch=request.safesearch,
@@ -236,7 +241,7 @@ async def search_images_get(
     """Perform an image search via GET request."""
     try:
         results = await asyncio.to_thread(
-            lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).images(
+            lambda: _get_ddgs().images(
                 query=query,
                 region=region,
                 safesearch=safesearch,
@@ -263,7 +268,7 @@ async def search_news(request: NewsSearchRequest) -> SearchResponse:
     """Perform a news search."""
     try:
         results = await asyncio.to_thread(
-            lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).news(
+            lambda: _get_ddgs().news(
                 query=request.query,
                 region=request.region,
                 safesearch=request.safesearch,
@@ -293,7 +298,7 @@ async def search_news_get(
     """Perform a news search via GET request."""
     try:
         results = await asyncio.to_thread(
-            lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).news(
+            lambda: _get_ddgs().news(
                 query=query,
                 region=region,
                 safesearch=safesearch,
@@ -315,7 +320,7 @@ async def search_videos(request: VideosSearchRequest) -> SearchResponse:
     """Perform a video search."""
     try:
         results = await asyncio.to_thread(
-            lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).videos(
+            lambda: _get_ddgs().videos(
                 query=request.query,
                 region=request.region,
                 safesearch=request.safesearch,
@@ -351,7 +356,7 @@ async def search_videos_get(
     """Perform a video search via GET request."""
     try:
         results = await asyncio.to_thread(
-            lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).videos(
+            lambda: _get_ddgs().videos(
                 query=query,
                 region=region,
                 safesearch=safesearch,
@@ -376,7 +381,7 @@ async def search_books(request: BooksSearchRequest) -> SearchResponse:
     """Perform a book search."""
     try:
         results = await asyncio.to_thread(
-            lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).books(
+            lambda: _get_ddgs().books(
                 query=request.query,
                 max_results=request.max_results,
                 page=request.page,
@@ -400,7 +405,7 @@ async def search_books_get(
     """Perform a book search via GET request."""
     try:
         results = await asyncio.to_thread(
-            lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).books(
+            lambda: _get_ddgs().books(
                 query=query,
                 max_results=max_results,
                 page=page,
@@ -419,7 +424,7 @@ async def extract_content(request: ExtractRequest) -> dict[str, str | bytes]:
     """Extract text content from a URL."""
     try:
         return await asyncio.to_thread(
-            lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).extract(
+            lambda: _get_ddgs().extract(
                 url=request.url,
                 fmt=request.format,
             )
@@ -434,7 +439,7 @@ async def extract_content_get(url: str, fmt: str = "text_markdown") -> dict[str,
     """Extract text content from a URL via GET request."""
     try:
         return await asyncio.to_thread(
-            lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).extract(
+            lambda: _get_ddgs().extract(
                 url=url,
                 fmt=fmt,
             )
