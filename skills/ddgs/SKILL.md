@@ -124,7 +124,7 @@ Available backends by method:
 | Method | Backends |
 |--------|----------|
 | `text()` | `bing`, `brave`, `duckduckgo`, `google`, `grokipedia`, `mojeek`, `yandex`, `yahoo`, `wikipedia` |
-| `images()` | `duckduckgo` |
+| `images()` | `bing`, `duckduckgo` |
 | `videos()` | `duckduckgo` |
 | `news()` | `bing`, `duckduckgo`, `yahoo` |
 | `books()` | `annasarchive` |
