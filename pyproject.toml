@@ -74,9 +74,9 @@ api = [
 dht = [
     "fastapi>=0.135.1",
     "uvicorn[standard]>=0.41.0",
-    "coincurve @ git+https://github.com/ofek/coincurve.git@7829b29c08ebb1cc80386a1cdaf8c2243c4ef5c5",
-    "libp2p @ git+https://github.com/libp2p/py-libp2p.git@0e88584c89377086883c6f5b26cd1a8052399be7",
     "trio>=0.25.0",
+    #"coincurve @ git+https://github.com/ofek/coincurve.git@7829b29c08ebb1cc80386a1cdaf8c2243c4ef5c5",
+    #"libp2p @ git+https://github.com/libp2p/py-libp2p.git@0e88584c89377086883c6f5b26cd1a8052399be7",
 ]
 
 [tool.ruff]

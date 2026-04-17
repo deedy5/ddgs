@@ -26,7 +26,6 @@ ___
 pip install -U ddgs       # Base install
 pip install -U ddgs[api]  # API server (FastAPI)
 pip install -U ddgs[mcp]  # MCP server (stdio)
-pip install -U ddgs[dht]  # DHT Network (BETA)
 ```
 
 ## CLI version
@@ -117,14 +116,17 @@ When running:
 ### Installation
 
 ```bash
-# For Linux
+# Install base DHT package
 pip install -U ddgs[dht]
 
-# For macOS, first install gmp via homebrew:
+# Install required dependencies (works on Linux and macOS)
+pip install coincurve@git+https://github.com/ofek/coincurve.git@7829b29c08ebb1cc80386a1cdaf8c2243c4ef5c5
+pip install libp2p@git+https://github.com/libp2p/py-libp2p.git@0e88584c89377086883c6f5b26cd1a8052399be7
+
+# macOS only: First install gmp
 brew install gmp
-pip install -U ddgs[dht]
 
-# For Windows: DHT is not currently supported. Use base package only.
+# Windows: DHT is not supported. Use base package only.
 ```
 
 When installed, DHT:
