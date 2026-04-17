@@ -33,8 +33,11 @@ dependencies = [
 ]
 dynamic = ["version"]
 
-[project.urls]  # Optional
+[project.urls]
 "Homepage" = "https://github.com/deedy5/ddgs"
+"Source" = "https://github.com/deedy5/ddgs"
+"Bug Tracker" = "https://github.com/deedy5/ddgs/issues"
+"Documentation" = "https://github.com/deedy5/ddgs/blob/main/README.md"
 
 [project.scripts]
 ddgs = "ddgs.cli:safe_entry_point"

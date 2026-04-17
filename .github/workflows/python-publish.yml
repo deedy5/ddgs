@@ -29,4 +29,4 @@ jobs:
         TWINE_PASSWORD: ${{ secrets.ddgs }}
       run: |
         python -m build
-        twine upload dist/*
+        twine upload dist/* --verbose
