@@ -7,6 +7,7 @@ from typing import Any
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
 from ddgs import DDGS
@@ -447,6 +448,186 @@ async def extract_content_get(url: str, fmt: str = "text_markdown") -> dict[str,
     except Exception as e:
         logger.warning("Error extracting content (GET): %s", e)
         raise HTTPException(status_code=500, detail=f"Extraction failed: {e!s}") from e
+
+
+# Optional DHT Endpoints - only added if DHT dependencies are installed
+try:
+    from pydantic import BaseModel, Field
+
+    class CacheRequest(BaseModel):
+        """Request model for cache operations."""
+
+        query: str = Field(..., description="Search query")
+        results: list[dict[str, Any]] = Field(..., description="Search results to cache")
+        category: str = Field("text", description="Search category")
+
+    class DhtStatusResponse(BaseModel):
+        """Response model for DHT status."""
+
+        running: bool
+        connected: bool
+        peer_id: str | None
+        port: int | None
+        cache_size: int
+        cache_count: int
+        peer_count: int
+        routing_table_size: int
+        metrics: dict[str, Any]
+
+    @app.get("/dht/cache", response_model=SearchResponse)
+    async def get_cached(query: str, category: str = "text") -> SearchResponse:
+        """Get cached results from DHT."""
+        from ddgs.api_server import get_dht_service  # noqa: PLC0415
+
+        dht = get_dht_service()
+        results = dht.get_cached(query, category)
+        if results is None:
+            raise HTTPException(status_code=404, detail="Not found in cache")
+        return SearchResponse(results=results)
+
+    @app.post("/dht/cache", status_code=201)
+    async def cache_results(request: CacheRequest) -> dict[str, str]:
+        """Cache results to DHT."""
+        from ddgs.api_server import get_dht_service  # noqa: PLC0415
+
+        dht = get_dht_service()
+        dht.cache(request.query, request.results, request.category)
+        return {"status": "ok"}
+
+    @app.delete("/dht/cache", status_code=204)
+    async def invalidate_cache(query: str, category: str = "text") -> None:
+        """Invalidate cached results."""
+        from ddgs.api_server import get_dht_service  # noqa: PLC0415
+        from ddgs.dht.types import compute_query_hash  # noqa: PLC0415
+
+        dht = get_dht_service()
+        query_hash = compute_query_hash(query, category)
+        if dht._cache:
+            dht._cache.delete(query_hash)
+
+    @app.get("/dht/status", response_model=DhtStatusResponse)
+    async def dht_status() -> DhtStatusResponse:
+        """Get DHT service status."""
+        from ddgs.api_server import get_dht_service  # noqa: PLC0415
+
+        dht = get_dht_service()
+        status = dht.get_status()
+        return DhtStatusResponse(**status)
+
+    @app.get("/dht/peers", response_model=list[str])
+    async def dht_peers() -> list[str]:
+        """Get list of connected DHT peers."""
+        from ddgs.api_server import get_dht_service  # noqa: PLC0415
+
+        dht = get_dht_service()
+        return dht.get_peers()
+
+    @app.get("/dht/peers/detailed", response_model=list[dict[str, Any]])
+    async def dht_peers_detailed() -> list[dict[str, Any]]:
+        """Get detailed information about all connected peers."""
+        from ddgs.api_server import get_dht_service  # noqa: PLC0415
+
+        dht = get_dht_service()
+        return dht._dht.get_neighbors() if dht._dht else []
+
+    @app.get("/dht/map")
+    async def dht_map() -> dict[str, Any]:
+        """Get local DHT network map view as graph structure.
+
+        Each node only sees its own routing table neighborhood.
+        No global crawling, no gossip, zero additional network traffic.
+        """
+        from ddgs.api_server import get_dht_service  # noqa: PLC0415
+
+        dht = get_dht_service()
+        if not dht._dht:
+            return {"nodes": [], "edges": [], "total_peers_estimated": 0, "local_view_size": 0, "bucket_depth": 0}
+
+        peers = dht._dht.get_neighbors()
+
+        # Build graph
+        nodes = []
+        edges = []
+
+        # Add self node
+        nodes.append(
+            {
+                "id": dht._dht.peer_id,
+                "type": "self",
+                "connections": len(peers),
+            }
+        )
+
+        # Add neighbor nodes
+        for peer in peers:
+            nodes.append(
+                {
+                    "id": peer["peer_id"],
+                    "type": "peer",
+                    "xor_distance": peer["xor_distance"],
+                    "latency_ms": peer["latency_ms"],
+                }
+            )
+            edges.append(
+                {
+                    "source": dht._dht.peer_id,
+                    "target": peer["peer_id"],
+                    "latency_ms": peer["latency_ms"],
+                }
+            )
+
+        # Network size estimation using Kademlia math
+        # For 256 bit ID space: estimated_size = 2^(average_bucket_depth)
+        bucket_depth = next((i for i, count in enumerate(dht._dht.kbucket_distribution) if count == 0), 255)
+        estimated_size = 2**bucket_depth
+
+        return {
+            "nodes": nodes,
+            "edges": edges,
+            "total_peers_estimated": estimated_size,
+            "local_view_size": len(nodes),
+            "bucket_depth": bucket_depth,
+        }
+
+    @app.get("/dht/metrics")
+    async def dht_metrics() -> Response:
+        """Get DHT metrics in Prometheus format."""
+        from ddgs.api_server import get_dht_service  # noqa: PLC0415
+
+        dht = get_dht_service()
+        status = dht.get_status()
+
+        metrics = [
+            "# HELP ddgs_dht_running Whether DHT service is running",
+            "# TYPE ddgs_dht_running gauge",
+            f"ddgs_dht_running {1 if status['running'] else 0}",
+            "# HELP ddgs_dht_connected_peers Number of currently connected peers",
+            "# TYPE ddgs_dht_connected_peers gauge",
+            f"ddgs_dht_connected_peers {status.get('peer_count', 0)}",
+            "# HELP ddgs_dht_cache_entries Number of entries in local cache",
+            "# TYPE ddgs_dht_cache_entries gauge",
+            f"ddgs_dht_cache_entries {status['cache_count']}",
+            "# HELP ddgs_dht_cache_size_bytes Size of local cache in bytes",
+            "# TYPE ddgs_dht_cache_size_bytes gauge",
+            f"ddgs_dht_cache_size_bytes {status['cache_size']}",
+            "# HELP ddgs_dht_query_success_rate DHT query success rate (0-1)",
+            "# TYPE ddgs_dht_query_success_rate gauge",
+            f"ddgs_dht_query_success_rate {status['metrics'].get('query_success_rate', 1.0)}",
+            "# HELP ddgs_dht_average_query_latency_ms Average DHT query latency in milliseconds",
+            "# TYPE ddgs_dht_average_query_latency_ms gauge",
+            f"ddgs_dht_average_query_latency_ms {status['metrics'].get('average_query_latency_ms', 0.0)}",
+            "# HELP ddgs_dht_routing_table_size Number of entries in DHT routing table",
+            "# TYPE ddgs_dht_routing_table_size gauge",
+            f"ddgs_dht_routing_table_size {status.get('routing_table_size', 0)}",
+        ]
+
+        return Response("\n".join(metrics), media_type="text/plain")
+
+    logger.info("DHT endpoints enabled - distributed cache available")
+
+except ImportError:
+    # DHT dependencies not installed - silently skip adding endpoints
+    pass
 
 
 if __name__ == "__main__":

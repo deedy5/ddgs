@@ -51,6 +51,7 @@ dev = [
     "mypy>=1.17.1",
     "prek",
     "pytest>=8.4.1",
+    "pytest-trio",
     "ruff>=0.13.0",
 
     # for mypy
@@ -60,12 +61,19 @@ dev = [
     "types-PyYAML",
     "types-ujson"
 ]
+mcp = [
+    "mcp>=1.26.0",
+]
 api = [
     "fastapi>=0.135.1",
     "uvicorn[standard]>=0.41.0",
 ]
-mcp = [
-    "mcp>=1.26.0",
+dht = [
+    "fastapi>=0.135.1",
+    "uvicorn[standard]>=0.41.0",
+    "coincurve @ git+https://github.com/ofek/coincurve.git@7829b29c08ebb1cc80386a1cdaf8c2243c4ef5c5",
+    "libp2p @ git+https://github.com/libp2p/py-libp2p.git@0e88584c89377086883c6f5b26cd1a8052399be7",
+    "trio>=0.25.0",
 ]
 
 [tool.ruff]
@@ -146,4 +154,28 @@ ignore = [
 [tool.mypy]
 python_version = "3.10"
 strict = true
-exclude = ["build/"]
+exclude = [
+    "build/",
+]
+disable_error_code = [
+    "unused-ignore",
+]
+
+# Ignore missing imports for optional DHT dependencies
+[[tool.mypy.overrides]]
+module = [
+    "dns",
+    "dns.resolver",
+    "libp2p",
+    "libp2p.*",
+    "multiaddr",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+pythonpath = [".", "tests"]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::UserWarning",
+]
