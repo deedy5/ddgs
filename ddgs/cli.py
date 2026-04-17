@@ -599,10 +599,10 @@ def mcp(proxy: str | None) -> None:
 @click.option("-d", "--detach", is_flag=True, help="Run the server in detached mode (background)")
 @click.option("-s", "--stop", is_flag=True, help="Stop the detached server")
 @click.option("--host", default="0.0.0.0", help="Host to bind the server to")  # noqa: S104
-@click.option("--port", default=8000, type=int, help="Port to bind the server to")
+@click.option("--port", default=4479, type=int, help="Port to bind the server to")
 @click.option("--reload", is_flag=True, help="Enable auto-reload on code changes")
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
-def api(detach: bool, stop: bool, host: str, port: int, reload: bool, proxy: str | None) -> None:  # noqa: FBT001, PLR0912, C901
+def api(detach: bool, stop: bool, host: str, port: int, reload: bool, proxy: str | None) -> None:  # noqa: PLR0912, C901, FBT001
     """Start/stop the DDGS API server.
 
     Starts a FastAPI server with REST endpoints for search tools.
@@ -642,6 +642,15 @@ def api(detach: bool, stop: bool, host: str, port: int, reload: bool, proxy: str
     except ImportError:
         click.echo("Error: API dependencies not installed. Run: pip install 'ddgs[api]'", err=True)
         return
+
+    try:
+        # Pre-initialize DHT service if dependencies are available
+        from .api_server import get_dht_service  # noqa: PLC0415
+
+        get_dht_service()
+        click.echo("API server starting with distributed DHT cache enabled")
+    except ImportError:
+        click.echo("API server starting (DHT cache not available - install ddgs[dht] to enable)")
 
     # Prepare proxy environment variable
     proxy_env = os.environ.copy()
