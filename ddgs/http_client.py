@@ -1,6 +1,7 @@
 """HTTP client."""
 
 import logging
+import threading
 from typing import Any
 
 import primp
@@ -8,6 +9,15 @@ import primp
 from .exceptions import DDGSException, TimeoutException
 
 logger = logging.getLogger(__name__)
+
+# Serialize primp.Client construction to avoid a first-call init race:
+# when several threads construct primp.Client(impersonate="random", ...)
+# concurrently, a deadlock can occur between Python's logging._lock and
+# an internal Rust mutex (lazy-init of the browser-fingerprint data).
+# Construction is short (microseconds after the first call), so the
+# overhead of a process-global lock is negligible; it only matters for
+# the very first concurrent init.
+_PRIMP_CLIENT_INIT_LOCK = threading.Lock()
 
 
 class Response:
@@ -50,14 +60,15 @@ class HttpClient:
             verify: (bool | str):  True to verify, False to skip, or a str path to a PEM file. Defaults to True.
 
         """
-        self.client = primp.Client(
-            proxy=proxy,
-            timeout=timeout,
-            impersonate="random",
-            impersonate_os="random",
-            verify=verify if isinstance(verify, bool) else True,
-            ca_cert_file=verify if isinstance(verify, str) else None,
-        )
+        with _PRIMP_CLIENT_INIT_LOCK:
+            self.client = primp.Client(
+                proxy=proxy,
+                timeout=timeout,
+                impersonate="random",
+                impersonate_os="random",
+                verify=verify if isinstance(verify, bool) else True,
+                ca_cert_file=verify if isinstance(verify, str) else None,
+            )
 
     def request(self, *args: Any, **kwargs: Any) -> Response:  # noqa: ANN401
         """Make a request to the HTTP client."""
