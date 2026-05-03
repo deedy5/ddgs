@@ -313,31 +313,40 @@ class DDGS:
         else:
             keys = backend_list
 
-        try:
-            engine_classes = [ENGINES[category][key] for key in keys]
-            # Initialize and cache engine instances
-            instances = []
-            for engine_class in engine_classes:
-                # If already cached, use the cached instance
-                if engine_class in self._engines_cache:
-                    instances.append(self._engines_cache[engine_class])
-                # If not cached, create a new instance
-                else:
-                    engine_instance = engine_class(proxy=self._proxy, timeout=self._timeout, verify=self._verify)
-                    self._engines_cache[engine_class] = engine_instance
-                    instances.append(engine_instance)
+        engine_classes = []
+        invalid_keys = []
+        for key in keys:
+            if engine_class := ENGINES[category].get(key):
+                engine_classes.append(engine_class)
+            else:
+                invalid_keys.append(key)
 
-            # sorting by `engine.priority`
-            instances.sort(key=lambda e: (e.priority, random), reverse=True)
-        except KeyError as ex:
+        if invalid_keys:
             logger.warning(
-                "%r - backend is not exist or disabled. Available: %s. Using 'auto'",
-                ex,
+                "%s - backends do not exist or are disabled. Available: %s",
+                ", ".join(sorted(invalid_keys)),
                 ", ".join(sorted(engine_keys)),
             )
+
+        # Initialize and cache engine instances
+        instances = []
+        for engine_class in engine_classes:
+            # If already cached, use the cached instance
+            if engine_class in self._engines_cache:
+                instances.append(self._engines_cache[engine_class])
+            # If not cached, create a new instance
+            else:
+                engine_instance = engine_class(proxy=self._proxy, timeout=self._timeout, verify=self._verify)
+                self._engines_cache[engine_class] = engine_instance
+                instances.append(engine_instance)
+
+        if not instances:
+            logger.warning("backend is not set. Using 'auto'")
             return self._get_engines(category, "auto")
-        else:
-            return instances
+
+        # sorting by `engine.priority`
+        instances.sort(key=lambda e: (e.priority, random), reverse=True)
+        return instances
 
     def _search_sync(  # noqa: C901, PLR0912
         self,
