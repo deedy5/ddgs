@@ -309,7 +309,7 @@ class DDGS:
         if "auto" in backend_list or "all" in backend_list:
             keys = engine_keys
             if category == "text":
-                keys = ["wikipedia", "grokipedia"] + [k for k in keys if k not in ("wikipedia", "grokipedia")]
+                keys = ["wikipedia"] + [k for k in keys if k not in ("wikipedia", "grokipedia")]
         else:
             keys = backend_list
 
