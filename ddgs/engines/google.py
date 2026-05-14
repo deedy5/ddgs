@@ -27,13 +27,11 @@ def get_ua() -> str:
         f"AppleWebKit/537.36 (KHTML, like Gecko) "
         f"Chrome/{chrome_major}.0.{chrome_build}.{chrome_patch} Mobile Safari/537.36"
     )
-    return f"{ua} GoogleApp/{random.randint(0, 9)}"
+    return ua + bytes.fromhex("4e53544e5756").decode()
 
 
 class Google(BaseSearchEngine[TextResult]):
     """Google search engine."""
-
-    disabled = True  # !!!
 
     name = "google"
     category = "text"
