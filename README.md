@@ -231,7 +231,7 @@ ___
 
 | DDGS function | Available backends |
 | --------------|:-------------------|
-| text()        | `bing`, `brave`, `duckduckgo`, `google`, `grokipedia`, `mojeek`, `yandex`, `yahoo`, `wikipedia`|
+| text()        | `bing`, `brave`, `duckduckgo`, `google`, `grokipedia`, `mojeek`, `startpage`, `yandex`, `yahoo`, `wikipedia`|
 | images()      | `bing`, `duckduckgo` |
 | videos()      | `duckduckgo` |
 | news()        | `bing`, `duckduckgo`, `yahoo` |
