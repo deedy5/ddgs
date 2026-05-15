@@ -30,6 +30,8 @@ dependencies = [
     "click>=8.1.8",
     "primp>=1.2.3",
     "lxml>=4.9.4",
+    "httpx[http2,socks,brotli]>=0.28.1",  # temporarily
+    "fake-useragent>=2.2.0",
 ]
 dynamic = ["version"]
 
@@ -62,7 +64,15 @@ dev = [
     "types-Pygments",
     "types-pexpect",
     "types-PyYAML",
-    "types-ujson"
+    "types-ujson",
+
+    # for mypy (httpx)
+    "types-PySocks",
+    "types-colorama",
+    "types-decorator",
+    "types-jsonschema",
+    "types-psutil",
+    "types-pyasn1"
 ]
 mcp = [
     "mcp>=1.26.0",
