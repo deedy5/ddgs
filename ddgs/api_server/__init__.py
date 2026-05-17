@@ -1,7 +1,6 @@
 """DDGS API server.
 
-This module provides the FastAPI application for the DDGS REST API
-and the distributed network cache service.
+This module provides the FastAPI application for the DDGS REST API.
 """
 
 __all__: list[str] = []
@@ -12,12 +11,4 @@ try:
     __all__ += ["fastapi_app"]
 except ImportError:
     # API dependencies not installed
-    pass
-
-try:
-    from ddgs.api_server.dht_service import get_dht_service
-
-    __all__ += ["get_dht_service"]
-except ImportError:
-    # DHT dependencies not installed
     pass

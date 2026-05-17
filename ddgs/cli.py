@@ -644,15 +644,6 @@ def api(detach: bool, stop: bool, host: str, port: int, reload: bool, proxy: str
         click.echo("Error: API dependencies not installed. Run: pip install 'ddgs[api]'", err=True)
         return
 
-    try:
-        # Pre-initialize DHT service if dependencies are available
-        from .api_server import get_dht_service  # noqa: PLC0415
-
-        get_dht_service()
-        click.echo("API server starting with distributed DHT cache enabled")
-    except ImportError:
-        click.echo("API server starting (DHT cache not available - install ddgs[dht] to enable)")
-
     # Prepare proxy environment variable
     proxy_env = os.environ.copy()
     if proxy:
