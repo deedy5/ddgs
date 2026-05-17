@@ -8,7 +8,6 @@ A metasearch library that aggregates results from diverse web search services.
 * [Install](#install)
 * [CLI version](#cli-version)
 * [API Server](#api-server)
-* [DHT Network (BETA)](#dht-network-beta)
 * [MCP Server](#mcp-server)
 * [Engines](#engines)
 * [DDGS class](#ddgs-class)
@@ -79,109 +78,6 @@ chmod +x start_api.sh
 | `/health` | GET | Health check |
 | `/docs` | GET | Swagger UI |
 | `/redoc` | GET | ReDoc documentation |
-
-[Go To TOP](#TOP)
-___
-
-## DHT Network (BETA)
-
-DDGS includes an optional peer-to-peer distributed cache network. Search results are shared anonymously between users, drastically reducing rate limits and latency for everyone.
-
-This is the only metasearch engine that can actually get faster the more people use it.
-
----
-
-### Why this exists
-
-Every DDGS user currently hits search engines independently. Everyone gets rate limited individually. Everyone waits 1-2 seconds for exactly the same results.
-
-The DHT network fixes this:
-- ✅ **90% faster** repeated queries (50ms instead of 1-2s)
-- ✅ **No rate limits** for common queries
-- ✅ **Zero infrastructure cost** - runs entirely on user machines
-- ✅ **No central server** - cannot be blocked or shut down
-- ✅ **Anonymous** - no one sees your queries, no logs
-
-### How it works
-
-When running:
-1. Your node automatically discovers other DDGS users
-2. All existing API endpoints automatically check the network first
-3. If found, returns results immediately
-4. If not, searches normally and shares the result anonymously
-5. Every new user makes the network faster for everyone else
-
----
-
-### Installation
-
-```bash
-# Install base DHT package
-pip install -U ddgs[dht]
-
-# Install required dependencies (works on Linux and macOS)
-pip install coincurve@git+https://github.com/ofek/coincurve.git@7829b29c08ebb1cc80386a1cdaf8c2243c4ef5c5
-pip install libp2p@git+https://github.com/libp2p/py-libp2p.git@0e88584c89377086883c6f5b26cd1a8052399be7
-
-# macOS only: First install gmp
-brew install gmp
-
-# Windows: DHT is not supported. Use base package only.
-```
-
-When installed, DHT:
-- Adds persistent local result cache
-- Adds `/dht/*` endpoints to the API server automatically
-- Starts full distributed network node when you run `ddgs api`
-- Works fully transparently - all existing search methods automatically use cache
-
-> **Platform Support**: DHT works on Linux and macOS. Windows is not currently supported due to libp2p dependencies.
-
-### Running
-
-1. Using terminal
-```bash
-ddgs api -d
-```
-2. Using DDGS initialization
-```python
-from ddgs import DDGS
-
-ddgs = DDGS(api_url="http://localhost:4479", spawn_api=True)
-```
-
-You do **not** need to change any existing code. Any Python script using `DDGS().text()`, `images()`, etc. will automatically use both the local cache and the distributed DHT network.
-
-DHT will automatically start in the background and begin participating in the network.
-
-### DHT API Endpoints
-
-| Endpoint | Method | Description |
-|---|---|---|
-| `/dht/cache` | GET | Get cached results |
-| `/dht/cache` | POST | Store results to cache |
-| `/dht/cache` | DELETE | Invalidate cached results |
-| `/dht/status` | GET | DHT service status and metrics |
-| `/dht/peers` | GET | List connected peers |
-| `/dht/peers/detailed` | GET | Detailed peer information |
-| `/dht/map` | GET | Network graph view |
-| `/dht/metrics` | GET | Prometheus format metrics |
-
----
-
-### Beta Status
-
-This is working beta software. All functionality is complete, but network performance will improve as more users join:
-
-| Network Size | Performance |
-|--------------|-------------|
-| < 50 nodes | Marginal - expect timeouts |
-| 50-200 nodes | Good - >95% success rate |
-| >200 nodes | Excellent - near perfect |
-
-Results use eventual consistency and may take 1-5 minutes to propagate.
-
-Please report any issues here: https://github.com/deedy5/ddgs/issues
 
 [Go To TOP](#TOP)
 ___
