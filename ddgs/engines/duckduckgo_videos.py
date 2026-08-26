@@ -18,6 +18,17 @@ class DuckduckgoVideos(BaseSearchEngine[VideosResult]):
 
     search_url = "https://duckduckgo.com/v.js"
     search_method = "GET"
+    headers_update: ClassVar[Mapping[str, str]] = {
+        "Accept": "*/*",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Referer": "https://duckduckgo.com/",
+        "Sec-GPC": "1",
+        "Connection": "keep-alive",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-origin",
+        "Priority": "u=4",
+    }
 
     elements_replace: ClassVar[Mapping[str, str]] = {
         "content": "content",
