@@ -388,7 +388,7 @@ def images(
     multiple=True,
     callback=_convert_tuple_to_csv,
 )
-@click.option("-res", "--resolution", type=click.Choice(["high", "standart"]))
+@click.option("-res", "--resolution", type=click.Choice(["high", "standard"]))
 @click.option("-d", "--duration", type=click.Choice(["short", "medium", "long"]))
 @click.option("-lic", "--license_videos", type=click.Choice(["creativeCommon", "youtube"]))
 @click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")

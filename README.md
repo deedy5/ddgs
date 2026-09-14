@@ -305,7 +305,7 @@ def videos(
         max_results: maximum number of results. Defaults to 10.
         page: page of results. Defaults to 1.
         backend: A single or comma-delimited backends. Defaults to "auto".
-        resolution: high, standart. Defaults to None.
+        resolution: high, standard. Defaults to None.
         duration: short, medium, long. Defaults to None.
         license_videos: creativeCommon, youtube. Defaults to None.
 
