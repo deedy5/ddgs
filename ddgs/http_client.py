@@ -5,7 +5,7 @@ from typing import Any
 
 import primp
 
-from .exceptions import DDGSException, TimeoutException
+from .exceptions import DDGSException, HTTPStatusException, RatelimitException, TimeoutException
 
 logger = logging.getLogger(__name__)
 
@@ -63,12 +63,18 @@ class HttpClient:
         """Make a request to the HTTP client."""
         try:
             resp = self.client.request(*args, **kwargs)
-            return Response(resp)
         except primp.TimeoutError as ex:
             raise TimeoutException(ex) from ex
         except Exception as ex:
             msg = f"{type(ex).__name__}: {ex!r}"
             raise DDGSException(msg) from ex
+        # Check here so bootstrap/token requests cannot parse a denial page either.
+        if resp.status_code == 429:
+            msg = "Search backend rate limited the request (HTTP 429)."
+            raise RatelimitException(msg)
+        if resp.status_code != 200:
+            raise HTTPStatusException(resp.status_code)
+        return Response(resp)
 
     def get(self, url: str, *args: Any, **kwargs: Any) -> Response:  # noqa: ANN401
         """Make a GET request to the HTTP client."""

@@ -2,7 +2,7 @@
 
 import logging
 import os
-from concurrent.futures import ThreadPoolExecutor, wait
+from concurrent.futures import Future, ThreadPoolExecutor, wait
 from math import ceil
 from random import random, shuffle
 from types import TracebackType
@@ -10,7 +10,7 @@ from typing import Any, ClassVar
 
 from .base import BaseSearchEngine
 from .engines import ENGINES
-from .exceptions import DDGSException, TimeoutException
+from .exceptions import DDGSException, NoResultsException, TimeoutException
 from .http_client import HttpClient
 from .results import ResultsAggregator
 from .similarity import SimpleFilterRanker
@@ -57,7 +57,7 @@ class DDGS:
             type[BaseSearchEngine[Any]], BaseSearchEngine[Any]
         ] = {}  # dict[engine_class, engine_instance]
 
-    def __enter__(self) -> "DDGS":  # noqa: PYI034
+    def __enter__(self) -> "DDGS":
         """Enter the context manager and return the DDGS instance."""
         return self
 
@@ -132,7 +132,7 @@ class DDGS:
         instances.sort(key=lambda e: (e.priority, random), reverse=True)
         return instances
 
-    def _search_sync(  # noqa: C901
+    def _search_sync(  # noqa: C901, PLR0915
         self,
         category: str,
         query: str,
@@ -178,8 +178,24 @@ class DDGS:
         max_workers = min(len_unique_providers, ceil(max_results / 10) + 1) if max_results else len_unique_providers
         if DDGS.threads:
             max_workers = min(max_workers, DDGS.threads)
-        futures, err = {}, None
+        futures: dict[Future[Any], BaseSearchEngine[Any]] = {}
+        err = None
         with ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="DDGS") as executor:
+
+            def collect(done: set[Future[Any]], *, preserve_error: bool = False) -> None:
+                nonlocal err
+                for f, f_engine in futures.items():
+                    if f not in done:
+                        continue
+                    try:
+                        if r := f.result():
+                            results_aggregator.extend(r)
+                            seen_providers.add(f_engine.provider)
+                    except Exception as ex:  # noqa: BLE001
+                        if not preserve_error or err is None:
+                            err = ex
+                        logger.info("Error in engine %s: %r", f_engine.name, ex)
+
             for i, engine in enumerate(engines, start=1):
                 if engine.provider in seen_providers:
                     continue
@@ -196,19 +212,18 @@ class DDGS:
 
                 if len(futures) >= max_workers or i >= max_workers:
                     done, not_done = wait(futures, timeout=self._timeout, return_when="FIRST_EXCEPTION")
-                    for f, f_engine in futures.items():
-                        if f in done:
-                            try:
-                                if r := f.result():
-                                    results_aggregator.extend(r)
-                                    seen_providers.add(f_engine.provider)
-                            except Exception as ex:  # noqa: BLE001
-                                err = ex
-                                logger.info("Error in engine %s: %r", f_engine.name, ex)
+                    collect(done)
                     futures = {f: futures[f] for f in not_done}
 
                 if max_results and len(results_aggregator) >= max_results:
                     break
+
+            # `wait(..., return_when="FIRST_EXCEPTION")` can leave still-running futures behind
+            # when the loop has no more engines left to submit. The executor blocks until they
+            # finish anyway on __exit__, so collect their results instead of discarding them.
+            if futures:
+                done, _ = wait(futures)
+                collect(done, preserve_error=True)
 
         results = results_aggregator.extract_dicts()
         # Rank results
@@ -218,9 +233,14 @@ class DDGS:
         if results:
             return results[:max_results] if max_results else results
 
+        if isinstance(err, DDGSException):
+            raise err
         if "timed out" in f"{err}":
-            raise TimeoutException(err)
-        raise DDGSException(err or "No results found.")
+            raise TimeoutException(err) from err
+        if err is not None:
+            raise DDGSException(err) from err
+        msg = "No results found."
+        raise NoResultsException(msg)
 
     def text(self, query: str, **kwargs: Any) -> list[dict[str, Any]]:  # noqa: ANN401
         """Perform a text search."""
@@ -255,10 +275,6 @@ class DDGS:
         """
         client = HttpClient(proxy=self._proxy, timeout=self._timeout, verify=self._verify)
         resp = client.get(url)
-        if resp.status_code != 200:
-            msg = f"Failed to fetch {url}: HTTP {resp.status_code}"
-            raise DDGSException(msg)
-
         if fmt == "text_plain":
             content = resp.text_plain
         elif fmt == "text_rich":

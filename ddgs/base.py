@@ -65,9 +65,7 @@ class BaseSearchEngine(ABC, Generic[T]):
     def request(self, *args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
         """Make a request to the search engine."""
         resp = self.http_client.request(*args, **kwargs)
-        if resp.status_code == 200:
-            return resp.text
-        return None
+        return resp.text
 
     @cached_property
     def parser(self) -> LHTMLParser:

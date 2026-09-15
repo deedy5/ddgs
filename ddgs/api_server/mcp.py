@@ -3,17 +3,48 @@
 import asyncio
 import logging
 import os
-from typing import Any
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from ddgs import DDGS
+from ddgs.exceptions import DDGSException, HTTPStatusException, NoResultsException, RatelimitException, TimeoutException
 from ddgs.utils import _expand_proxy_tb_alias
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 logger = logging.getLogger(__name__)
 
 # Create MCP server with secure defaults
 mcp = MCPServer("ddgs-search")
+
+_T = TypeVar("_T")
+
+
+async def _run_ddgs(operation: "Callable[[], _T]") -> _T:
+    """Run blocking DDGS work and expose only safe, actionable expected errors."""
+    try:
+        return await asyncio.to_thread(operation)
+    except DDGSException as ex:
+        # Exception text may contain request URLs and proxy credentials.
+        if isinstance(ex, TimeoutException):
+            msg = "TimeoutException: DDGS request timed out. Retry later or check network/proxy configuration."
+        elif isinstance(ex, RatelimitException):
+            msg = "RatelimitException: Upstream rate limit reached. Wait before retrying and reduce request frequency."
+        elif isinstance(ex, HTTPStatusException):
+            msg = "HTTPStatusException: Upstream request failed. Retry later or check network/proxy configuration."
+            if type(ex.status_code) is int and 100 <= ex.status_code <= 599:
+                msg = (
+                    f"HTTPStatusException: Upstream returned HTTP {ex.status_code}. "
+                    "Retry later or check network/proxy configuration."
+                )
+        elif isinstance(ex, NoResultsException):
+            msg = "NoResultsException: No results found. Try a different query or search backend."
+        else:
+            msg = "DDGSException: Request failed. Retry later or check network/proxy configuration."
+        raise ToolError(msg) from ex
 
 
 @mcp.tool()
@@ -41,7 +72,7 @@ async def search_text(
         List of search results with title, href, and body
 
     """
-    results = await asyncio.to_thread(
+    results = await _run_ddgs(
         lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).text(
             query=query,
             region=region,
@@ -90,7 +121,7 @@ async def search_images(
         List of image search results with title, image URL, and source
 
     """
-    results = await asyncio.to_thread(
+    results = await _run_ddgs(
         lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).images(
             query=query,
             region=region,
@@ -134,7 +165,7 @@ async def search_news(
         List of news results with title, URL, source, and date
 
     """
-    results = await asyncio.to_thread(
+    results = await _run_ddgs(
         lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).news(
             query=query,
             region=region,
@@ -179,7 +210,7 @@ async def search_videos(
         List of video search results with title, URL, and metadata
 
     """
-    results = await asyncio.to_thread(
+    results = await _run_ddgs(
         lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).videos(
             query=query,
             region=region,
@@ -215,7 +246,7 @@ async def search_books(
         List of book search results with title, author, and metadata
 
     """
-    results = await asyncio.to_thread(
+    results = await _run_ddgs(
         lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).books(
             query=query,
             max_results=max_results,
@@ -238,7 +269,7 @@ async def extract_content(url: str, fmt: str = "text_markdown") -> dict[str, str
         Dictionary with url and content keys.
 
     """
-    return await asyncio.to_thread(
+    return await _run_ddgs(
         lambda: DDGS(proxy=_expand_proxy_tb_alias(os.environ.get("DDGS_PROXY"))).extract(
             url=url,
             fmt=fmt,

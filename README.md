@@ -84,6 +84,13 @@ ___
 
 ## MCP Server
 
+Search failures are returned as tool errors with a safe explanation (rate limited,
+timed out, unexpected HTTP status, no results, or an unclassified backend failure).
+Raw transport exceptions are not sent to the model because they can contain proxy
+credentials or private URLs. A tool error does not mean that the MCP connection
+failed. Do not retry HTTP 429 responses in a tight loop; wait before retrying or
+choose another supported backend.
+
 - **Install**
 ```bash
 pip install -U ddgs[mcp]
@@ -124,6 +131,16 @@ For MCP clients like Cursor or Claude Desktop:
 ___
 
 ## Engines
+
+Searches retain successful results even when another engine fails. If no engine
+returns results, the last collected error is raised; collecting a pending failure
+at shutdown does not replace an already collected error. `DDGSException`
+subclasses are preserved, including `RatelimitException` (HTTP 429),
+`TimeoutException`, and `HTTPStatusException` (with a `status_code` attribute).
+`NoResultsException` means the engines returned no results without reporting an
+error. A non-200 response is not treated as an empty search result, including
+HTTP 202 challenge pages. An HTTP 200 page containing a CAPTCHA or an unrecognized
+layout may still produce no results; this is not proof that no matching pages exist.
 
 | DDGS function | Available backends |
 | --------------|:-------------------|
