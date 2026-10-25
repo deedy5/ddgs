@@ -141,9 +141,7 @@ class DDGS:
         region: str = "us-en",
         safesearch: str = "moderate",
         timelimit: str | None = None,
-        max_results: int | None = 10,
         page: int = 1,
-        backend: str = "auto",
         **kwargs: str,
     ) -> list[dict[str, Any]]:
         """Perform a search across engines in the given category.
@@ -169,12 +167,14 @@ class DDGS:
             msg = "query is mandatory."
             raise DDGSException(msg)
 
+        backend = kwargs.get("backend", "auto")
         engines = self._get_engines(category, backend)
         len_unique_providers = len({engine.provider for engine in engines})
         seen_providers: set[str] = set()
 
         # Perform search
         results_aggregator: ResultsAggregator[set[str]] = ResultsAggregator({"href", "image", "url", "embed_url"})
+        max_results = int(kwargs.get("max_results", 0))
         max_workers = min(len_unique_providers, ceil(max_results / 10) + 1) if max_results else len_unique_providers
         if DDGS.threads:
             max_workers = min(max_workers, DDGS.threads)

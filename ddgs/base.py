@@ -110,14 +110,18 @@ class BaseSearchEngine(ABC, Generic[T]):
         **kwargs: str,
     ) -> list[T] | None:
         """Search the engine."""
-        payload = self.build_payload(
-            query=query, region=region, safesearch=safesearch, timelimit=timelimit, page=page, **kwargs
-        )
-        if self.search_method == "GET":
-            html_text = self.request(self.search_method, self.search_url, params=payload)
-        else:
-            html_text = self.request(self.search_method, self.search_url, data=payload)
-        if not html_text:
-            return None
-        results = self.extract_results(html_text)
+        max_results = int(kwargs.get("max_results", 10))
+        results = list()
+        while len(results) <= max_results:
+            payload = self.build_payload(
+                query=query, region=region, safesearch=safesearch, timelimit=timelimit, page=page, **kwargs
+            )
+            if self.search_method == "GET":
+                html_text = self.request(self.search_method, self.search_url, params=payload)
+            else:
+                html_text = self.request(self.search_method, self.search_url, data=payload)
+            if not html_text:
+                return None
+            page += 1
+            results += self.extract_results(html_text)
         return self.post_extract_results(results)
