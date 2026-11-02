@@ -9,6 +9,7 @@ from typing import Any, ClassVar, Generic, Literal, TypeVar
 from lxml import html
 from lxml.etree import HTMLParser as LHTMLParser
 
+from .exceptions import RatelimitException
 from .http_client import HttpClient
 from .results import BooksResult, ImagesResult, NewsResult, TextResult, VideosResult
 
@@ -65,6 +66,9 @@ class BaseSearchEngine(ABC, Generic[T]):
     def request(self, *args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
         """Make a request to the search engine."""
         resp = self.http_client.request(*args, **kwargs)
+        if resp.status_code == 429:
+            msg = "Rate limit exceeded."
+            raise RatelimitException(msg)
         if resp.status_code == 200:
             return resp.text
         return None

@@ -10,7 +10,7 @@ from typing import Any, ClassVar
 
 from .base import BaseSearchEngine
 from .engines import ENGINES
-from .exceptions import DDGSException, TimeoutException
+from .exceptions import DDGSException, RatelimitException, TimeoutException
 from .http_client import HttpClient
 from .results import ResultsAggregator
 from .similarity import SimpleFilterRanker
@@ -203,6 +203,8 @@ class DDGS:
                                 if r := f.result():
                                     results_aggregator.extend(r)
                                     seen_providers.add(f_engine.provider)
+                            except RatelimitException:
+                                raise
                             except Exception as ex:  # noqa: BLE001
                                 err = ex
                                 logger.info("Error in engine %s: %r", f_engine.name, ex)
