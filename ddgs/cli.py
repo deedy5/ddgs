@@ -166,6 +166,13 @@ def cli() -> None:
 def safe_entry_point() -> None:
     """Run the CLI tool in try-except block to catch all exceptions."""
     logging.basicConfig(level=logging.WARNING)
+    # Fix Windows GBK encoding issues by setting stdout to UTF-8
+    if sys.platform == "win32" and hasattr(sys.stdout, "reconfigure"):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8")
+            sys.stderr.reconfigure(encoding="utf-8")
+        except Exception:  # noqa: BLE001
+            pass  # Fallback to original encoding if reconfigure fails
     try:
         cli()
     except Exception as ex:  # noqa: BLE001

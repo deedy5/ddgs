@@ -45,6 +45,12 @@ def test_books_command() -> None:
     assert "title" in result.output
 
 
+def test_extract_command() -> None:
+    result = runner.invoke(cli, ["extract", "-u", "https://www.technologyreview.com/2026/01/12/1130697/10-breakthrough-technologies-2026/"])
+    assert result.exit_code == 0
+    assert "Breakthrough" in result.output
+
+
 def test_text_workflow(tmp_path: Path) -> None:
     """Combined test for text search, save, and download functionality."""
     # Step 1: Get text results
