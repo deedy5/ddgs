@@ -217,6 +217,7 @@ def version() -> str:
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 @click.option("-nc", "--no-color", is_flag=True, default=False, help="disable color output")
+@click.option("--json", "as_json", is_flag=True, default=False, help="output results as JSON to stdout")
 def text(
     query: str,
     keywords: str | None,  # deprecated
@@ -234,6 +235,7 @@ def text(
     download: bool,
     verify: bool,
     no_color: bool,
+    as_json: bool,
 ) -> None:
     """CLI function to perform a DDGS text metasearch."""
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).text(
@@ -259,7 +261,9 @@ def text(
             verify=verify,
             pathname=download_directory,
         )
-    if not output and not download:
+    if as_json:
+        click.echo(json.dumps(data, ensure_ascii=False, indent=2))
+    elif not output and not download:
         _print_data(data, no_color=no_color)
 
 
@@ -316,6 +320,7 @@ def text(
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 @click.option("-nc", "--no-color", is_flag=True, default=False, help="disable color output")
+@click.option("--json", "as_json", is_flag=True, default=False, help="output results as JSON to stdout")
 def images(
     query: str,
     keywords: str | None,  # deprecated
@@ -338,6 +343,7 @@ def images(
     download: bool,
     verify: bool,
     no_color: bool,
+    as_json: bool,
 ) -> None:
     """CLI function to perform a DDGS images metasearch."""
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).images(
@@ -368,7 +374,9 @@ def images(
             verify=verify,
             pathname=download_directory,
         )
-    if not output and not download:
+    if as_json:
+        click.echo(json.dumps(data, ensure_ascii=False, indent=2))
+    elif not output and not download:
         _print_data(data, no_color=no_color)
 
 
@@ -395,6 +403,7 @@ def images(
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 @click.option("-nc", "--no-color", is_flag=True, default=False, help="disable color output")
+@click.option("--json", "as_json", is_flag=True, default=False, help="output results as JSON to stdout")
 def videos(
     query: str,
     keywords: str | None,  # deprecated
@@ -412,6 +421,7 @@ def videos(
     *,
     verify: bool,
     no_color: bool,
+    as_json: bool,
 ) -> None:
     """CLI function to perform a DDGS videos metasearch."""
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).videos(
@@ -430,7 +440,9 @@ def videos(
     query = _sanitize_query(keywords or query)
     if output:
         _save_data(query, data, function_name="videos", filename=output)
-    else:
+    if as_json:
+        click.echo(json.dumps(data, ensure_ascii=False, indent=2))
+    elif not output:
         _print_data(data, no_color=no_color)
 
 
@@ -454,6 +466,7 @@ def videos(
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 @click.option("-nc", "--no-color", is_flag=True, default=False, help="disable color output")
+@click.option("--json", "as_json", is_flag=True, default=False, help="output results as JSON to stdout")
 def news(
     query: str,
     keywords: str | None,  # deprecated
@@ -468,6 +481,7 @@ def news(
     *,
     verify: bool,
     no_color: bool,
+    as_json: bool,
 ) -> None:
     """CLI function to perform a DDGS news metasearch."""
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).news(
@@ -483,7 +497,9 @@ def news(
     query = _sanitize_query(keywords or query)
     if output:
         _save_data(query, data, function_name="news", filename=output)
-    else:
+    if as_json:
+        click.echo(json.dumps(data, ensure_ascii=False, indent=2))
+    elif not output:
         _print_data(data, no_color=no_color)
 
 
@@ -504,6 +520,7 @@ def news(
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 @click.option("-nc", "--no-color", is_flag=True, default=False, help="disable color output")
+@click.option("--json", "as_json", is_flag=True, default=False, help="output results as JSON to stdout")
 def books(
     query: str,
     keywords: str | None,  # deprecated
@@ -515,6 +532,7 @@ def books(
     *,
     verify: bool,
     no_color: bool,
+    as_json: bool,
 ) -> None:
     """CLI function to perform a DDGS books metasearch."""
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).books(
@@ -526,7 +544,9 @@ def books(
     )
     if output:
         _save_data(query, data, function_name="books", filename=output)
-    else:
+    if as_json:
+        click.echo(json.dumps(data, ensure_ascii=False, indent=2))
+    elif not output:
         _print_data(data, no_color=no_color)
 
 
@@ -543,6 +563,8 @@ def books(
 @click.option("-o", "--output", help="json or filename.json (save the results to a file)")
 @click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
+@click.option("-nc", "--no-color", is_flag=True, default=False, help="disable color output")
+@click.option("--json", "as_json", is_flag=True, default=False, help="output results as JSON to stdout")
 def extract(
     url: str,
     fmt: str,
@@ -550,12 +572,17 @@ def extract(
     proxy: str | None,
     *,
     verify: bool,
+    no_color: bool,
+    as_json: bool,
 ) -> None:
     """CLI function to extract content from a URL."""
     data = DDGS(proxy=_expand_proxy_tb_alias(proxy), verify=verify).extract(url=url, fmt=fmt)
     if output:
         str_data: dict[str, str] = {k: v.decode() if isinstance(v, bytes) else v for k, v in data.items()}
         _save_data(_sanitize_query(url), [str_data], "extract", filename=output)
+    elif as_json:
+        str_data = {k: v.decode() if isinstance(v, bytes) else v for k, v in data.items()}
+        click.echo(json.dumps([str_data], ensure_ascii=False, indent=2))
     else:
         click.echo(f"URL: {url}\n")
         content = data["content"]

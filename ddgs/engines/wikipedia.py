@@ -10,6 +10,10 @@ from ddgs.results import TextResult
 
 logger = logging.getLogger(__name__)
 
+# DuckDuckGo uses some region codes (e.g. "wt" for "worldwide") that are not
+# valid Wikipedia language codes.  Fall back to English when we encounter one.
+_INVALID_LANG_CODES: frozenset[str] = frozenset({"wt"})
+
 
 class Wikipedia(BaseSearchEngine[TextResult]):
     """Wikipedia text search engine."""
@@ -33,6 +37,9 @@ class Wikipedia(BaseSearchEngine[TextResult]):
     ) -> dict[str, Any]:
         """Build a payload for the search request."""
         _country, lang = region.lower().split("-")
+        if lang in _INVALID_LANG_CODES:
+            logger.debug("Region %s maps to invalid Wikipedia lang %r, falling back to 'en'", region, lang)
+            lang = "en"
         encoded_query = quote(query)
         self.search_url = (
             f"https://{lang}.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search={encoded_query}"
