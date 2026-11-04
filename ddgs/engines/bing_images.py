@@ -23,7 +23,7 @@ class BingImages(BaseSearchEngine[ImagesResult]):
         self,
         query: str,
         region: str,  # noqa: ARG002
-        safesearch: str,  # noqa: ARG002
+        safesearch: str,
         timelimit: str | None,
         page: int = 1,
         **kwargs: str,
@@ -32,6 +32,7 @@ class BingImages(BaseSearchEngine[ImagesResult]):
         count = max(int(kwargs.get("max_results", 10)), 35)
         payload = {
             "q": query,
+            "adlt": {"on": "strict", "moderate": "moderate", "off": "off"}[safesearch.lower()],
             "async": "1",
             "first": str((page - 1) * count + 1),
             "count": str(count),
