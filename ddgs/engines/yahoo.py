@@ -25,11 +25,24 @@ class Yahoo(BaseSearchEngine[TextResult]):
     search_url = "https://search.yahoo.com/search"
     search_method = "GET"
 
-    items_xpath = "//div[contains(@class, 'relsrch')]"
+    # Support Yahoo's legacy and current search-result layouts.
+    items_xpath = (
+        "//div[contains(@class, 'relsrch')]"
+        " | //section[contains(concat(' ', normalize-space(@class), ' '), ' algo-sr ')]"
+    )
     elements_xpath: ClassVar[Mapping[str, str]] = {
-        "title": ".//div[contains(@class, 'Title')]//h3//text()",
-        "href": ".//div[contains(@class, 'Title')]//a/@href",
-        "body": ".//div[contains(@class, 'Text')]//text()",
+        "title": (
+            ".//div[contains(concat(' ', normalize-space(@class), ' '), ' Title ')]//h3//text()"
+            " | (.//h3[contains(@class, 'title')]/a[contains(@class, 's-title')])[1]/text()"
+        ),
+        "href": (
+            "(.//div[contains(@class, 'Title')]//a"
+            " | .//h3[contains(@class, 'title')]/a[contains(@class, 's-title')])[1]/@href"
+        ),
+        "body": (
+            "(.//div[contains(@class, 'Text')]"
+            " | .//div[contains(@class, 'compText')]//p[contains(@class, 's-desc')])[1]//text()"
+        ),
     }
 
     def build_payload(
