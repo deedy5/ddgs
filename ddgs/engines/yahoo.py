@@ -6,6 +6,7 @@ from typing import Any, ClassVar
 from urllib.parse import unquote_plus
 
 from ddgs.base import BaseSearchEngine
+from ddgs.exceptions import DDGSException
 from ddgs.results import TextResult
 
 
@@ -44,6 +45,23 @@ class Yahoo(BaseSearchEngine[TextResult]):
             " | .//div[contains(@class, 'compText')]//p[contains(@class, 's-desc')])[1]//text()"
         ),
     }
+
+    def pre_process_html(self, html_text: str) -> str:
+        """Identify Yahoo's explicit temporary search failure response."""
+        if "zrp_yst" not in html_text:
+            return html_text
+
+        tree = self.extract_tree(html_text)
+        messages = tree.xpath(
+            "//div[contains(concat(' ', normalize-space(@class), ' '), ' zrp_yst ')]//h2[contains(@class, 'zrpmsg')]"
+        )
+
+        for message in messages:
+            if "We had temporary problems searching for web pages." in " ".join(message.itertext()):
+                msg = "Yahoo reported a temporary search failure"
+                raise DDGSException(msg)
+
+        return html_text
 
     def build_payload(
         self,

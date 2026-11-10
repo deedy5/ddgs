@@ -3,6 +3,7 @@
 import pytest
 
 from ddgs.engines.yahoo import Yahoo
+from ddgs.exceptions import DDGSException
 
 
 @pytest.fixture
@@ -71,3 +72,29 @@ def test_yahoo_legacy_layout(yahoo_engine: Yahoo) -> None:
     assert results[0].title == "Legacy Article"
     assert results[0].href == "https://example.com/legacy"
     assert results[0].body == "Legacy description."
+
+
+def test_yahoo_temporary_search_failure() -> None:
+    """Yahoo's temporary-error page must not be mistaken for no results."""
+    html = """
+    <html>
+      <section id="main-algo">
+        <div class="msg zrp_yst">
+          <h2 class="msg zrpmsg">
+            We had temporary problems searching for web pages.
+            <a href="/search">Search again</a>
+          </h2>
+        </div>
+      </section>
+    </html>
+    """
+
+    with pytest.raises(DDGSException, match="Yahoo reported a temporary search failure"):
+        Yahoo().extract_results(html)
+
+
+def test_yahoo_empty_search_is_not_temporary_failure() -> None:
+    """An ordinary empty page must not trigger a temporary-error exception."""
+    html = "<html><body><section id='main-algo'></section></body></html>"
+
+    assert Yahoo().extract_results(html) == []
