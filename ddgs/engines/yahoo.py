@@ -6,6 +6,7 @@ from typing import Any, ClassVar
 from urllib.parse import unquote_plus
 
 from ddgs.base import BaseSearchEngine
+from ddgs.exceptions import DDGSException
 from ddgs.results import TextResult
 
 
@@ -25,12 +26,42 @@ class Yahoo(BaseSearchEngine[TextResult]):
     search_url = "https://search.yahoo.com/search"
     search_method = "GET"
 
-    items_xpath = "//div[contains(@class, 'relsrch')]"
+    # Support Yahoo's legacy and current search-result layouts.
+    items_xpath = (
+        "//div[contains(@class, 'relsrch')]"
+        " | //section[contains(concat(' ', normalize-space(@class), ' '), ' algo-sr ')]"
+    )
     elements_xpath: ClassVar[Mapping[str, str]] = {
-        "title": ".//div[contains(@class, 'Title')]//h3//text()",
-        "href": ".//div[contains(@class, 'Title')]//a/@href",
-        "body": ".//div[contains(@class, 'Text')]//text()",
+        "title": (
+            ".//div[contains(concat(' ', normalize-space(@class), ' '), ' Title ')]//h3//text()"
+            " | (.//h3[contains(@class, 'title')]/a[contains(@class, 's-title')])[1]/text()"
+        ),
+        "href": (
+            "(.//div[contains(@class, 'Title')]//a"
+            " | .//h3[contains(@class, 'title')]/a[contains(@class, 's-title')])[1]/@href"
+        ),
+        "body": (
+            "(.//div[contains(@class, 'Text')]"
+            " | .//div[contains(@class, 'compText')]//p[contains(@class, 's-desc')])[1]//text()"
+        ),
     }
+
+    def pre_process_html(self, html_text: str) -> str:
+        """Identify Yahoo's explicit temporary search failure response."""
+        if "zrp_yst" not in html_text:
+            return html_text
+
+        tree = self.extract_tree(html_text)
+        messages = tree.xpath(
+            "//div[contains(concat(' ', normalize-space(@class), ' '), ' zrp_yst ')]//h2[contains(@class, 'zrpmsg')]"
+        )
+
+        for message in messages:
+            if "We had temporary problems searching for web pages." in " ".join(message.itertext()):
+                msg = "Yahoo reported a temporary search failure"
+                raise DDGSException(msg)
+
+        return html_text
 
     def build_payload(
         self,
