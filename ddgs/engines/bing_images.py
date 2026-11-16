@@ -38,7 +38,7 @@ class BingImages(BaseSearchEngine[ImagesResult]):
         }
         if timelimit:
             payload["qft"] = (
-                f"filterui:age-lt{ ({'day': 1440, 'week': 10080, 'month': 44640, 'year': 525600}[timelimit]) }"
+                f"filterui:age-lt{ ({'d': 1440, 'w': 10080, 'm': 44640, 'y': 525600}[timelimit]) }"
             )
         return payload
 
